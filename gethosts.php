@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 const ENDPOINT = 'https://crm.megaphonetech.com/rest/';
@@ -58,5 +59,5 @@ $creds = [
 $result = post($headers, 'user/login.json', $creds);
 $headers[] = "Cookie: $result->session_name=$result->sessid";
 
-$result =  get($headers, 'node?parameters[type]=server', NULL);
+$result =  get($headers, 'views/server_list?display_id=services_1', NULL);
 print_r($result);
