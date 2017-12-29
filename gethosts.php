@@ -42,6 +42,7 @@ function buildServerList($view) {
       $inventory['_meta']['hostvars'][$server->fqdn]['ansible_user'] = $server->username;
     }
   }
+  //print_r($inventory);
   return json_encode($inventory);
 }
 
@@ -67,11 +68,6 @@ function post($curlHeaders, $operation, $postFields = NULL) {
   $curl = curl_init();
   curl_setopt_array($curl, $curlOptions);
   $result = curl_exec($curl);
-  // DEBUG shit
-  if ($operation == 'node') {
-    print_r($curlOptions[CURLOPT_HTTPHEADER]);
-    print_r(curl_getinfo($curl));
-  }
   curl_close($curl);
   return json_decode($result);
 }
