@@ -13,17 +13,14 @@ function run($argv) {
   }
   switch ($argv[1]) {
     case '--list':
-      $headers = login();
-      // Pull the view that shows the list of Ansible-enabled servers from Drupal.
-      $result = get($headers, 'views/server_list?display_id=services_1', NULL);
-      $inventory = buildServerList($result);
-      echo $inventory;
-      break;
-
     case '--host':
       $headers = login();
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
-      $result = get($headers, "views/server_list?display_id=services_1&title=$argv[2]", NULL);
+      $resource = 'views/server_list?display_id=services_1';
+      if ($argv[1] == '--host' && $argv[2]) {
+        $resource .= "&title=$argv[2]";
+      }
+      $result = get($headers, $resource, NULL);
       $inventory = buildServerList($result);
       echo $inventory;
       break;
