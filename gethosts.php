@@ -60,4 +60,26 @@ $result = post($headers, 'user/login.json', $creds);
 $headers[] = "Cookie: $result->session_name=$result->sessid";
 
 $result =  get($headers, 'views/server_list?display_id=services_1', NULL);
-print_r($result);
+//print_r($result);
+
+$inventory = buildServerList($result);
+echo json_encode($inventory);
+/*
+ * Accepts an array from Drupal Services Views, outputs an Ansible-compatible host list.
+ *
+ * @param array $view
+ *   The array that holds all the db ids.
+ *
+ * @return CRM_Contribute_BAO_Contribution|\CRM_Core_Error
+ */
+
+function buildServerList($view) {
+  $inventory['hosts'] = [];
+  foreach ($view as $server) {
+    $inventory['hosts'][] = $server->fqdn;
+    if ($server->username) {
+      $inventory['_meta']['hostvars'][$server->fqdn]['ansible_user'] = $server->username;
+    }
+  }
+  return $inventory;
+}
