@@ -1,0 +1,6 @@
+---
+- hosts: vps
+
+  roles:
+    - common
+    - megaphoneusers

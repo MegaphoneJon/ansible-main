@@ -1,0 +1,7 @@
+# Palante members should have full access to all servers
+- name: Add Megaphone keys to "{{ sshuser }}"
+  authorized_key: user="{{ sshuser }}" key="{{ item }}"
+  with_file:
+    - files/jon_id_rsa.pub
+    - files/joseph_id_rsa.pub
+  tags: [configuration,users,keys]
