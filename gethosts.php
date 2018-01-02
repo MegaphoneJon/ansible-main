@@ -43,14 +43,13 @@ run($argv);
  * @return string $inventory This is a JSON-encoded inventory file in the format Ansible expects.
  */
 function buildServerList($view) {
-  $inventory['hosts'] = [];
+  $inventory[] = [];
   foreach ($view as $server) {
-    $inventory['hosts'][] = $server->fqdn;
+    $inventory[$server->group][] = $server->fqdn;
     if ($server->username) {
       $inventory['_meta']['hostvars'][$server->fqdn]['ansible_user'] = $server->username;
     }
   }
-  //print_r($inventory);
   return json_encode($inventory);
 }
 
