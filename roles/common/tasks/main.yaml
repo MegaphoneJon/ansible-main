@@ -1,7 +1,34 @@
-# Palante members should have full access to all servers
+# Add Megaphone key to root/Ansible user on all servers
 - name: Add Megaphone keys to "{{ sshuser }}"
   authorized_key: user="{{ sshuser }}" key="{{ item }}"
   with_file:
     - files/jon_id_rsa.pub
     - files/joseph_id_rsa.pub
   tags: [configuration,users,keys]
+
+- name: Install common packages
+  apt: name="{{ item }}" state=present update_cache=yes
+  with_items:
+    - apt-show-versions
+    - bzip2
+    - cron-apt
+    - fail2ban
+    - git
+    - htop
+    - iotop
+    - iptables-persistent
+    - mtr-tiny
+    - ncdu
+    - nmap
+    - ntp
+    - screen
+    - sudo
+    - sysstat
+    - tree
+    - unzip
+    - vim
+    - zip
+    - zsh
+   
+  tags: [packages, configuration]
+#  when: ansible_os_family =="Debian"

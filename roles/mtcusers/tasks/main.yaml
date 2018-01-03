@@ -1,0 +1,39 @@
+---
+
+- name: Create sudo group
+  group: name=sudo state=present
+
+- name: Add user {{ item.key }}
+  user: name="{{ item.value.name }}" shell="{{ item.value.shell }}" groups="{{ item.value.groups }}" password="{{ item.value.password }}" update_password=on_create
+  with_dict: "{{ mtcusers }}"
+
+- name: Add authorized key
+  authorized_key:
+    user: "{{ item.0.name }}"
+    key: "{{ lookup('file', item.1) }}"
+  with_subelements:
+    - "{{ mtcusers }}"
+    - authorized
+
+- name: Add sudo group to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) ALL'
+
+- name: Add dotfiles
+  git: repo="{{ item.value.dotfiles }}"
+       dest=~/dotfiles
+       version=master
+  when: item.value.dotfiles is defined
+  become: yes
+  become_user: "{{ item.value.name }}"
+  with_dict: "{{ mtcusers }}"
+
+- name: Execute dotfile script
+  command: ~/dotfiles/makesymlinks.sh creates=~/dotfiles_old
+  when: item.value.dotfiles is defined
+  become: yes
+  become_user: "{{ item.value.name }}"
+  with_dict: "{{ mtcusers }}"
