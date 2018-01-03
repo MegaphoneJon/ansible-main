@@ -1,0 +1,66 @@
+---
+
+#install composer
+- name: Download composer
+  get_url:
+    url: https://getcomposer.org/installer
+    dest: /tmp/installer
+  tags: composer
+
+- name: Run composer installer
+  shell: cat /tmp/installer | php -- --install-dir=/usr/local/bin
+  args:
+    creates: /usr/local/bin/composer
+  tags: composer
+
+- name: Rename composer.phar to composer
+  shell: mv /usr/local/bin/composer.phar /usr/local/bin/composer
+  args:
+    creates: /usr/local/bin/composer
+  tags: composer
+
+- name: Make composer executable
+  file:
+    path: /usr/local/bin/composer
+    mode: a+x
+    state: file
+  tags: composer
+
+
+
+
+#installing all relevant drush versions!
+- name: Clone drush from Github
+  git:
+    repo=https://github.com/drush-ops/drush.git
+    dest="/usr/local/src/drush{{ item[0:1] }}"
+    version="{{ item }}"
+  register: drush_clone
+  with_items: "{{ drushversion }}"
+  tags: [drush,drupal]
+
+- name: Install Drush dependencies with composer
+  shell: >
+    /usr/local/bin/composer install --prefer-source --no-interaction
+    chdir="/usr/local/src/drush{{ item[0:1] }}"
+    creates="/usr/local/src/drush{{ item[0:1] }}/vendor/autoload.php"
+  with_items: "{{ drushversion  }}"
+  tags: [drush,drupal]
+
+- name: Link drush executable
+  file:
+    src: "/usr/local/src/drush{{ item[0:1] }}/drush"
+    dest: "/usr/bin/drush{{ item[0:1] }}"
+    state: link
+  with_items: "{{ drushversion  }}"
+  tags: [drush,drupal]
+
+- name: install Backdrop
+  git:
+    repo=https://github.com/backdrop-contrib/drush.git
+    dest="/usr/local/src/drush8/commands/backdrop"
+    version=1.x-0.x
+  when: backdrop
+  tags: [drush,backdrop]
+- name: copy drush Script
+  copy: src=files/drush dest=/usr/bin/drush mode=0755

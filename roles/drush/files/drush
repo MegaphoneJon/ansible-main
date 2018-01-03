@@ -1,0 +1,11 @@
+#!/bin/bash
+version=$(git config --get drush.version)
+if [ "$version" = '8' ];
+then
+    drush8 "$@"
+elif [ "$version" = '7' ];
+  then
+  drush7 "$@"
+else
+    drush7 "$@"
+fi
