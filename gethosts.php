@@ -46,8 +46,8 @@ function buildServerList($view) {
   $inventory[] = [];
   foreach ($view as $server) {
     $inventory[$server->group][] = $server->fqdn;
-    if ($server->username) {
-      $inventory['_meta']['hostvars'][$server->fqdn]['ansible_user'] = $server->username;
+    if ($server->ansible_user) {
+      $inventory['_meta']['hostvars'][$server->fqdn]['ansible_user'] = $server->ansible_user;
     }
   }
   return json_encode($inventory);
