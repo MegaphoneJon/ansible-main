@@ -50,7 +50,7 @@
 - name: Link drush executable
   file:
     src: "/usr/local/src/drush{{ item[0:1] }}/drush"
-    dest: "/usr/bin/drush{{ item[0:1] }}"
+    dest: "/usr/local/bin/drush{{ item[0:1] }}"
     state: link
   with_items: "{{ drushversion  }}"
   tags: [drush,drupal]
@@ -63,4 +63,4 @@
   when: backdrop
   tags: [drush,backdrop]
 - name: copy drush Script
-  copy: src=files/drush dest=/usr/bin/drush mode=0755
+  copy: src=files/drush dest=/usr/local/bin/drush mode=0755
