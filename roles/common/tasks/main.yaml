@@ -29,6 +29,7 @@
     - vim
     - zip
     - zsh
+    - silversearcher-ag
    
   tags: [packages, configuration]
 #  when: ansible_os_family =="Debian"
