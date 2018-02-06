@@ -1,4 +1,3 @@
-# sudo apt install python-netaddr
 # sudo pip2 install python-linode
 - name: Provision a Linode VM
   linode:
@@ -35,16 +34,9 @@
     body_format: json
   register: login
 
-- name: Show a node (test)
+- name: update the inventory node with linode ID and IP address
   uri:
-    url: "{{ inventory_rest_endpoint }}node/29"
-    headers:
-      Cookie: "{{ login.json.session_name }}={{login.json.sessid}}"
-  register: node
-
-- name: update a node (test)
-  uri:
-    url: "{{ inventory_rest_endpoint }}node/29.json"
+    url: "{{ inventory_rest_endpoint }}node/{{ nid }}.json"
     headers:
       X-CSRF-Token: "{{ login.json.token }}"
       Cookie: "{{ login.json.session_name }}={{login.json.sessid}}"
@@ -54,8 +46,8 @@
       field_ipv4_address:
         und:
           0:
-            end: "{{ linode.instance.ipv4 | ipaddr('address') | ipaddr('int') }}"
-            start: "{{ linode.instance.ipv4 | ipaddr('address') | ipaddr('int') }}"
+            end: "{{ linode.instance.ipv4 }}"
+            start: "{{ linode.instance.ipv4 }}"
       field_linode_id:
         und:
           0:
@@ -63,13 +55,5 @@
       field_notes:
         und:
           0:
-            value: "IP Address: {{ linode.instance.ipv4 | ipaddr('address') | ipaddr('int') }} IP: {{ linode.instance.ipv4 }}"
+            value: "IP: {{ linode.instance.ipv4 }}"
   register: debugstuff
-
-- name: show node
-  debug: var=node
-
-- name: show debugstuff
-  debug: var=debugstuff
-
-
