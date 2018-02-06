@@ -49,6 +49,7 @@ function buildServerList($view) {
     // Pull in all field values as Ansible variables.
     foreach ($server as $key => $value) {
       if ($value) {
+        $key = str_replace(' ', '_', $key);
         $inventory['_meta']['hostvars'][$server->fqdn][$key] = $value;
       }
     }
