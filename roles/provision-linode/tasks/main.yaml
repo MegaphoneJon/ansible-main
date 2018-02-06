@@ -1,0 +1,75 @@
+# sudo apt install python-netaddr
+# sudo pip2 install python-linode
+- name: Provision a Linode VM
+  linode:
+    api_key: "{{ api_key }}"
+    name: "{{ inventory_hostname_short }}"
+    linode_id: "{{ linode_id }}"
+    # 1GB VM
+    plan: 1
+    # Newark, NJ
+    datacenter: 6
+    # Debian 9
+    distribution: 158
+    swap: 256
+    # This should use your primary public key.  Others will be added post-provision.
+    ssh_pub_key: "{{ lookup('file', 'files/id_rsa.pub') }}"
+    wait: yes
+    wait_timeout: 600
+    state: present
+  when: hosting_company == "Linode"
+  register: linode
+
+- name: show Linode debug info
+  debug: var=linode
+
+- name: Login to Drupal Inventory
+  uri:
+    url: "{{ inventory_rest_endpoint }}user/login.json"
+    headers:
+      X-CSRF-Token: token.json.token
+    body:
+      username: "{{ inventory_username }}"
+      password: "{{ inventory_password }}"
+    method: POST
+    body_format: json
+  register: login
+
+- name: Show a node (test)
+  uri:
+    url: "{{ inventory_rest_endpoint }}node/29"
+    headers:
+      Cookie: "{{ login.json.session_name }}={{login.json.sessid}}"
+  register: node
+
+- name: update a node (test)
+  uri:
+    url: "{{ inventory_rest_endpoint }}node/29.json"
+    headers:
+      X-CSRF-Token: "{{ login.json.token }}"
+      Cookie: "{{ login.json.session_name }}={{login.json.sessid}}"
+    method: PUT
+    body_format: json
+    body:
+      field_ipv4_address:
+        und:
+          0:
+            end: "{{ linode.instance.ipv4 | ipaddr('address') | ipaddr('int') }}"
+            start: "{{ linode.instance.ipv4 | ipaddr('address') | ipaddr('int') }}"
+      field_linode_id:
+        und:
+          0:
+            value: "{{ linode.instance.id }}"
+      field_notes:
+        und:
+          0:
+            value: "IP Address: {{ linode.instance.ipv4 | ipaddr('address') | ipaddr('int') }} IP: {{ linode.instance.ipv4 }}"
+  register: debugstuff
+
+- name: show node
+  debug: var=node
+
+- name: show debugstuff
+  debug: var=debugstuff
+
+
