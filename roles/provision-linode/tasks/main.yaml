@@ -4,8 +4,7 @@
     api_key: "{{ api_key }}"
     name: "{{ inventory_hostname_short }}"
     linode_id: "{{ linode_id }}"
-    # 1GB VM
-    plan: 1
+    plan: "{{ linode_plan }}"
     # Newark, NJ
     datacenter: 6
     # Debian 9
@@ -16,7 +15,7 @@
     wait: yes
     wait_timeout: 600
     state: present
-  when: hosting_company == "Linode"
+  when: hosting_company == "Linode" and linode_plan > 0
   register: linode
 
 - name: show Linode debug info
@@ -32,6 +31,7 @@
       password: "{{ inventory_password }}"
     method: POST
     body_format: json
+  when: hosting_company == "Linode" and linode_plan > 0
   register: login
 
 - name: update the inventory node with linode ID and IP address
@@ -56,4 +56,5 @@
         und:
           0:
             value: "IP: {{ linode.instance.ipv4 }}"
+  when: hosting_company == "Linode" and linode_plan > 0
   register: debugstuff
