@@ -1,0 +1,12 @@
+---
+- name: Provision VMs
+  hosts: testgroup
+  gather_facts: no
+  connection: local
+
+  roles:
+    - provision-linode
+   # - common
+   # - mtcusers
+   # - drush
+   # - icinga2
