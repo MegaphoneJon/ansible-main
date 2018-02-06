@@ -57,15 +57,6 @@ function buildServerList($view) {
   return json_encode($inventory);
 }
 
-/**
- * Get the CSRF header.
- * @return array the curl options for this transaction.
- */
-function post_csrf_header() {
-  $csrfToken = post([], 'user/token.json', NULL);
-  return 'X-CSRF-Token: ' . $csrfToken->token;
-}
-
 function post($curlHeaders, $operation, $postFields = NULL) {
   $curlHeaders[] = 'Content-Type: application/json';
   $curlOptions = [
@@ -100,14 +91,12 @@ function get($curlHeaders, $operation, $body = NULL) {
  * @return array $headers The necessary headers to perform further POST/GET actions.
  */
 function login() {
-  // This all is the CSRF token + login process
-  $headers[] = post_csrf_header();
   $creds = [
     'username' => USERNAME,
     'password' => PASSWORD,
   ];
 
-  $result = post($headers, 'user/login.json', $creds);
+  $result = post(NULL, 'user/login.json', $creds);
   $headers[] = "Cookie: $result->session_name=$result->sessid";
   return $headers;
 }
