@@ -3,7 +3,6 @@
 
 const ENDPOINT = 'https://crm.megaphonetech.com/rest/';
 const USERNAME = 'restuser';
-const PASSWORD = 'dbSfzFqvHXDHBhCy1wI4OO1dKhH2ResX';
 
 function run($argv) {
   if (empty($argv[1])) {
@@ -14,7 +13,11 @@ function run($argv) {
   switch ($argv[1]) {
     case '--list':
     case '--host':
-      $headers = login();
+      # Get password from the "pass" utility.
+      exec('pass ls megaphone/crm/restpassword', $password);
+      $password = $password[0];
+      print_r($password);
+      $headers = login($password);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
       if ($argv[1] == '--host' && $argv[2]) {
@@ -90,10 +93,10 @@ function get($curlHeaders, $operation, $body = NULL) {
  * Handle login (including getting a CSRF header)
  * @return array $headers The necessary headers to perform further POST/GET actions.
  */
-function login() {
+function login($password) {
   $creds = [
     'username' => USERNAME,
-    'password' => PASSWORD,
+    'password' => $password,
   ];
 
   $result = post(NULL, 'user/login.json', $creds);
