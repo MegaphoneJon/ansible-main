@@ -1,7 +1,6 @@
 #defaults for crm.megaphonetech.com REST API
 inventory_rest_endpoint: 'https://crm.megaphonetech.com/rest/'
 inventory_username: 'restuser'
-inventory_password: 'dbSfzFqvHXDHBhCy1wI4OO1dKhH2ResX'
 #Linode
-api_key: 6ZGB5my7ldwr9JCU6iGExwgRnTXqhlnhkxnylvTh3MeUDDYsphbDG3zt37ixpwvc
 linode_plan: 0
+linode_id: 0
