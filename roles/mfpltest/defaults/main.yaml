@@ -1,0 +1,5 @@
+api_user: megaphone-ansible
+mfpl_api_endpoint: https://members.mayfirst.org/cp/api.php
+# Hosting Order ID (megaphonetech.com)
+hosting_order_id: 1003514
+test_dns: 1.2.3.4
