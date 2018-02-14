@@ -16,7 +16,6 @@ function run($argv) {
       # Get password from the "pass" utility.
       exec('pass ls megaphone/crm/restpassword', $password);
       $password = $password[0];
-      print_r($password);
       $headers = login($password);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
