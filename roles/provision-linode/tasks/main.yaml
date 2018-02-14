@@ -1,9 +1,4 @@
 # sudo pip2 install python-linode
-- name: debug
-  debug:
-    msg: "{{ lookup('passwordstore', 'megaphone/crm/restpassword') }}"
-  tags: test
-
 - name: Provision a Linode VM
   linode:
     api_key: "{{ lookup('passwordstore', 'linode/apikey') }}"
@@ -26,6 +21,7 @@
 - name: show Linode debug info
   debug: var=linode
 
+# Next two steps update crm.megaphonetech.com/server-list
 - name: Login to Drupal Inventory
   uri:
     url: "{{ inventory_rest_endpoint }}user/login.json"
@@ -38,7 +34,6 @@
     body_format: json
   when: hosting_company == "Linode" and linode_plan > 0
   register: login
-  tags: test
 
 - name: update the inventory node with linode ID and IP address
   uri:
@@ -58,9 +53,15 @@
         und:
           0:
             value: "{{ linode.instance.id }}"
-      field_notes:
-        und:
-          0:
-            value: "IP: {{ linode.instance.ipv4 }}"
   when: hosting_company == "Linode" and linode_plan > 0
   register: debugstuff
+
+# Next two steps add DNS
+- name: Add new host to in-memory inventory
+  add_host:
+    hostname: "{{ linode.instance.ipv4 }}"
+    groupname: "linode"
+
+- name: Update MFPL DNS
+  local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ inventory_hostname }}" "{{ linode.instance.ipv4 }}"
+  with_items: groups['linode']
