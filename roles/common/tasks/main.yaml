@@ -13,15 +13,18 @@
     path: /etc/hosts
     regexp: '^127\.0\.1\.1'
     line: "127.0.1.1 {{ inventory_hostname }} {{ hostname }}"
-  tags: [configuration]
+  tags: [hostname, configuration]
 
 - name: Set hostname
   hostname:
     name: "{{ hostname }}"
-  tags: [configuration]
+  tags: [hostname, configuration]
 
 - name: Install common packages
-  apt: name="{{ item }}" state=present update_cache=yes
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
   with_items:
     - aptitude
     - apt-show-versions
@@ -47,4 +50,11 @@
     - silversearcher-ag
    
   tags: [packages, configuration]
-#  when: ansible_os_family =="Debian"
+  when: ansible_os_family =="Debian"
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+  notify:
+    - restart crond
+  tags: [timezone, configuration]
