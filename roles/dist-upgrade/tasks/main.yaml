@@ -1,6 +1,0 @@
-#apt-get update && apt-get dist-upgrade
-- name: Update all packages to the latest version
-  connection: ssh
-  apt:
-    upgrade: dist
-    update_cache: yes
