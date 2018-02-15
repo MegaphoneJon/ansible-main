@@ -1,0 +1,3 @@
+# This is for gathering facts AFTER provisioning takes place
+- name: Gather facts
+  setup:
