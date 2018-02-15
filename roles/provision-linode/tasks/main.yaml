@@ -61,6 +61,7 @@
   add_host:
     hostname: "{{ linode.instance.ipv4 }}"
     groupname: "linode"
+    ansible_user: root
   when: linode.instance is defined
 
 - name: Update MFPL DNS
