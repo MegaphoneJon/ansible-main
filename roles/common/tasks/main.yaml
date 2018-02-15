@@ -1,14 +1,29 @@
 # Add Megaphone key to root/Ansible user on all servers
 - name: Add Megaphone keys to "{{ sshuser }}"
-  authorized_key: user="{{ sshuser }}" key="{{ item }}"
+  authorized_key:
+    user: "{{ sshuser }}"
+    key: "{{ item }}"
   with_file:
     - files/jon_id_rsa.pub
     - files/joseph_id_rsa.pub
   tags: [configuration,users,keys]
 
+- name: Configure the hosts file
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "127.0.1.1 {{ inventory_hostname }} {{ hostname }}"
+  tags: [configuration]
+
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
+  tags: [configuration]
+
 - name: Install common packages
   apt: name="{{ item }}" state=present update_cache=yes
   with_items:
+    - aptitude
     - apt-show-versions
     - bzip2
     - cron-apt
