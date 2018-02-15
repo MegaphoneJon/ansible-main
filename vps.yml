@@ -2,6 +2,7 @@
 # This provisions any VPSes that were defined but not built in server-list
 - import_playbook: provision.yml
 - hosts: vps
+  become: yes
 
   roles:
     - common

@@ -1,0 +1,28 @@
+- name: Add an Ansible user
+  connection: ssh
+  user: 
+    name: "{{ ansible_user_2 }}"
+  tags: bootstrap
+
+- name: Add Ansible user to sudo
+  connection: ssh
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: "^{{ ansible_user_2 }}"
+    line: "{{ ansible_user_2 }} ALL=(ALL) NOPASSWD: ALL"
+    validate: 'visudo -cf %s'
+  tags: bootstrap
+
+- name: Add authorized keys to Ansible user
+  connection: ssh
+  authorized_key:
+    user: "{{ ansible_user_2 }}"
+    key: "{{ lookup('file', 'files/megaphonetech.pub') }}"
+
+#apt-get update && apt-get dist-upgrade
+- name: Update all packages to the latest version
+  connection: ssh
+  apt:
+    upgrade: dist
+    update_cache: yes

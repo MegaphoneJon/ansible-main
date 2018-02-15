@@ -1,9 +1,11 @@
 ---
 - name: Provision VMs
   hosts: all
+  vars:
+    ansible_user: root
   gather_facts: no
   connection: local
 
   roles:
     - provision-linode
-    - dist-upgrade
+    - bootstrap
