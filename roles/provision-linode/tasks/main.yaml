@@ -61,7 +61,9 @@
   add_host:
     hostname: "{{ linode.instance.ipv4 }}"
     groupname: "linode"
+  when: linode.instance is defined
 
 - name: Update MFPL DNS
   local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ inventory_hostname }}" "{{ linode.instance.ipv4 }}"
   with_items: groups['linode']
+  when: linode.instance is defined
