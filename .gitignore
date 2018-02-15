@@ -1,3 +1,4 @@
 roles/common/files
 roles/mtcusers/files
+roles/bootstrap/files
 *swp
