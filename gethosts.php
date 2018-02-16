@@ -17,6 +17,10 @@ function run($argv) {
       exec('pass ls megaphone/crm/restpassword', $password);
       $password = $password[0];
       $headers = login($password);
+      // Build a group hierarchy.
+      $groupResource = 'taxonomy_term';
+      $groups = get($headers, $groupResource, NULL);
+      $groupHierarchy = buildGroupHierarchy($groups, NULL);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
       if ($argv[1] == '--host' && $argv[2]) {
@@ -24,6 +28,7 @@ function run($argv) {
       }
       $result = get($headers, $resource, NULL);
       $inventory = buildServerList($result);
+      $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
       echo $inventory;
       break;
 
@@ -35,6 +40,18 @@ function run($argv) {
 }
 run($argv);
 
+function buildGroupHierarchy($groups, $hierarchicalList, $parent = 0) {
+  foreach ($groups as $k => $group) {
+    if ($group->parent == $parent) {
+      unset($groups[$k]);
+      $hierarchicalList[$group->name]['children'] = buildGroupHierarchy($groups, NULL, $group->tid);
+      if (empty($hierarchicalList[$group->name]['children'])) {
+        unset($hierarchicalList[$group->name]['children']);
+      }
+    }
+  }
+  return $hierarchicalList;
+}
 
 /**
  * Accepts an array from Drupal Services Views, outputs an Ansible-compatible host list.
@@ -47,7 +64,7 @@ run($argv);
 function buildServerList($view) {
   $inventory[] = [];
   foreach ($view as $server) {
-    $inventory[$server->group][] = $server->fqdn;
+    $inventory[$server->group]['hosts'][] = $server->fqdn;
     // Pull in all field values as Ansible variables.
     foreach ($server as $key => $value) {
       if ($value) {
@@ -56,7 +73,8 @@ function buildServerList($view) {
       }
     }
   }
-  return json_encode($inventory);
+  return $inventory;
+  //return json_encode($inventory);
 }
 
 function post($curlHeaders, $operation, $postFields = NULL) {
