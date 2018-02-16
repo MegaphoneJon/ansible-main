@@ -20,7 +20,7 @@ function run($argv) {
       // Build a group hierarchy.
       $groupResource = 'taxonomy_term';
       $groups = get($headers, $groupResource, NULL);
-      $groupHierarchy = buildGroupHierarchy($groups, NULL);
+      $groupHierarchy = buildGroupHierarchy($groups);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
       if ($argv[1] == '--host' && $argv[2]) {
@@ -40,13 +40,15 @@ function run($argv) {
 }
 run($argv);
 
-function buildGroupHierarchy($groups, $hierarchicalList, $parent = 0) {
+/**
+ * Accepts a taxonomy term list from Drupal Services.
+ * Outputs a hierarchical array of children, suitable for merging into the taxonomy.
+ */
+function buildGroupHierarchy($groups) {
   foreach ($groups as $k => $group) {
-    if ($group->parent == $parent) {
-      unset($groups[$k]);
-      $hierarchicalList[$group->name]['children'] = buildGroupHierarchy($groups, NULL, $group->tid);
-      if (empty($hierarchicalList[$group->name]['children'])) {
-        unset($hierarchicalList[$group->name]['children']);
+    foreach ($groups as $childKey => $childGroup) {
+      if ($childGroup->parent == $group->tid) {
+        $hierarchicalList[$group->name]['children'][] = $childGroup->name;
       }
     }
   }
