@@ -1,3 +1,15 @@
+# So we get the new IP address
+- meta: refresh_inventory
+
+- name: debug listening
+  debug: var=ansible_host
+
+- name: Wait for Linode to listen on port 22
+  wait_for:
+    state: started
+    host: "{{ ansible_host }}"
+    port: 22
+
 - name: Add an Ansible user
   connection: ssh
   user: 
