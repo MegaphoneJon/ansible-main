@@ -1,0 +1,74 @@
+- name: iptables - Allow incoming on localhost
+  iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
+- name: Drop invalid packets
+  iptables:
+    chain: INPUT
+    ctstate: INVALID
+    jump: DROP
+
+- name: iptables - Accept connections
+  iptables: 
+    chain: INPUT
+    destination_port: "{{ item.port }}"
+    protocol: tcp
+    jump: ACCEPT
+  with_items: "{{ incoming_ports }}"
+
+- name: iptables - Respond to established SSH
+  iptables:
+    chain: OUTPUT
+    ctstate: ESTABLISHED
+    source_port: "{{ item.port }}"
+    protocol: tcp
+    jump: ACCEPT
+  with_items: "{{ incoming_ports }}"
+
+- name: iptables - Allow outgoing services
+  iptables:
+    chain: OUTPUT
+    destination_port: "{{ item.port }}"
+    protocol: "{{ item.protocol }}"
+    jump: ACCEPT
+  with_items: "{{ outgoing_ports }}"
+
+- name: iptables - Allow established connections incoming
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Allow incoming ping
+  iptables:
+    chain: INPUT
+    protocol: icmp
+    icmp_type: 8
+    ctstate: NEW,ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Allow outgoing ping 1/2
+  iptables:
+    chain: OUTPUT
+    protocol: icmp
+    ctstate: NEW,ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Allow outgoing ping 2/2
+  iptables:
+    chain: INPUT
+    protocol: icmp
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: iptables - drop anything else incoming
+  iptables:
+    chain: "{{ item }}"
+    policy: DROP
+
+  with_items:
+    - INPUT
+    - OUTPUT
+
