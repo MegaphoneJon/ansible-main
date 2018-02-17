@@ -1,11 +1,10 @@
 ---
-- name: Provision VMs
+- name: Test group
   hosts: testgroup
-  gather_facts: no
-  connection: local
+  become: yes
 
   roles:
-    - provision-linode
+    - { role: firewall-common, tags: firewall }
    # - common
    # - mtcusers
    # - drush
