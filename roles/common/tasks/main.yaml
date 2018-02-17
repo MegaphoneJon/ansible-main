@@ -24,7 +24,8 @@
   apt:
     name: "{{ item }}"
     state: present
-    update_cache: yes
+    # 86400 seconds = 24 hours
+    cache_valid_time: 86400
   with_items:
     - acl
     - aptitude
