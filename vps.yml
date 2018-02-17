@@ -7,5 +7,7 @@
   roles:
     - common
     - mtcusers
+    - ypsman.ipv6-disable
+    - { role: firewall-common, tags: firewall }
     - drush
     - icinga2
