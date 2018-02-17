@@ -18,9 +18,6 @@
   when: hosting_company == "Linode" and linode_plan > 0
   register: linode
 
-- name: show Linode debug info
-  debug: var=linode
-
 # Next two steps update crm.megaphonetech.com/server-list
 - name: Login to Drupal Inventory
   uri:
@@ -54,7 +51,6 @@
           0:
             value: "{{ linode.instance.id }}"
   when: hosting_company == "Linode" and linode_plan > 0
-  register: debugstuff
 
 # Next two steps add DNS
 - name: Add new host to in-memory inventory
