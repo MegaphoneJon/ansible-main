@@ -7,6 +7,11 @@
   roles:
     - common
     - mtcusers
+
+- hosts: lamp
+  become: yes
+
+  roles:
     - ypsman.ipv6-disable
     - { role: firewall-common, tags: firewall }
     - drush
