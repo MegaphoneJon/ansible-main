@@ -1,0 +1,2 @@
+apache_remove_default_vhost: true
+apache_vhosts: []
