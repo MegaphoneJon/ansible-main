@@ -12,7 +12,12 @@
   become: yes
 
   roles:
-    - ypsman.ipv6-disable
     - { role: firewall-common, tags: firewall }
+    - { role: geerlingguy.apache, tags: apache }
     - drush
     - icinga2
+
+- hosts: testgroup
+  become: yes
+  roles:
+    - { role: geerlingguy.php , tags: php }

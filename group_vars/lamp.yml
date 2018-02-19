@@ -1,2 +1,15 @@
-apache_remove_default_vhost: true
 apache_vhosts: []
+php_packages_extra:
+  - php-pear
+  - php-gd
+  - php-imagick
+  - php-mysql
+  - php-curl
+  - php-sqlite3
+  - php-opcache
+  - php-mbstring
+  - php-mcrypt
+
+php_max_execution_time: 300
+php_post_max_size: '128M'
+php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_NOTICE" 
