@@ -28,7 +28,7 @@
     - "{{ ip_versions }}"
   notify: save iptables
 
-- name: iptables - Respond to established SSH
+- name: iptables - Respond to established connections
   iptables:
     chain: OUTPUT
     ctstate: ESTABLISHED
@@ -75,26 +75,25 @@
 - name: Allow incoming ping ipv6
   iptables:
     chain: INPUT
-    protocol: icmp
+    protocol: icmpv6
     ctstate: NEW,ESTABLISHED,RELATED
     jump: ACCEPT
     ip_version: ipv6
   notify: save iptables
 
-- name: Allow outgoing ping 1/2
+- name: Allow outgoing ping ipv6
   iptables:
     chain: OUTPUT
-    protocol: icmp
-    ctstate: NEW,ESTABLISHED,RELATED
+    protocol: icmpv6
     jump: ACCEPT
     ip_version: "{{ item }}"
   with_items: "{{ ip_versions }}"
   notify: save iptables
 
-- name: Allow outgoing ping 2/2
+- name: Allow incoming ping ipv6
   iptables:
     chain: INPUT
-    protocol: icmp
+    protocol: icmpv6
     ctstate: ESTABLISHED,RELATED
     jump: ACCEPT
     ip_version: "{{ item }}"
