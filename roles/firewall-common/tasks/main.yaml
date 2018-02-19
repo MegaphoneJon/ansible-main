@@ -23,6 +23,7 @@
     protocol: tcp
     jump: ACCEPT
     ip_version: "{{ item[1] }}"
+    source: "{{ item[0].source|default(omit) }}"
   with_nested:
     - "{{ incoming_ports }}"
     - "{{ ip_versions }}"

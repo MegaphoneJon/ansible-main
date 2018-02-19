@@ -3,6 +3,7 @@ incoming_ports:
   - { port: 80, name: 'HTTP' }
   - { port: 443, name: 'HTTPS' }
   - { port: 5665, name: 'Icinga2' }
+  - { port: 25, name: 'SMTP', source: 'localhost' }
 
 outgoing_ports:
   - { port: 22, protocol: tcp, name: 'SSH' }
