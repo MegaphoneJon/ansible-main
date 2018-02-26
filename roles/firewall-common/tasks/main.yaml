@@ -7,15 +7,6 @@
   with_items: "{{ ip_versions }}"
   notify: save iptables
 
-- name: Drop invalid packets
-  iptables:
-    chain: INPUT
-    ctstate: INVALID
-    jump: DROP
-    ip_version: "{{ item }}"
-  with_items: "{{ ip_versions }}"
-  notify: save iptables
-
 - name: iptables - Accept connections
   iptables: 
     chain: INPUT
@@ -73,11 +64,18 @@
     ip_version: ipv4
   notify: save iptables
 
+- name: Allow outgoing ping ipv4
+  iptables:
+    chain: OUTPUT
+    protocol: icmp
+    jump: ACCEPT
+    ip_version: ipv4
+  notify: save iptables
+
 - name: Allow incoming ping ipv6
   iptables:
     chain: INPUT
     protocol: icmpv6
-    ctstate: NEW,ESTABLISHED,RELATED
     jump: ACCEPT
     ip_version: ipv6
   notify: save iptables
@@ -87,19 +85,18 @@
     chain: OUTPUT
     protocol: icmpv6
     jump: ACCEPT
+    ip_version: ipv6
+  notify: save iptables
+
+- name: Drop invalid packets
+  iptables:
+    chain: INPUT
+    ctstate: INVALID
+    jump: DROP
     ip_version: "{{ item }}"
   with_items: "{{ ip_versions }}"
   notify: save iptables
 
-- name: Allow incoming ping ipv6
-  iptables:
-    chain: INPUT
-    protocol: icmpv6
-    ctstate: ESTABLISHED,RELATED
-    jump: ACCEPT
-    ip_version: "{{ item }}"
-  with_items: "{{ ip_versions }}"
-  notify: save iptables
 
 - name: iptables - drop anything else incoming
   iptables:
