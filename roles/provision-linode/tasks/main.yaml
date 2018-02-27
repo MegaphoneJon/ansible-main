@@ -58,9 +58,11 @@
     hostname: "{{ linode.instance.ipv4 }}"
     groupname: "linode"
     ansible_user: root
-  when: linode.instance is defined
+  when: linode.instance.id|string != linode_id|string
 
 - name: Update MFPL DNS
   local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ inventory_hostname }}" "{{ linode.instance.ipv4 }}"
   with_items: groups['linode']
+  register: dnshelper_result
   when: linode.instance is defined
+  changed_when: "dnshelper_result.stdout != 'DNS already exists and is correct.'"
