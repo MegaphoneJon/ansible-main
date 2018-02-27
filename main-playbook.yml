@@ -20,4 +20,5 @@
   become: yes
   roles:
     - { role: geerlingguy.php , tags: php }
+    - { role: geerlingguy.apache-fpm-php , tags: php }
     - drush
