@@ -1,4 +1,6 @@
+#temp for Apache
 apache_vhosts: []
+#PHP
 php_packages_extra:
   - php-pear
   - php-gd
@@ -14,3 +16,5 @@ php_post_max_size: '128M'
 php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_NOTICE" 
 php_enable_php_fpm: true
 php_fpm_listen: "/var/run/php/php-fpm.sock"
+#MySQL
+mysql_root_password: "{{ lookup('passwordstore', client + '/' + hostname + '/mysql/root create=true length=32') }}"
