@@ -34,3 +34,4 @@
   tags: [drush,backdrop]
 - name: copy drush Script
   copy: src=files/drush dest=/usr/local/bin/drush mode=0755
+  tags: [drush,backdrop]
