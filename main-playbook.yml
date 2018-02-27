@@ -13,14 +13,15 @@
 
   roles:
     - { role: firewall-common, tags: firewall }
-    - { role: geerlingguy.apache, tags: apache }
+    - { role: contrib/geerlingguy.apache, tags: apache }
     - icinga2
 
 - hosts: testgroup
   become: yes
   roles:
-    - { role: geerlingguy.mysql, tags: mysql }
-    - { role: geerlingguy.php , tags: php }
-    - { role: php-fpm-additional , tags: php }
-    - { role: geerlingguy.apache-fpm-php , tags: php }
+    - { role: contrib/geerlingguy.mysql, tags: mysql }
+    - { role: contrib/geerlingguy.php , tags: php }
+    - { role: contrib/geerlingguy.apache-fpm-php , tags: php }
+    - { role: fpm-php-additional , tags: php }
+    - { role: contrib/geerlingguy.composer, tags: composer}
     - drush
