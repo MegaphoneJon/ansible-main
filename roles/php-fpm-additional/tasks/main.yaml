@@ -4,3 +4,4 @@
     regexp: "^;*catch_workers_output = yes$"
     line: "catch_workers_output = yes"
     state: present
+  notify: restart php-fpm
