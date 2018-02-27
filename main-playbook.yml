@@ -21,5 +21,6 @@
   roles:
     - { role: geerlingguy.mysql, tags: mysql }
     - { role: geerlingguy.php , tags: php }
+    - { role: php-fpm-additional , tags: php }
     - { role: geerlingguy.apache-fpm-php , tags: php }
     - drush
