@@ -11,7 +11,7 @@ if (!isset($argv[2])) {
   echo "You need more parameters to execute this command.\n";
   echo "Usage: mfplapi.php <FQDN> <ip address>\n";
   echo "E.g.: mfplapi.php orange.megaphonetech.com 1.2.3.4\n";
-  die;
+  exit(1);
 }
 $params['fqdn'] = $argv[1];
 $params['ipv4'] = $argv[2];
@@ -21,14 +21,16 @@ list($dns, $item_id) = $result;
 if (!$dns) {
   // DNS not found.
   write_dns($params, 'insert');
+  exit(0);
 }
 elseif ($dns != $params['ipv4']) {
   // DNS found but doesn't match our provisioning.
   write_dns($params, 'update', $item_id);
+  exit(0);
 }
 else {
   echo "DNS already exists and is correct.";
-  return 0;
+  exit(0);
 }
 
 /**
