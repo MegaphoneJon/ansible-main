@@ -26,6 +26,4 @@
   command: wp --allow-root package install aaemnnosttv/wp-cli-login-command
   args:
     creates: /usr/local/lib/wp-cli-packages/vendor/aaemnnosttv/wp-cli-login-command/wp-cli.yml
-  tags: 
-    - wp-cli
-    - debug
+  tags: wp-cli
