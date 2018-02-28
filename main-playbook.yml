@@ -28,3 +28,4 @@
     - { role: php-additional , tags: php }
     - wp-cli
     - { role: contrib/geerlingguy.security, tags: security }
+    - { role: contrib/geerlingguy.postfix, tags: postfix }
