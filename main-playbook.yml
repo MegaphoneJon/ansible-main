@@ -27,3 +27,4 @@
     - { role: contrib/geerlingguy.apache-fpm-php , tags: php }
     - { role: php-additional , tags: php }
     - wp-cli
+    - { role: contrib/geerlingguy.security, tags: security }
