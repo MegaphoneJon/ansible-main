@@ -3,5 +3,10 @@
     dest: "{{ php_fpm_pool_conf_path }}"
     regexp: "^;*catch_workers_output = yes$"
     line: "catch_workers_output = yes"
-    state: present
   notify: restart php-fpm
+
+- name: CLI PHP should have no memory limit
+  lineinfile:
+    dest: /etc/php/7.0/cli/php.ini
+    regexp: "^memory_limit"
+    line: "memory_limit = -1"
