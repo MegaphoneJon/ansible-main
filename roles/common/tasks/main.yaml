@@ -32,6 +32,7 @@
     - apt-show-versions
     - bzip2
     - cron-apt
+    - debconf-utils
     - fail2ban
     - git
     - htop
