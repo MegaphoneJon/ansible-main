@@ -73,3 +73,21 @@
   environment:
     BORG_PASSPHRASE: "{{ lookup('passwordstore', client + '/' + hostname + '/borg/remote create=true length=32') }}"
   when: remoterepo.rc == 1
+
+- name: Configure backupninja
+  template:
+    src: "{{ 'templates/' + item + '.j2' }}"
+    dest: "{{ '/etc/backup.d/' + item }}"
+    mode: 0600
+  with_items:
+    - 10-info.sys
+    - 30-databases.mysql
+    - 50-borg-local.sh
+    - 60-borg-remote.sh
+
+- name: Configure backupninja.conf with Icinga2
+  template:
+    src: templates/backupninja.conf.j2
+    dest: /etc/backupninja.conf
+    mode: 0600
+  tags: debug
