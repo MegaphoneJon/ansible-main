@@ -1,0 +1,75 @@
+---
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=86400
+
+- name: Ensure backupninja and borgbackup are installed
+  apt:
+    name: 
+      - borgbackup
+      - backupninja
+
+- name: Install borgbackup backport (on Debian 8)
+  apt:
+    name: borgbackup
+    default_release: jessie-backports
+  when: ansible_distribution == 'Debian' and ansible_distribution_version == '8'
+
+- name: Install the patched MySQL handler
+  copy:
+    force: yes
+    src: files/mysql
+    dest: /usr/share/backupninja/mysql
+
+- name: Install the Icinga-aware fork
+  copy:
+    force: yes
+    src: files/backupninja
+    dest: /usr/sbin/backupninja
+
+- name: create a keypair for root
+  user:
+    name: root
+    generate_ssh_key: yes
+
+- name: get the public key
+  command: cat /root/.ssh/id_rsa.pub
+  register: publickey
+  changed_when: false
+
+# If your public key isn't on the rsync.net account this will fail!
+- name: get the authorized_keys from rsync.net
+  local_action: command ssh 8139@usw-s008.rsync.net cat .ssh/authorized_keys
+  register: installed_keys
+  become: no
+  changed_when: false
+
+- name: Add the public key to the local authorized_keys file
+  shell: echo {{ publickey.stdout }} | ssh 8139@usw-s008.rsync.net 'dd of=.ssh/authorized_keys oflag=append conv=notrunc'
+  delegate_to: 127.0.0.1
+  become: no
+  when: publickey.stdout not in installed_keys.stdout_lines
+
+- name: Create a borg repo local to the remote host
+  command: borg init /opt/borg
+  args:
+    creates: /opt/borg/config
+  environment:
+    BORG_PASSPHRASE: "{{ lookup('passwordstore', client + '/' + hostname + '/borg/local create=true length=32') }}"
+
+- name: Add the rsync.net public hostkey to known_hosts
+  known_hosts:
+    key: "{{ rsyncnet_public_hostkey }}"
+    name: usw-s008.rsync.net
+    path: /root/.ssh/known_hosts
+
+- name: Check if the remote repo exists
+  command: ssh 8139@usw-s008.rsync.net ls -l "{{ client + '-' + hostname + '/config' }}"
+  register: remoterepo
+  changed_when: false
+  failed_when: false
+
+- name: Create a borg repo on rsync.net
+  command: "borg init 8139@usw-s008.rsync.net:{{ client + '-' + hostname }} --remote-path=/usr/local/bin/borg1/borg1"
+  environment:
+    BORG_PASSPHRASE: "{{ lookup('passwordstore', client + '/' + hostname + '/borg/remote create=true length=32') }}"
+  when: remoterepo.rc == 1

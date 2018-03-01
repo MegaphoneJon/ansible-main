@@ -1,0 +1,329 @@
+# -*- mode: sh; sh-basic-offset: 3; indent-tabs-mode: nil; -*-
+# vim: set filetype=sh sw=3 sts=3 expandtab autoindent:
+#
+# mysql handler script for backupninja
+#
+
+getconf backupdir /var/backups/mysql
+getconf databases all
+getconf ignores
+getconf nodata
+getconf dbhost localhost
+getconf hotcopy no
+getconf sqldump no
+getconf sqldumpoptions "--lock-tables --complete-insert --add-drop-table --quick --quote-names"
+getconf compress yes
+getconf vsname
+
+# authentication:
+getconf user
+getconf dbusername
+getconf dbpassword
+getconf configfile /etc/mysql/debian.cnf
+
+
+# Decide if the handler should operate on a vserver or on the host.
+# In the former case, check that $vsname exists and is running.
+usevserver=no
+vroot=''
+if [ $vservers_are_available = yes ]; then
+   if [ -n "$vsname" ]; then
+      # does it exist ?
+      if ! vservers_exist "$vsname" ; then
+         fatal "The vserver given in vsname ($vsname) does not exist."
+      fi
+      # is it running ?
+      vservers_running $vsname || fatal "The vserver $vsname is not running."
+      # everything ok
+      info "Using vserver '$vsname'."
+      usevserver=yes
+      vroot="$VROOTDIR/$vsname"
+   else
+      info "No vserver name specified, actions will be performed on the host."
+   fi
+fi
+
+## Prepare ignore part of the command
+## This only works for mysqldump at the moment
+
+ignore=''
+for i in $ignores $nodata; do
+   ignore="$ignore --ignore-table=$i"
+done
+
+# create backup dirs, $vroot will be empty if no vsname was specified
+# and we will instead proceed to operate on the host
+[ -d $vroot$backupdir ] || mkdir -p $vroot$backupdir
+[ -d $vroot$backupdir ] || fatal "Backup directory '$vroot$backupdir'"
+hotdir="$backupdir/hotcopy"
+dumpdir="$backupdir/sqldump"
+
+if [ $usevserver = yes ]
+then
+   [ "$sqldump" == "no" -o -d $vroot$dumpdir ] || $VSERVER $vsname exec mkdir -p $dumpdir
+   [ "$hotcopy" == "no" -o -d $vroot$hotdir ] || $VSERVER $vsname exec mkdir -p $hotdir
+else
+   [ "$sqldump" == "no" -o -d $dumpdir ] || mkdir -p $dumpdir
+   [ "$hotcopy" == "no" -o -d $hotdir ] || mkdir -p $hotdir
+fi
+
+#######################################################################
+## AUTHENTICATION
+
+#
+# one of three authentication methods:
+# 1. setting the user, so that /home/user/.my.cnf is used.
+# 2. specifying the user and password in the handler config,
+#    which generates a temporary .my.cnf in /root/.my.cnf
+# 3. specify the config file with --defaults-extra-file
+#    (this option DOESN'T WORK WITH MYSQLHOTCOPY)
+#
+
+# create .my.cnf
+# only if dbusername and dbpassword specified.
+# we create a tmp file because we don't want to
+# specify the password on the command line.
+
+defaultsfile=""
+
+if [ -n "$dbusername" -a -n "$dbpassword" ]
+then
+   if [ $usevserver = yes ]
+   then
+      home=`$VSERVER $vsname exec getent passwd "root" | /usr/bin/awk -F: '{print $6}'`
+   else
+      home=`getent passwd "root" | /usr/bin/awk -F: '{print $6}'`
+   fi
+
+   [ -d $home ] || fatal "Can't find root's home directory ($home)."
+    
+   mycnf="$home/.my.cnf"
+
+   if [ $usevserver = yes ]
+   then
+      workcnf="$vroot$mycnf"
+   else
+      workcnf="$mycnf"
+   fi
+
+   if [ -f $workcnf ]
+   then
+      # rename temporarily
+      tmpcnf="$workcnf.disable"
+      debug "mv $workcnf $tmpcnf"
+      mv $workcnf $tmpcnf
+   fi
+    
+   oldmask=`umask`
+   umask 077
+   cat > $workcnf <<EOF
+# auto generated backupninja mysql conf
+[mysql]
+host=$dbhost
+user=$dbusername
+password="$dbpassword"
+
+[mysqldump]
+host=$dbhost
+user=$dbusername
+password="$dbpassword"
+
+[mysqlhotcopy]
+host=$dbhost
+user=$dbusername
+password="$dbpassword"
+
+[mysqladmin]
+host=$dbhost
+user=$dbusername
+password="$dbpassword"
+EOF
+   umask $oldmask
+   defaultsfile="--defaults-extra-file=$mycnf"
+
+# else, if a user is set use her .my.cnf
+elif [ -n "$user" ]
+then
+   userset=true;
+   if [ $usevserver = yes ]
+   then
+      userhome=`$VSERVER $vsname exec getent passwd "$user" | /usr/bin/awk -F: '{print $6}'`
+      if [ $? -eq 2 ]
+      then
+	 fatal "User $user not found in /etc/passwd"
+      fi
+      debug "User home set to: $vroot$userhome"
+      [ -f $vroot$userhome/.my.cnf ] || fatal "Can't find config file in $userhome/.my.cnf"
+   else
+      userhome=`getent passwd "$user" | /usr/bin/awk -F: '{print $6}'`
+      if [ $? -eq 2 ]
+      then
+	 fatal "User $user not found in /etc/passwd"
+      fi
+      debug "User home set to: $userhome"
+      [ -f $userhome/.my.cnf ] || fatal "Can't find config file in $userhome/.my.cnf"
+   fi
+	
+   defaultsfile="--defaults-extra-file=$userhome/.my.cnf"
+   debug "using $defaultsfile"
+# otherwise use $configfile
+else
+   user=root
+   defaultsfile="--defaults-extra-file=$configfile"
+fi
+
+#######################################################################
+## HOT COPY
+
+if [ "$hotcopy" == "yes" ]
+then
+   info "Initializing hotcopy method"
+   if [ "$databases" == "all" ]
+   then
+      if [ $usevserver = yes ]
+      then
+         info "dbhost: $dbhost"
+         execstr="$VSERVER $vsname exec $MYSQLHOTCOPY -h $dbhost --quiet --allowold --regexp /.\*/./.\*/ $hotdir"
+      else
+         execstr="$MYSQLHOTCOPY --quiet --allowold --regexp /.\*/./.\*/ $hotdir"
+      fi
+      debug "su $user -c \"$execstr\""
+      if [ ! $test ]
+      then
+         output=`su $user -c "$execstr" 2>&1`
+         code=$?
+         if [ "$code" == "0" ]
+         then
+            debug $output
+            info "Successfully finished hotcopy of all mysql databases"
+         else
+            warning $output
+            warning "Failed to hotcopy all mysql databases"
+         fi
+      fi
+   else
+      for db in $databases
+      do
+         if [ $usevserver = yes ]
+         then
+            execstr="$VSERVER $vsname exec $MYSQLHOTCOPY --allowold $db $hotdir"
+         else
+            execstr="$MYSQLHOTCOPY --allowold $db $hotdir"
+         fi
+         debug 'su $user -c \"$execstr\"'
+         if [ ! $test ]
+         then
+            output=`su $user -c "$execstr" 2>&1`
+            code=$?
+            if [ "$code" == "0" ]
+            then
+               debug $output
+               info "Successfully finished hotcopy of mysql database $db"
+            else
+               warning $output
+               warning "Failed to hotcopy mysql database $db"
+            fi
+         fi
+      done
+   fi
+fi
+
+##########################################################################
+## SQL DUMP
+
+if [ "$sqldump" == "yes" ]
+then
+   info "Initializing SQL dump method"
+   if [ "$databases" == "all" ]
+   then
+      if [ $usevserver = yes ]
+      then
+         debug 'set -o pipefail ; echo show databases | $VSERVER $vsname exec su $user -c \"$MYSQL $defaultsfile\" | grep -v Database | grep -v '^\(information\|performance\)_schema$''
+         databases=`set -o pipefail ; echo 'show databases' | $VSERVER $vsname exec su $user -c "$MYSQL $defaultsfile" | grep -v Database | grep -v '^\(information\|performance\)_schema$'`
+         if [ $? -ne 0 ]
+         then
+            fatal "Authentication problem, maybe user/password is wrong or mysqld is not running?"
+         fi
+      else
+         databases=$(set -o pipefail ; su $user -c "$MYSQL $defaultsfile -N -B -e 'show databases'" | sed 's/|//g;/\+----/d;/^\(information\|performance\)_schema$/d')
+         if [ $? -ne 0 ]
+         then
+            fatal "Authentication problem, maybe user/password is wrong or mysqld is not running?"
+         fi
+      fi
+   fi
+
+   for db in $databases
+   do
+      DUMP_BASE="$MYSQLDUMP $defaultsfile $sqldumpoptions"
+
+      # Dumping structure and data
+      DUMP="$DUMP_BASE $ignore $db"
+
+      # If requested, dump only the table structure for this database
+      if echo "$nodata" | grep -E '(^|[[:space:]])'"$db\." >/dev/null
+      then
+         # Get the structure of the tables, without data
+         DUMP_STRUCT="$DUMP_BASE --no-data $db"
+         for qualified_table in $nodata
+         do
+            table=$( expr match "$qualified_table" "$db\.\([^\w]*\)" )
+            DUMP_STRUCT="$DUMP_STRUCT $table"
+         done
+         DUMP="( $DUMP; $DUMP_STRUCT )"
+      fi
+      if [ $usevserver = yes ]
+      then
+         # Test to make sure mysqld is running, if it is not sqldump will not work
+         $VSERVER $vsname exec su $user -c "$MYSQLADMIN $defaultsfile ping 2>&1 >/dev/null"
+         if [ $? -ne 0 ]; then
+            fatal "mysqld doesn't appear to be running!"
+         fi
+         if [ "$compress" == "yes" ]; then
+            execstr="$VSERVER $vsname exec $DUMP | $GZIP $GZIP_OPTS > '$vroot$dumpdir/${db}.sql.gz'"
+         else
+            execstr="$VSERVER $vsname exec $DUMP -r '$vroot$dumpdir/${db}.sql'"
+         fi
+      else
+         # Test to make sure mysqld is running, if it is not sqldump will not work
+         su $user -c "$MYSQLADMIN $defaultsfile ping 2>&1 >/dev/null"
+         if [ $? -ne 0 ]; then
+            fatal "mysqld doesn't appear to be running!"
+         fi
+         if [ "$compress" == "yes" ]; then
+            execstr="$DUMP | $GZIP $GZIP_OPTS > '$dumpdir/${db}.sql.gz'"
+         else
+            execstr="$DUMP -r '$dumpdir/${db}.sql'"
+         fi
+      fi
+      debug "su $user -c \"$execstr\""
+      if [ ! $test ]
+      then
+         output=`su $user -s /bin/bash -c "set -o pipefail ; $execstr" 2>&1`
+         code=$?
+         if [ "$code" == "0" ]
+         then
+            debug $output
+            info "Successfully finished dump of mysql database $db"
+         else
+            warning $output
+            warning "Failed to dump mysql databases $db"
+         fi
+      fi
+   done
+fi
+
+# clean up tmp config file
+if [ "$dbusername" != "" -a "$dbpassword" != "" ]
+then
+   ## clean up tmp config file
+   debug "rm $workcnf"
+   rm $workcnf
+   if [ -f "$tmpcnf" ]
+   then
+      debug "mv $tmpcnf $workcnf"
+      mv $tmpcnf $workcnf
+   fi
+fi
+
+return 0

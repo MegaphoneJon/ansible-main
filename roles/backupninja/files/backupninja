@@ -1,0 +1,665 @@
+#!/bin/bash
+# -*- mode: sh; sh-basic-offset: 3; indent-tabs-mode: nil; -*-
+# vim: set filetype=sh sw=3 sts=3 expandtab autoindent:
+#
+#                          |\_
+# B A C K U P N I N J A   /()/
+#                         `\|
+#
+# Copyright (C) 2004-05 riseup.net -- property is theft.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+
+#####################################################
+## FUNCTIONS
+
+function setupcolors () {
+   BLUE="\033[34;01m"
+   GREEN="\033[32;01m"
+   YELLOW="\033[33;01m"
+   PURPLE="\033[35;01m"
+   RED="\033[31;01m"
+   OFF="\033[0m"
+   CYAN="\033[36;01m"
+   COLORS=($BLUE $GREEN $YELLOW $RED $PURPLE $CYAN)
+}
+
+function colorize () {
+   if [ "$usecolors" == "yes" ]; then
+      local typestr=`echo "$@" | /bin/sed 's/\(^[^:]*\).*$/\1/'`
+      [ "$typestr" == "Debug" ] && type=0
+      [ "$typestr" == "Info" ] && type=1
+      [ "$typestr" == "Warning" ] && type=2
+      [ "$typestr" == "Error" ] && type=3
+      [ "$typestr" == "Fatal" ] && type=4
+      [ "$typestr" == "Halt" ] && type=5
+      color=${COLORS[$type]}
+      endcolor=$OFF
+      echo -e "$color$@$endcolor"
+   else
+      echo -e "$@"
+   fi
+}
+
+# We have the following message levels:
+# 0 - debug - blue
+# 1 - normal messages - green
+# 2 - warnings - yellow
+# 3 - errors - red
+# 4 - fatal - purple
+# 5 - halt - cyan
+# First variable passed is the error level, all others are printed
+
+# if 1, echo out all warnings, errors, or fatal
+# used to capture output from handlers
+echo_debug_msg=0
+
+usecolors=yes
+
+function printmsg() {
+   [ ${#@} -gt 1 ] || return
+
+   type=$1
+   shift
+   if [ $type == 100 ]; then
+      typestr=`echo "$@" | /bin/sed 's/\(^[^:]*\).*$/\1/'`
+      [ "$typestr" == "Debug" ] && type=0
+      [ "$typestr" == "Info" ] && type=1
+      [ "$typestr" == "Warning" ] && type=2
+      [ "$typestr" == "Error" ] && type=3
+      [ "$typestr" == "Fatal" ] && type=4
+      [ "$typestr" == "Halt" ] && type=5
+      typestr=""
+   else
+      types=(Debug Info Warning Error Fatal Halt)
+      typestr="${types[$type]}: "
+   fi
+
+   print=$[4-type]
+
+   if [ $echo_debug_msg == 1 ]; then
+      echo -e "$typestr$@" >&2
+   elif [ $debug ]; then
+      colorize "$typestr$@" >&2
+   fi
+
+   if [ $print -lt $loglevel ]; then
+      logmsg "$typestr$@"
+   fi
+}
+
+function logmsg() {
+   if [ -w "$logfile" ]; then
+      echo -e `LC_ALL=C date "+%h %d %H:%M:%S"` "$@" >> $logfile
+   fi
+}
+
+function passthru() {
+   printmsg 100 "$@"
+}
+function debug() {
+   printmsg 0 "$@"
+}
+function info() {
+   printmsg 1 "$@"
+}
+function warning() {
+   printmsg 2 "$@"
+}
+function error() {
+   printmsg 3 "$@"
+}
+function fatal() {
+   printmsg 4 "$@"
+   exit 2
+}
+function halt() {
+   printmsg 5 "$@"
+   exit 2
+}
+
+msgcount=0
+function msg {
+   messages[$msgcount]=$1
+   let "msgcount += 1"
+}
+
+#
+# enforces very strict permissions on configuration file $file.
+#
+
+function check_perms() {
+   local file=$1
+   debug "check_perms $file"
+   local perms
+   local owners
+
+   perms=($(/usr/bin/stat -L --format='%A' $file))
+   debug "perms: $perms"
+   local gperm=${perms:4:3}
+   debug "gperm: $gperm"
+   local wperm=${perms:7:3}
+   debug "wperm: $wperm"
+
+   owners=($(/usr/bin/stat -L --format='%g %G %u %U' $file))
+   local gid=${owners[0]}
+   local group=${owners[1]}
+   local owner=${owners[2]}
+
+   if [ "$owner" != 0 ]; then
+      echo "Configuration files must be owned by root! Dying on file $file"
+      fatal "Configuration files must be owned by root! Dying on file $file"
+   fi
+
+   if [ "$wperm" != '---' ]; then
+      echo "Configuration files must not be world writable/readable! Dying on file $file"
+      fatal "Configuration files must not be world writable/readable! Dying on file $file"
+   fi
+
+   if [ "$gperm" != '---' ]; then
+      case "$admingroup" in
+         $gid|$group) :;;
+
+         *)
+           if [ "$gid" != 0 ]; then
+              echo "Configuration files must not be writable/readable by group $group! Use the admingroup option in backupninja.conf. Dying on file $file"
+              fatal "Configuration files must not be writable/readable by group $group! Use the admingroup option in backupninja.conf. Dying on file $file"
+           fi
+         ;;
+         esac
+   fi
+}
+
+# simple lowercase function
+function tolower() {
+   echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+# simple to integer function
+function toint() {
+   echo "$1" | tr -d '[:alpha:]'
+}
+
+#
+# function isnow(): returns 1 if the time/day passed as $1 matches
+# the current time/day.
+#
+# format is <day> at <time>:
+#   sunday at 16
+#   8th at 01
+#   everyday at 22
+#
+
+# we grab the current time once, since processing
+# all the configs might take more than an hour.
+nowtime=`LC_ALL=C date +%H`
+nowday=`LC_ALL=C date +%d`
+nowdayofweek=`LC_ALL=C date +%A`
+nowdayofweek=`tolower "$nowdayofweek"`
+
+function isnow() {
+   local when="$1"
+   set -- $when
+
+   [ "$when" == "manual" ] && return 0
+
+   whendayofweek=$1; at=$2; whentime=$3;
+   whenday=`toint "$whendayofweek"`
+   whendayofweek=`tolower "$whendayofweek"`
+   whentime=`echo "$whentime" | /bin/sed 's/:[0-9][0-9]$//' | /bin/sed -r 's/^([0-9])$/0\1/'`
+
+   if [ "$whendayofweek" == "everyday" -o "$whendayofweek" == "daily" ]; then
+      whendayofweek=$nowdayofweek
+   fi
+
+   if [ "$whenday" == "" ]; then
+      if [ "$whendayofweek" != "$nowdayofweek" ]; then
+         whendayofweek=${whendayofweek%s}
+         if [ "$whendayofweek" != "$nowdayofweek" ]; then
+            return 0
+         fi
+      fi
+   elif [ "$whenday" != "$nowday" ]; then
+      return 0
+   fi
+
+   [ "$at" == "at" ] || return 0
+   [ "$whentime" == "$nowtime" ] || return 0
+
+   return 1
+}
+
+function usage() {
+   cat << EOF
+$0 usage:
+This script allows you to coordinate system backup by dropping a few
+simple configuration files into /etc/backup.d/. Typically, this
+script is run hourly from cron.
+
+The following options are available:
+-h, --help           This usage message
+-d, --debug          Run in debug mode, where all log messages are
+                     output to the current shell.
+-f, --conffile FILE  Use FILE for the main configuration instead
+                     of /etc/backupninja.conf
+-t, --test           Test run mode. This will test if the backup
+                     could run, without actually preforming any
+                     backups. For example, it will attempt to authenticate
+                     or test that ssh keys are set correctly.
+-n, --now            Perform actions now, instead of when they might
+                     be scheduled. No output will be created unless also
+                     run with -d.
+    --run FILE       Execute the specified action file and then exit.
+                     Also puts backupninja in debug mode.
+
+When in debug mode, output to the console will be colored:
+EOF
+   usecolors=yes
+   colorize "Debug: Debugging info (when run with -d)"
+   colorize "Info: Informational messages (verbosity level 4)"
+   colorize "Warning: Warnings (verbosity level 3 and up)"
+   colorize "Error: Errors (verbosity level 2 and up)"
+   colorize "Fatal: Errors which halt a given backup action (always shown)"
+   colorize "Halt: Errors which halt the whole backupninja run (always shown)"
+}
+
+##
+## this function handles the running of a backup action
+##
+## these globals are modified:
+## halts, fatals, errors, warnings, actions_run, errormsg
+##
+
+function process_action() {
+   local file="$1"
+   local suffix="$2"
+   local run="no"
+   setfile $file
+
+   # skip over this config if "when" option
+   # is not set to the current time.
+   getconf when "$defaultwhen"
+   if [ "$processnow" == 1 ]; then
+      info ">>>> starting action $file (because of --now)"
+      run="yes"
+   elif [ "$when" == "hourly" ]; then
+      info ">>>> starting action $file (because 'when = hourly')"
+      run="yes"
+   else
+      IFS=$'\t\n'
+      for w in $when; do
+         IFS=$' \t\n'
+         isnow "$w"
+         ret=$?
+         IFS=$'\t\n'
+         if [ $ret == 0 ]; then
+            debug "skipping $file because current time does not match $w"
+         else
+            info ">>>> starting action $file (because current time matches $w)"
+            run="yes"
+         fi
+      done
+      IFS=$' \t\n'
+   fi
+   debug $run
+   [ "$run" == "no" ] && return
+
+   # Prepare for lock creation
+   if [ ! -d /var/lock/backupninja ]; then
+      mkdir /var/lock/backupninja
+   fi
+   lockfile=`echo $file | /bin/sed 's,/,_,g'`
+   lockfile=/var/lock/backupninja/$lockfile
+
+   local bufferfile=`maketemp backupninja.buffer`
+   echo "" > $bufferfile
+
+   # start locked section : avoid concurrent execution of the same backup
+   # uses a construct specific to shell scripts with flock. See man flock for details
+   {
+       debug "executing handler in locked section controlled by $lockfile"
+       flock -x -w 5 200
+       # if all is good, we acquired the lock
+       if [ $? -eq 0 ]; then
+
+	   let "actions_run += 1"
+
+           # call the handler:
+	   echo_debug_msg=1
+	   (
+	       . $scriptdirectory/$suffix $file
+	   ) 2>&1 | (
+	       while read a; do
+		   echo $a >> $bufferfile
+		   [ $debug ] && colorize "$a"
+	       done
+	   )
+	   retcode=$?
+           # ^^^^^^^^ we have a problem! we can't grab the return code "$?". grrr.
+	   echo_debug_msg=0
+
+       else
+	   # a backup is probably ongoing already, so display an error message
+	   debug "failed to acquire lock $lockfile"
+	   echo "Fatal: Could not acquire lock $lockfile. A backup is probably already running for $file." >>$bufferfile
+       fi
+   } 200> $lockfile
+   # end of locked section
+
+   _warnings=`cat $bufferfile | grep "^Warning: " | wc -l`
+   _errors=`cat $bufferfile | grep "^Error: " | wc -l`
+   _fatals=`cat $bufferfile | grep "^Fatal: " | wc -l`
+   _halts=`cat $bufferfile | grep "^Halt: " | wc -l`
+   _infos=`cat $bufferfile | grep "^Info: " | wc -l`
+
+   ret=`grep "\(^Info: \|^Warning: \|^Error: \|^Fatal: \|Halt: \)" $bufferfile`
+   rm $bufferfile
+
+   if [ $_halts != 0 ]; then
+      msg "*halt* -- $file"
+      errormsg="$errormsg\n== halt request from $file==\n\n$ret\n"
+      passthru "Halt: <<<< finished action $file: FAILED"
+   elif [ $_fatals != 0 ]; then
+      msg "*failed* -- $file"
+      errormsg="$errormsg\n== fatal errors from $file ==\n\n$ret\n"
+      passthru "Fatal: <<<< finished action $file: FAILED"
+   elif [ $_errors != 0 ]; then
+      msg "*error* -- $file"
+      errormsg="$errormsg\n== errors from $file ==\n\n$ret\n"
+      error "<<<< finished action $file: ERROR"
+   elif [ $_warnings != 0 ]; then
+      msg "*warning* -- $file"
+      errormsg="$errormsg\n== warnings from $file ==\n\n$ret\n"
+      warning "<<<< finished action $file: WARNING"
+   else
+      msg "success -- $file"
+      if [ $_infos != 0 -a "$reportinfo" == "yes" ]; then
+         errormsg="$errormsg\n== infos from $file ==\n\n$ret\n"
+      fi
+      info "<<<< finished action $file: SUCCESS"
+   fi
+
+   let "halts += _halts"
+   let "fatals += _fatals"
+   let "errors += _errors"
+   let "warnings += _warnings"
+}
+
+#####################################################
+## MAIN
+
+setupcolors
+conffile="/etc/backupninja.conf"
+loglevel=3
+
+## process command line options
+
+while [ $# -ge 1 ]; do
+   case $1 in
+      -h|--help) usage;;
+      -d|--debug) debug=1; export BACKUPNINJA_DEBUG=yes;;
+      -t|--test) test=1;debug=1;;
+      -n|--now) processnow=1;;
+      -f|--conffile)
+         if [ -f $2 ]; then
+            conffile=$2
+         else
+            echo "-f|--conffile option must be followed by an existing filename"
+            fatal "-f|--conffile option must be followed by an existing filename"
+            usage
+         fi
+         # we shift here to avoid processing the file path
+         shift
+         ;;
+      --run)
+         debug=1
+         if [ -f $2 ]; then
+            singlerun=$2
+            processnow=1
+         else
+            echo "--run option must be followed by a backupninja action file"
+            fatal "--run option must be followed by a backupninja action file"
+            usage
+         fi
+         shift
+         ;;
+      *)
+         debug=1
+         echo "Unknown option $1"
+         fatal "Unknown option $1"
+         usage
+         exit
+         ;;
+   esac
+   shift
+done
+
+#if [ $debug ]; then
+#   usercolors=yes
+#fi
+
+## Load and confirm basic configuration values
+
+# bootstrap
+if [ ! -r "$conffile" ]; then
+   echo "Configuration file $conffile not found."
+   fatal "Configuration file $conffile not found."
+fi
+
+# find $libdirectory
+libdirectory=`grep '^libdirectory' $conffile | /usr/bin/awk '{print $3}'`
+if [ -z "$libdirectory" ]; then
+   if [ -d "/usr/lib/backupninja" ]; then
+      libdirectory="/usr/lib/backupninja"
+   else
+      echo "Could not find entry 'libdirectory' in $conffile."
+      fatal "Could not find entry 'libdirectory' in $conffile."
+   fi
+else
+   if [ ! -d "$libdirectory" ]; then
+      echo "Lib directory $libdirectory not found."
+      fatal "Lib directory $libdirectory not found."
+   fi
+fi
+
+# include shared functions
+. $libdirectory/tools
+. $libdirectory/vserver
+
+setfile $conffile
+
+# get global config options (second param is the default)
+getconf configdirectory /etc/backup.d
+getconf scriptdirectory /usr/share/backupninja
+getconf reportdirectory
+getconf reportemail
+getconf reporthost
+getconf reportspace
+getconf reportsuccess yes
+getconf reportinfo no
+getconf reportuser
+getconf reportwarning yes
+getconf loglevel 3
+getconf when "Everyday at 01:00"
+defaultwhen=$when
+getconf logfile /var/log/backupninja.log
+getconf usecolors "yes"
+getconf SLAPCAT /usr/sbin/slapcat
+getconf LDAPSEARCH /usr/bin/ldapsearch
+getconf RDIFFBACKUP /usr/bin/rdiff-backup
+getconf CSTREAM /usr/bin/cstream
+getconf MYSQLADMIN /usr/bin/mysqladmin
+getconf MYSQL /usr/bin/mysql
+getconf MYSQLHOTCOPY /usr/bin/mysqlhotcopy
+getconf MYSQLDUMP /usr/bin/mysqldump
+getconf PSQL /usr/bin/psql
+getconf PGSQLDUMP /usr/bin/pg_dump
+getconf PGSQLDUMPALL /usr/bin/pg_dumpall
+getconf PGSQLUSER postgres
+getconf GZIP /bin/gzip
+getconf GZIP_OPTS --rsyncable
+getconf RSYNC /usr/bin/rsync
+getconf admingroup root
+
+# initialize vservers support
+# (get config variables and check real vservers availability)
+init_vservers nodialog
+
+if [ ! -d "$configdirectory" ]; then
+   echo "Configuration directory '$configdirectory' not found."
+   fatal "Configuration directory '$configdirectory' not found."
+fi
+
+[ -f "$logfile" ] || touch $logfile
+
+if [ "$UID" != "0" ]; then
+   echo "`basename $0` can only be run as root"
+   exit 1
+fi
+
+## Process each configuration file
+
+# by default, don't make files which are world or group readable.
+umask 077
+
+# these globals are set by process_action()
+halts=0
+fatals=0
+errors=0
+warnings=0
+actions_run=0
+errormsg=""
+
+if [ "$singlerun" ]; then
+   files=$singlerun
+else
+   files=`find $configdirectory -follow -mindepth 1 -maxdepth 1 -type f ! -name '.*.swp' | sort -n`
+
+   if [ -z "$files" ]; then
+      info "No backup actions configured in '$configdirectory', run ninjahelper!"
+   fi
+fi
+
+for file in $files; do
+   [ -f "$file" ] || continue
+   [ "$halts" = "0" ] || continue
+
+   check_perms ${file%/*} # check containing dir
+   check_perms $file
+   suffix="${file##*.}"
+   base=`basename $file`
+   if [ "${base:0:1}" == "0" -o "$suffix" == "disabled" ]; then
+      info "Skipping $file"
+      continue
+   fi
+
+   if [ -e "$scriptdirectory/$suffix" ]; then
+      process_action $file $suffix
+   else
+      error "Can't process file '$file': no handler script for suffix '$suffix'"
+      msg "*missing handler* -- $file"
+   fi
+done
+
+## mail the messages to the report address
+
+if [ $actions_run == 0 ]; then doit=0
+elif [ "$reportemail" == "" ]; then doit=0
+elif [ $fatals != 0 ]; then doit=1
+elif [ $errors != 0 ]; then doit=1
+elif [ "$reportsuccess" == "yes" ]; then doit=1
+elif [ "$reportwarning" == "yes" -a $warnings != 0 ]; then doit=1
+else doit=0
+fi
+
+if [ $doit == 1 ]; then
+   debug "send report to $reportemail"
+   hostname=`hostname`
+   [ $warnings == 0 ] || subject="WARNING"
+   [ $errors == 0 ] || subject="ERROR"
+   [ $fatals == 0 ] || subject="FAILED"
+
+   {
+      for ((i=0; i < ${#messages[@]} ; i++)); do
+          echo ${messages[$i]}
+      done
+      echo -e "$errormsg"
+      if [ "$reportspace" == "yes" ]; then
+         previous=""
+         for i in $(ls "$configdirectory"); do
+            backuploc=$(grep ^directory "$configdirectory"/"$i" | /usr/bin/awk '{print $3}')
+            if [ "$backuploc" != "$previous" -a -n "$backuploc" -a -d "$backuploc" ]; then
+               df -h "$backuploc"
+               previous="$backuploc"
+            fi
+         done
+      fi
+   } | mail -s "backupninja: $hostname $subject" $reportemail
+fi
+
+if [ $actions_run != 0 ]; then
+   info "FINISHED: $actions_run actions run. $fatals fatal. $errors error. $warnings warning."
+   if [ "$halts" != "0" ]; then
+      info "Backup was halted prematurely.  Some actions may not have run."
+   fi
+fi
+
+if [ -n "$reporthost" ]; then
+   debug "send $logfile to $reportuser@$reporthost:$reportdirectory"
+   rsync -qt $logfile $reportuser@$reporthost:$reportdirectory
+fi
+function generate_post_data() {
+  cat <<EOF
+{
+  "exit_status": $EXIT_STATUS,
+  "plugin_output": "$PLUGIN_OUTPUT"
+}
+EOF
+}
+
+function generate_post_reschedule() {
+  #TODO: Make the check time configurable
+  RESCHEDULE_TIME=$(date -d "tomorrow 6am" "+%s")
+  cat <<EOF
+{
+  "next_check": "$RESCHEDULE_TIME"
+}
+EOF
+}
+
+function icinga_exit_status() {
+  EXIT_STATUS=3
+  [ $warnings == 0 ] && [ $errors == 0 ] && [ $fatals == 0 ]  &&  EXIT_STATUS=0
+  [ $warnings == 0 ] || EXIT_STATUS=1
+  [ $errors == 0 ] || EXIT_STATUS=2
+  [ $fatals == 0 ] || EXIT_STATUS=2
+}
+
+function icinga_plugin_output() {
+  for ((i=0; i < ${#messages[@]} ; i++)); do
+    PLUGIN_OUTPUT+="${messages[$i]}\n"
+  done
+}
+
+setfile $conffile
+getconf ICINGA2_API_USER
+getconf ICINGA2_API_PASSWORD
+getconf ICINGA2_SERVER_ADDRESS
+getconf ICINGA2_API_PORT
+getconf ICINGA2_HOSTNAME
+if [ -n "$ICINGA2_SERVER_ADDRESS" ] && [ $actions_run != 0 ]; then
+  icinga_exit_status
+  icinga_plugin_output
+  curl -k -s -u $ICINGA2_API_USER:$ICINGA2_API_PASSWORD -H 'Accept: application/json' -X POST "https://$ICINGA2_SERVER_ADDRESS:$ICINGA2_API_PORT/v1/actions/process-check-result?service=${ICINGA2_HOSTNAME}!backupninja" --data "$(generate_post_data)" > /dev/null
+  # Reschedule the next dummy backupninja check
+  curl -k -s -u $ICINGA2_API_USER:$ICINGA2_API_PASSWORD -H 'Accept: application/json' -X POST "https://$ICINGA2_SERVER_ADDRESS:$ICINGA2_API_PORT/v1/actions/reschedule-check?service=${ICINGA2_HOSTNAME}!backupninja" --data "$(generate_post_reschedule)" > /dev/null
+fi

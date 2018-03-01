@@ -30,3 +30,4 @@
     - { role: contrib/geerlingguy.security, tags: security }
     - { role: incoming-smtp, tags: postfix }
     - { role: contrib/geerlingguy.postfix, tags: postfix }
+    - { role: backupninja, tags: backup }
