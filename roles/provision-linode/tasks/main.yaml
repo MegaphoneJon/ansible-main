@@ -1,10 +1,11 @@
 # sudo pip2 install python-linode
 - name: Provision a Linode VM
   linode:
-    api_key: "{{ lookup('passwordstore', 'linode/apikey') }}"
+    api_key: "{{ lookup('passwordstore', 'megaphone/linode/apikey') }}"
     name: "{{ inventory_hostname_short }}"
     linode_id: "{{ linode_id }}"
     plan: "{{ linode_plan }}"
+    password: "{{ lookup('passwordstore', client + '/' + hostname + '/root create=true length=32') }}"
     # Newark, NJ
     datacenter: 6
     # Debian 9
@@ -17,6 +18,33 @@
     state: present
   when: hosting_company == "Linode" and linode_plan > 0
   register: linode
+  tags: debug
+
+- name: update known_hosts
+  shell: |
+    log_user 0
+    spawn ssh -t jongoldberg@lish-newark.linode.com 6296443_yellow
+    expect -re "localhost login: $"
+    send "root\n"
+    expect "Password:"
+    send "{{ lookup('passwordstore', client + '/' + hostname + '/root') }}\n"
+    expect "root@localhost:"
+    #send "ssh-keygen -lf <(ssh-keyscan localhost 2>/dev/null\n"
+    send "ssh-keyscan localhost\n"
+    expect -re "ssh-keyscan localhost\r\n(.*)\r\nroot@localhost:"
+    set output $expect_out(1,string)
+    puts $output
+    send "logout\n"
+    expect -re "localhost login: $"
+    exit
+  args:
+    executable: /usr/bin/expect
+  register: definitive_fingerprints
+  tags: debug
+
+- name: debug shit
+  debug: var=definitive_fingerprints
+  tags: debug
 
 # Next two steps update crm.megaphonetech.com/server-list
 - name: Login to Drupal Inventory
