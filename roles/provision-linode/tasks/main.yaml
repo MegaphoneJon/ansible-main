@@ -20,10 +20,22 @@
   register: linode
   tags: debug
 
-- name: update known_hosts
+- name: debug shit1
+  debug: var=linode
+  tags: debug
+
+- name: Wait for Linode to listen on port 22
+  wait_for:
+    state: started
+    host: "{{ linode.instance.ipv4 }}"
+    port: 22
+
+
+- name: get keys for known_hosts
   shell: |
     log_user 0
-    spawn ssh -t jongoldberg@lish-newark.linode.com 6296443_yellow
+    match_max 5000
+    spawn ssh -t jongoldberg@lish-newark.linode.com "{{ linode.instance.name }}"
     expect -re "localhost login: $"
     send "root\n"
     expect "Password:"
@@ -33,18 +45,28 @@
     send "ssh-keyscan localhost\n"
     expect -re "ssh-keyscan localhost\r\n(.*)\r\nroot@localhost:"
     set output $expect_out(1,string)
-    puts $output
     send "logout\n"
     expect -re "localhost login: $"
+    set output2 [exec echo $output | sed "s/\u001b...;105H//g" | sed "s/localhost//g" | grep -v #]
+    puts $output2
     exit
   args:
     executable: /usr/bin/expect
-  register: definitive_fingerprints
+  register: definitive_keys
   tags: debug
 
-- name: debug shit
-  debug: var=definitive_fingerprints
+- name: debug shit2
+  debug: var=definitive_keys
   tags: debug
+
+- name: update the local known_hosts
+  known_hosts:
+    name: "{{ linode.instance.ipv4 }}"
+    key: "{{ linode.instance.ipv4 + item }}"
+    path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
+  with_items: "{{ definitive_keys.stdout_lines }}"
+  tags: [debug,debug2]
+
 
 # Next two steps update crm.megaphonetech.com/server-list
 - name: Login to Drupal Inventory
@@ -60,7 +82,7 @@
   when: hosting_company == "Linode" and linode_plan > 0
   register: login
 
-- name: update the inventory node with linode ID and IP address
+- name: update the inventory node with linode ID, IP address, ssh key
   uri:
     url: "{{ inventory_rest_endpoint }}node/{{ nid }}.json"
     headers:
