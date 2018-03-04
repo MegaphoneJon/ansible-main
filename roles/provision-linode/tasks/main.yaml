@@ -18,11 +18,6 @@
     state: present
   when: hosting_company == "Linode" and linode_plan > 0
   register: linode
-  tags: debug
-
-- name: debug shit1
-  debug: var=linode
-  tags: debug
 
 - name: Wait for Linode to listen on port 22
   wait_for:
@@ -30,89 +25,95 @@
     host: "{{ linode.instance.ipv4 }}"
     port: 22
 
+# If this returns true, skip the rest of provisioning.
+- name: Check if Ansible user exists
+  command: ssh -q -o BatchMode=yes -o ConnectTimeout=3 {{ ansible_user }}@{{ inventory_hostname }} "echo OK"
+  changed_when: false
+  failed_when: false
+  register: check_ansible_user
 
-- name: get keys for known_hosts
-  shell: |
-    log_user 0
-    match_max 5000
-    spawn ssh -t jongoldberg@lish-newark.linode.com "{{ linode.instance.name }}"
-    expect -re "localhost login: $"
-    send "root\n"
-    expect "Password:"
-    send "{{ lookup('passwordstore', client + '/' + hostname + '/root') }}\n"
-    expect "root@localhost:"
-    #send "ssh-keygen -lf <(ssh-keyscan localhost 2>/dev/null\n"
-    send "ssh-keyscan localhost\n"
-    expect -re "ssh-keyscan localhost\r\n(.*)\r\nroot@localhost:"
-    set output $expect_out(1,string)
-    send "logout\n"
-    expect -re "localhost login: $"
-    set output2 [exec echo $output | sed "s/\u001b...;105H//g" | sed "s/localhost//g" | grep -v #]
-    puts $output2
-    exit
-  args:
-    executable: /usr/bin/expect
-  register: definitive_keys
-  tags: debug
+- block:
+  - name: get keys for known_hosts
+    shell: |
+      log_user 0
+      match_max 5000
+      set prompt "~# $"
+      set prompt [string trim $prompt]
+      spawn ssh -t jongoldberg@lish-newark.linode.com "{{ linode.instance.name }}"
+      #expect -re "login:.*$"
+      send "root\n"
+      expect "Password:"
+      send "{{ lookup('passwordstore', client + '/' + hostname + '/root') }}\n"
+      expect $prompt
+      send "ssh-keyscan localhost\n"
+      expect -re "ssh-keyscan localhost\r\n(.*)\r\nroot@.*$prompt"
+      set output $expect_out(1,string)
+      send "logout\n"
+      expect -re "login: $"
+      set output2 [exec echo $output | sed "s/\u001b...;105H//g" | sed "s/localhost//g" | grep -v #]
+      puts $output2
+      exit
+    args:
+      executable: /usr/bin/expect
+    register: definitive_keys
+  
+  - name: update the local known_hosts
+    known_hosts:
+      name: "{{ linode.instance.ipv4 }}"
+      key: "{{ linode.instance.ipv4 + item }}"
+      path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
+    with_items: "{{ definitive_keys.stdout_lines }}"
 
-- name: debug shit2
-  debug: var=definitive_keys
-  tags: debug
+  # Next two steps update crm.megaphonetech.com/server-list
+  - name: Login to Drupal Inventory
+    uri:
+      url: "{{ inventory_rest_endpoint }}user/login.json"
+      headers:
+        X-CSRF-Token: token.json.token
+      body:
+        username: "{{ inventory_username }}"
+        password: "{{ lookup('passwordstore', 'megaphone/crm/restpassword') }}"
+      method: POST
+      body_format: json
+    when: hosting_company == "Linode" and linode_plan > 0
+    register: login
 
-- name: update the local known_hosts
-  known_hosts:
-    name: "{{ linode.instance.ipv4 }}"
-    key: "{{ linode.instance.ipv4 + item }}"
-    path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
-  with_items: "{{ definitive_keys.stdout_lines }}"
-  tags: [debug,debug2]
+  - name: update the inventory node with linode ID, IP address, ssh key
+    uri:
+      url: "{{ inventory_rest_endpoint }}node/{{ nid }}.json"
+      headers:
+        X-CSRF-Token: "{{ login.json.token }}"
+        Cookie: "{{ login.json.session_name }}={{login.json.sessid}}"
+      method: PUT
+      body_format: json
+      body:
+        field_ipv4_address:
+          und:
+            0:
+              end: "{{ linode.instance.ipv4 }}"
+              start: "{{ linode.instance.ipv4 }}"
+        field_linode_id:
+          und:
+            0:
+              value: "{{ linode.instance.id }}"
+        field_ssh_keys:
+          und:
+            0:
+              value: "{{ definitive_keys.stdout }}"
+    when: hosting_company == "Linode" and linode_plan > 0
 
+  # Next two steps add DNS
+  - name: Add new host to in-memory inventory
+    add_host:
+      hostname: "{{ linode.instance.ipv4 }}"
+      groupname: "linode"
+      ansible_user: root
+    when: linode.instance is defined and (linode.instance.id|string != linode_id|string)
 
-# Next two steps update crm.megaphonetech.com/server-list
-- name: Login to Drupal Inventory
-  uri:
-    url: "{{ inventory_rest_endpoint }}user/login.json"
-    headers:
-      X-CSRF-Token: token.json.token
-    body:
-      username: "{{ inventory_username }}"
-      password: "{{ lookup('passwordstore', 'megaphone/crm/restpassword') }}"
-    method: POST
-    body_format: json
-  when: hosting_company == "Linode" and linode_plan > 0
-  register: login
-
-- name: update the inventory node with linode ID, IP address, ssh key
-  uri:
-    url: "{{ inventory_rest_endpoint }}node/{{ nid }}.json"
-    headers:
-      X-CSRF-Token: "{{ login.json.token }}"
-      Cookie: "{{ login.json.session_name }}={{login.json.sessid}}"
-    method: PUT
-    body_format: json
-    body:
-      field_ipv4_address:
-        und:
-          0:
-            end: "{{ linode.instance.ipv4 }}"
-            start: "{{ linode.instance.ipv4 }}"
-      field_linode_id:
-        und:
-          0:
-            value: "{{ linode.instance.id }}"
-  when: hosting_company == "Linode" and linode_plan > 0
-
-# Next two steps add DNS
-- name: Add new host to in-memory inventory
-  add_host:
-    hostname: "{{ linode.instance.ipv4 }}"
-    groupname: "linode"
-    ansible_user: root
-  when: linode.instance is defined and (linode.instance.id|string != linode_id|string)
-
-- name: Update MFPL DNS
-  local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ inventory_hostname }}" "{{ linode.instance.ipv4 }}"
-  with_items: groups['linode']
-  register: dnshelper_result
-  when: linode.instance is defined
-  changed_when: "dnshelper_result.stdout != 'DNS already exists and is correct.'"
+  - name: Update MFPL DNS
+    local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ inventory_hostname }}" "{{ linode.instance.ipv4 }}"
+    with_items: groups['linode']
+    register: dnshelper_result
+    when: linode.instance is defined
+    changed_when: "dnshelper_result.stdout != 'DNS already exists and is correct.'"
+  when: check_ansible_user | failed
