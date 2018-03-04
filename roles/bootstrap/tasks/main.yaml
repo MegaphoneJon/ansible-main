@@ -1,33 +1,35 @@
 # So we get the new IP address
 - meta: refresh_inventory
 
-- name: Wait for Linode to listen on port 22
-  wait_for:
-    state: started
-    host: "{{ ansible_host }}"
-    port: 22
+- block:
+  - name: Wait for Linode to listen on port 22
+    wait_for:
+      state: started
+      host: "{{ ansible_host }}"
+      port: 22
 
-- name: Add an Ansible user
-  connection: ssh
-  user: 
-    name: "{{ ansible_user_2 }}"
-  tags: bootstrap
+  - name: Add an Ansible user
+    connection: ssh
+    user: 
+      name: "{{ ansible_user_2 }}"
+    tags: bootstrap
 
-- name: Add Ansible user to sudo
-  connection: ssh
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    regexp: "^{{ ansible_user_2 }}"
-    line: "{{ ansible_user_2 }} ALL=(ALL) NOPASSWD: ALL"
-    validate: 'visudo -cf %s'
-  tags: bootstrap
+  - name: Add Ansible user to sudo
+    connection: ssh
+    lineinfile:
+      dest: /etc/sudoers
+      state: present
+      regexp: "^{{ ansible_user_2 }}"
+      line: "{{ ansible_user_2 }} ALL=(ALL) NOPASSWD: ALL"
+      validate: 'visudo -cf %s'
+    tags: bootstrap
 
-- name: Add authorized keys to Ansible user
-  connection: ssh
-  authorized_key:
-    user: "{{ ansible_user_2 }}"
-    key: "{{ lookup('file', 'files/megaphonetech.pub') }}"
+  - name: Add authorized keys to Ansible user
+    connection: ssh
+    authorized_key:
+      user: "{{ ansible_user_2 }}"
+      key: "{{ lookup('file', 'files/megaphonetech.pub') }}"
+  when: check_ansible_user is defined and check_ansible_user | failed
 
 #apt-get update && apt-get dist-upgrade
 - name: Update all packages to the latest version
@@ -36,3 +38,4 @@
     upgrade: dist
      # 86400 seconds = 24 hours
     cache_valid_time: 86400
+
