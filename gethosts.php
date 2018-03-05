@@ -26,8 +26,14 @@ function run($argv) {
       if ($argv[1] == '--host' && $argv[2]) {
         $resource .= "&title=$argv[2]";
       }
-      $result = get($headers, $resource, NULL);
-      $inventory = buildServerList($result);
+      $servers = get($headers, $resource, NULL);
+      // Get the websites too.
+      $resource = 'views/website_list?display_id=services_1';
+      if ($argv[1] == '--host' && $argv[2]) {
+        $resource .= "&title=$argv[2]";
+      }
+      $websites = get($headers, $resource, NULL);
+      $inventory = buildServerList($servers, $websites);
       $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
       echo $inventory;
       break;
@@ -58,14 +64,16 @@ function buildGroupHierarchy($groups) {
 /**
  * Accepts an array from Drupal Services Views, outputs an Ansible-compatible host list.
  *
- * @param array $view
- *   The array that holds all the db ids.
+ * @param array $servers
+ *   The array that holds all the server data.
+ * @param array $websites
+ *   The array that holds all the website data.
  *
  * @return string $inventory This is a JSON-encoded inventory file in the format Ansible expects.
  */
-function buildServerList($view) {
+function buildServerList($servers, $websites) {
   $inventory[] = [];
-  foreach ($view as $server) {
+  foreach ($servers as $server) {
     $inventory[$server->group]['hosts'][] = $server->fqdn;
     // Pull in all field values as Ansible variables.
     foreach ($server as $key => $value) {
@@ -73,6 +81,9 @@ function buildServerList($view) {
         $key = str_replace(' ', '_', $key);
         $inventory['_meta']['hostvars'][$server->fqdn][$key] = $value;
       }
+    }
+    foreach ($websites as $website) {
+      $inventory['_meta']['hostvars'][$website->server]['sites'][$website->primary_url] = $website;
     }
   }
   return $inventory;
