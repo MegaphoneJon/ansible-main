@@ -24,10 +24,11 @@
     state: started
     host: "{{ linode.instance.ipv4 }}"
     port: 22
+  when: linode is defined
 
 # If this returns true, skip the rest of provisioning.
 - name: Check if Ansible user exists
-  command: ssh -q -o BatchMode=yes -o ConnectTimeout=3 {{ ansible_user }}@{{ inventory_hostname }} "echo OK"
+  command: ssh -q -o BatchMode=yes -o ConnectTimeout=3 {{ ansible_user_2 }}@{{ linode.instance.ipv4 }} "echo OK"
   changed_when: false
   failed_when: false
   register: check_ansible_user
@@ -57,10 +58,25 @@
       executable: /usr/bin/expect
     register: definitive_keys
   
-  - name: update the local known_hosts
+  - name: update the local known_hosts by IP
     known_hosts:
       name: "{{ linode.instance.ipv4 }}"
       key: "{{ linode.instance.ipv4 + item }}"
+      path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
+    with_items: "{{ definitive_keys.stdout_lines }}"
+
+  - name: remove existing known_hosts by hostname
+    known_hosts:
+      name: "{{ inventory_hostname }}"
+      key: "{{ inventory_hostname + item }}"
+      path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
+      state: absent
+    with_items: "{{ definitive_keys.stdout_lines }}"
+
+  - name: update the local known_hosts by hostname
+    known_hosts:
+      name: "{{ inventory_hostname }}"
+      key: "{{ inventory_hostname + item }}"
       path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
     with_items: "{{ definitive_keys.stdout_lines }}"
 
@@ -116,4 +132,4 @@
     register: dnshelper_result
     when: linode.instance is defined
     changed_when: "dnshelper_result.stdout != 'DNS already exists and is correct.'"
-  when: check_ansible_user | failed
+  when: check_ansible_user.rc != 0
