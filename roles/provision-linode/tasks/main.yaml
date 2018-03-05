@@ -24,7 +24,7 @@
     state: started
     host: "{{ linode.instance.ipv4 }}"
     port: 22
-  when: linode is defined
+  when: linode|changed
 
 # If this returns true, skip the rest of provisioning.
 - name: Check if Ansible user exists
@@ -32,6 +32,7 @@
   changed_when: false
   failed_when: false
   register: check_ansible_user
+  when: linode|changed
 
 - block:
   - name: get keys for known_hosts
@@ -132,4 +133,4 @@
     register: dnshelper_result
     when: linode.instance is defined
     changed_when: "dnshelper_result.stdout != 'DNS already exists and is correct.'"
-  when: check_ansible_user.rc != 0
+  when: linode|changed and check_ansible_user.rc != 0
