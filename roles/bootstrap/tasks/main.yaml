@@ -29,7 +29,7 @@
     authorized_key:
       user: "{{ ansible_user_2 }}"
       key: "{{ lookup('file', 'files/megaphonetech.pub') }}"
-  when: check_ansible_user is defined and check_ansible_user | failed
+  when: check_ansible_user is defined and check_ansible_user.rc != 0
 
 #apt-get update && apt-get dist-upgrade
 - name: Update all packages to the latest version
