@@ -83,7 +83,7 @@ function buildServerList($servers, $websites) {
       }
     }
     foreach ($websites as $website) {
-      $inventory['_meta']['hostvars'][$website->server]['sites'][$website->primary_url] = $website;
+      $inventory['_meta']['hostvars'][$website->server]['sites'][$website->bare_url] = $website;
     }
   }
   return $inventory;
