@@ -9,36 +9,18 @@
   become: no
   register: key
 
-- name: debug shit
-  debug: 
-    msg: "{{ key['content'] | b64decode }}"
-
-
-- name: Query gogs API to ensure deploy key exists (and for URLs)
-  uri:
-    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}/keys
-#    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/lava' }}/keys
-    headers:
-      Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
-  register: temp
-
-- debug: var=temp
-
 - name: Set up deploy keys on gogs
   uri:
-    url: https://git.megaphonetech.com/api/v1/user/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}
-    method: GET
+    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}/keys
+    method: POST
     body_format: json
     body:
-      title: test key
-      body: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDnDHxPimfgZi+/nZJvuXcQehofpwP+kH/rmQ36S1aSVazC5Q/DhVhUoh90wGcgbAKk32Cfdf7BLdP9pnrSrHT8M/DaLBNF4c+kQGoLaQbE0dNv4tgxVoITV7pcQPHzeiXHMBVCy2sDPbIpK367HtDke6R5dHM2jgUvKHoshfe7pS0LjmQvOnp2gAvSFcSPkmg3gAfWi32ogpN+zSMGtEATKAGQlxFb8a3SPcntJMPUdUrJWOeAuLRZ6xClRgHhhCWQNHkbbFnliuL06KbEPWN2pgWlhVB6vgV8mSIinsaiZ97+3vigES0rGlgbNc5y5y1tBXOLN3VHZ/kSyTJZD8nF jon@orange
+      title: "{{ ansible_user + '@' + inventory_hostname_short }}"
+      key: "{{ key['content'] | b64decode }}"
     headers:
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
-  register: debug
-
-
-- name: show var
-  debug: var=debug
+  register: gogs_result
+  failed_when: gogs_result.status != 201 and not (gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
 
 #TODO: Sometimes we're making a new site
 - name: clone an existing site
