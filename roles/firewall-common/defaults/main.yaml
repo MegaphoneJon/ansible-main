@@ -13,6 +13,7 @@ outgoing_ports:
   - { port: 5665, protocol: tcp, name: 'Icinga2' }
   - { port: 10022, protocol: tcp, name: 'Megaphone git SSH' }
   - { port: 53, protocol: udp, name: 'DNS' }
+  - { port: 993, protocol: tcp, name: 'IMAPS' }
 
 ip_versions:
   - ipv4
