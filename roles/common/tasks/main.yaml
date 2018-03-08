@@ -1,3 +1,10 @@
+- name: Update all packages to the latest version
+  connection: ssh
+  apt:
+    upgrade: dist
+     # 86400 seconds = 24 hours
+    cache_valid_time: 86400
+
 # Add Megaphone key to root/Ansible user on all servers
 - name: Add Megaphone keys to "{{ sshuser }}"
   authorized_key:
