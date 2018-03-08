@@ -1,0 +1,21 @@
+---
+- name: Create vhost conf
+  template: 
+    src: templates/vhost.conf.j2 
+    dest: /etc/apache2/sites-available/{{ item.key }}.conf
+  with_dict: "{{ sites }}"
+  notify: restart apache
+
+- name: Enable the site
+  file:
+    src: /etc/apache2/sites-available/{{ item.key }}.conf
+    dest: /etc/apache2/sites-enabled/{{ item.key }}.conf
+    state: link
+  with_dict: "{{ sites }}"
+  notify: restart apache
+
+# For internal (git.megaphonetech.com) repos
+- include_tasks: internal-git.yml
+  with_dict: "{{ sites }}"
+  become_user: ansible
+  tags: debug

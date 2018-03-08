@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+  DocumentRoot {{ item.value.webroot }}
+  ServerName {{ item.key }}
+
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ "unix:/var/run/php/php-fpm.sock|fcgi://localhost{{ item.value.webroot }}"
+
+<Directory "{{ item.value.webroot }}">
+  AllowOverride All
+  Require all granted
+  Options -Indexes
+</Directory>
+</VirtualHost>
+

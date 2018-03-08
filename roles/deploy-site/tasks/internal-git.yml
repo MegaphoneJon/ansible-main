@@ -1,0 +1,48 @@
+- name: Get the home directory
+  user:
+    name: "{{ ansible_user }}"
+  register: userinfo
+
+- name: Get the Ansible user's SSH key
+  slurp:
+    src: "{{ userinfo.home }}/.ssh/id_rsa.pub"
+  become: no
+  register: key
+
+- name: debug shit
+  debug: 
+    msg: "{{ key['content'] | b64decode }}"
+
+
+- name: Query gogs API to ensure deploy key exists (and for URLs)
+  uri:
+    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}/keys
+#    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/lava' }}/keys
+    headers:
+      Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
+  register: temp
+
+- debug: var=temp
+
+- name: Set up deploy keys on gogs
+  uri:
+    url: https://git.megaphonetech.com/api/v1/user/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}
+    method: GET
+    body_format: json
+    body:
+      title: test key
+      body: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDnDHxPimfgZi+/nZJvuXcQehofpwP+kH/rmQ36S1aSVazC5Q/DhVhUoh90wGcgbAKk32Cfdf7BLdP9pnrSrHT8M/DaLBNF4c+kQGoLaQbE0dNv4tgxVoITV7pcQPHzeiXHMBVCy2sDPbIpK367HtDke6R5dHM2jgUvKHoshfe7pS0LjmQvOnp2gAvSFcSPkmg3gAfWi32ogpN+zSMGtEATKAGQlxFb8a3SPcntJMPUdUrJWOeAuLRZ6xClRgHhhCWQNHkbbFnliuL06KbEPWN2pgWlhVB6vgV8mSIinsaiZ97+3vigES0rGlgbNc5y5y1tBXOLN3VHZ/kSyTJZD8nF jon@orange
+    headers:
+      Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
+  register: debug
+
+
+- name: show var
+  debug: var=debug
+
+#TODO: Sometimes we're making a new site
+- name: clone an existing site
+  git:
+    repo: "{{ item.value.git_repo_url }}"
+    dest: "{{ item.value.gitroot }}"
+    version: master
