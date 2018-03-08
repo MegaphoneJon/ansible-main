@@ -12,6 +12,7 @@
     connection: ssh
     user: 
       name: "{{ ansible_user_2 }}"
+      generate_ssh_key: yes
     tags: bootstrap
 
   - name: Add Ansible user to sudo
