@@ -90,4 +90,3 @@
     src: templates/backupninja.conf.j2
     dest: /etc/backupninja.conf
     mode: 0600
-  tags: debug
