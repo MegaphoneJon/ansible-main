@@ -6,7 +6,7 @@
 
   roles:
     - common
-    - mtcusers
+    - { role: mtcusers, tags: users }
 
 - hosts: lamp
   become: yes
@@ -32,4 +32,4 @@
     - { role: incoming-smtp, tags: postfix }
     - { role: contrib/geerlingguy.postfix, tags: postfix }
     - { role: backupninja, tags: backup }
-    - { role: apache-vhosts, tags: [apache,apache-vhosts] }
+    - { role: deploy-site, tags: deploy-site, when: sites is defined }
