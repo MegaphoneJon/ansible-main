@@ -23,17 +23,6 @@
   changed_when: gogs_result.status == 201
   failed_when: gogs_result.status != 201 and not (gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
 
-- name: Add gogs keys to Ansible user known_hosts
-  known_hosts:
-    name: "[git.megaphonetech.com]:10022"
-    key: "{{ inner_item }}" 
-  loop_control:
-    loop_var: inner_item
-  with_items:
-    - "[git.megaphonetech.com]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgNwIe3TBtRHtkwoHL2TG84/f039hgzqVbN0z4sk1UHPZr4rxFinGCGjedzE+adVucqr/gemPnETfashTujcPyZZkwPn2dQNx0HuPHw3H+cqXqKt03fsgPcerqsqvFS509pcblmP5vtJLF4uVgbh6TLmZiObMuiIYe9VTyZSXo67DTt/K6SSgwyUFldqJIJQA+DO1nXoSYSJ4fP1DDPdue0RTL06VtlnUL2w9iHrOgVRY1KqAtpnGRslKx5c3L8+9EBMdJWM1CPK11vkvyf8LnYwuCH4V7w0rVs2QAE9Abm4g4HiE4wql5QJrjCi/cq/1doeY9KXxFb8SOTtZBk5Nn"
-    - "[git.megaphonetech.com]:10022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLuEP2fW8Eycdbeo0XWihr63zj6yCTcCjxh4C4i3c8p2O44mKRjVhxOSSBQQxZNUKeJYAGTuWh+EPW71KADzXv0="
-    - "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w"
-      
 - name: Create the folder hierarchy
   file:
     path: "{{ item.value.gitroot }}"
