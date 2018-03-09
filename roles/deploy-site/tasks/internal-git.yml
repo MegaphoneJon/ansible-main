@@ -38,9 +38,9 @@
   file:
     path: "{{ item.value.gitroot }}"
     state: directory
-    mode: u=rwx,g=rwxs,o=rwx
+    mode: 02770
 #    recurse: yes
-    owner: "{{ item.value.run_as_user }}"
+    owner: "{{ ansible_user }}"
     group: "{{ item.value.run_as_user }}"
   become_user: root
 
@@ -50,3 +50,4 @@
     repo: "{{ item.value.git_repo_url }}"
     dest: "{{ item.value.gitroot }}"
     version: master
+    umask: "0007"
