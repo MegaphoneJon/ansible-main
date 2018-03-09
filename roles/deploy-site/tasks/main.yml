@@ -1,12 +1,12 @@
 ---
-- name: Create vhost conf
+- name: Create vhost conf (Apache)
   template: 
     src: templates/vhost.conf.j2 
     dest: /etc/apache2/sites-available/{{ item.key }}.conf
   with_dict: "{{ sites }}"
   notify: restart apache
 
-- name: Enable the site
+- name: Enable the site (Apache)
   file:
     src: /etc/apache2/sites-available/{{ item.key }}.conf
     dest: /etc/apache2/sites-enabled/{{ item.key }}.conf
@@ -18,4 +18,3 @@
 - include_tasks: internal-git.yml
   with_dict: "{{ sites }}"
   become_user: ansible
-  tags: debug
