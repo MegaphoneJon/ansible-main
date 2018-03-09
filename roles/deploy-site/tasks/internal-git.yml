@@ -20,6 +20,7 @@
     headers:
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
   register: gogs_result
+  changed_when: gogs_result.status == 201
   failed_when: gogs_result.status != 201 and not (gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
 
 - name: Add gogs keys to Ansible user known_hosts
@@ -35,16 +36,13 @@
       
 - name: Create the folder hierarchy
   file:
-    path: /var/www/crm.megaphonetech.com
+    path: "{{ item.value.gitroot }}"
     state: directory
     mode: u=rwx,g=rwxs,o=rwx
 #    recurse: yes
     owner: "{{ item.value.run_as_user }}"
     group: "{{ item.value.run_as_user }}"
   become_user: root
-
-- fail:
-
 
 #TODO: Sometimes we're making a new site
 - name: clone an existing site
