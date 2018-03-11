@@ -14,7 +14,18 @@
   with_dict: "{{ sites }}"
   notify: restart apache
 
+# This will return 200 in repo_check.results.item.status if the repo exists, 404 if not
+- name: Check if a repo exists on git.megaphonetech.com
+  uri:
+    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}
+    headers:
+      Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
+  with_dict: "{{ sites }}"
+  register: repo_check
+  failed_when: false
+
 # For internal (git.megaphonetech.com) repos
 - include_tasks: internal-git.yml
-  with_dict: "{{ sites }}"
-  become_user: ansible
+  with_items: "{{ repo_check.results }}"
+  become_user: "{{ ansible_user }}"
+  when: item.status == 200
