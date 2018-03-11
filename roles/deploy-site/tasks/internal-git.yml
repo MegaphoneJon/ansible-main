@@ -23,16 +23,6 @@
   changed_when: gogs_result.status == 201
   failed_when: gogs_result.status != 201 and not (gogs_result.json is defined and gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
 
-- name: Create the folder hierarchy
-  file:
-    path: "{{ item.item.value.gitroot }}"
-    state: directory
-    mode: 02770
-#    recurse: yes
-    owner: "{{ ansible_user }}"
-    group: "{{ item.item.value.run_as_user }}"
-  become_user: root
-
 #TODO: Sometimes we're making a new site
 - name: clone an existing site
   git:
