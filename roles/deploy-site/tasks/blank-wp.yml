@@ -1,0 +1,8 @@
+- name: Download wordpress into /srv/wordpress using wp[-cli] command as the wordpress user
+  command: "wp core download --path={{ item.item.value.webroot }}"
+
+#- name: Run the WP installer
+#  command: wp core install --url="{{item.item.value.bare_url}}" 
+#TODO: Finish install https://blog.sucuri.net/2015/08/wp-cli-guide-installing-wordpress.html
+#TODO: git init, commit, maybe .gitignore tweak and permissions fixed?
+#TODO: CiviCRM.  Is cv:install useful here?
