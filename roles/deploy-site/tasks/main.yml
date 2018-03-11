@@ -23,6 +23,7 @@
   with_dict: "{{ sites }}"
   register: repo_check
   failed_when: false
+  tags: debug
 
 - name: Create the folder hierarchy
   file:
@@ -56,13 +57,13 @@
     host: 'localhost' 
     state: present
   with_dict: "{{ sites }}"
-- fail:
 
 # Build a new WP site
 - include_tasks: blank-wp.yml
   with_items: "{{ repo_check.results }}"
   become_user: "{{ ansible_user }}"
   when: item.status == 404 and item.item.value.cms == 'WordPress'
+  tags: debug
 
 # TODO
 # Next 3 steps ensure the Ansible user's deploy key is on each gogs repo
@@ -72,4 +73,3 @@
   with_items: "{{ repo_check.results }}"
   become_user: "{{ ansible_user }}"
   when: item.status == 200
-

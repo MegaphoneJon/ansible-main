@@ -26,25 +26,45 @@
   become_user: root
   when: item.item.value.civicrm == 'Yes'
 
-- name: Check out CiviCRM from git
-  git:
-    repo: https://github.com/civicrm/civicrm-core.git
-    dest: "{{ item.item.value.webroot }}/wp-content/plugins/civicrm/civicrm"
+- name: Download the latest tarball
+  get_url:
+    url: https://download.civicrm.org/latest/civicrm-STABLE-wordpress.zip
+    dest: /tmp/civicrm-STABLE-wordpress.zip
+  when: item.item.value.civicrm == 'Yes'
+
+- name: Create CiviCRM folder
+  file:
+    path: "{{ item.item.value.civiroot }}"
+    state: directory
+  when: item.item.value.civicrm == 'Yes'
+
+- name: Unzip the tarball
+  unarchive:
+    src: /tmp/civicrm-STABLE-wordpress.zip
+    dest: "{{ item.item.value.civiroot }}/../.."
+    remote_src: yes
+    creates: "{{ item.item.value.civiroot }}/composer.json"
   when: item.item.value.civicrm == 'Yes'
 
 - name: Create CiviCRM uploads folder
   file:
     path: "{{ item.item.value.civicrm_settings_php_path }}"
     state: directory
+  when: item.item.value.civicrm == 'Yes'
 
-- name: Template out civicrm.settings.php
-  template:
-    src: civicrm.settings.j2
-    dest: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
+- name: Set file permissions
+  file:
+    dest: "{{ item.item.value.webroot }}"
     owner: "{{ ansible_user }}"
     group: "{{ item.item.value.run_as_user }}"
-    mode: 0660
+    recurse: yes
+    mode: ug=rwX
   become_user: root
-  when: item.item.value.civicrm == 'Yes'
-#TODO: git init, commit, maybe .gitignore tweak and permissions fixed?
-#TODO: CiviCRM.  Is cv:install useful here?
+
+- name: Run cv core:install
+  command: "cv core:install --db=mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }}"
+  args:
+    chdir: "{{ item.item.value.civiroot }}"
+    creates: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
+
+#TODO: git init, commit, maybe .gitignore tweak
