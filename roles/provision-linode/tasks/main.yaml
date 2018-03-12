@@ -1,7 +1,7 @@
 # sudo pip2 install python-linode
 - name: Provision a Linode VM
   linode:
-    api_key: "{{ lookup('passwordstore', 'megaphone/linode/apikey') }}"
+    api_key: "{{ linode_api_key }}"
     name: "{{ inventory_hostname_short }}"
     linode_id: "{{ linode_id }}"
     plan: "{{ linode_plan }}"
