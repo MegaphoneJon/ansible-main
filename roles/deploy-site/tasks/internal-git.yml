@@ -9,13 +9,19 @@
   become: no
   register: key
 
+# Gogs thinks the key exists if the title matches an existing key.
+# So we hash the key to add to the title.
+- name: Get a key checksum
+  set_fact:
+    key_md5: "{{ key['content'] | b64decode | md5 }}"
+
 - name: Set up deploy keys on gogs
   uri:
     url: https://git.megaphonetech.com/api/v1/repos/{{ item.item.value.git_repo_owner + '/' + item.item.value.git_repo_name }}/keys
     method: POST
     body_format: json
     body:
-      title: "{{ ansible_user + '@' + inventory_hostname_short }}"
+      title: "{{ ansible_user + '@' + inventory_hostname_short + ' ' + key_md5 }}"
       key: "{{ key['content'] | b64decode }}"
     headers:
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
