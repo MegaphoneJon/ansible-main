@@ -1,18 +1,18 @@
 ---
 # Run this role BEFORE the postfix role.
-- name: Set Postfix/firewall to allow incoming
+- name: Set Postfix to allow incoming
   set_fact:
     postfix_inet_interfaces: all
     smtp_firewall_opening: present
   when: incoming_email == '1'
 
-- name: Set Postfix/firewall to deny incoming
+- name: Set Postfix to deny incoming
   set_fact:
     postfix_inet_interfaces: localhost
     smtp_firewall_opening: absent
   when: incoming_email == '0'
 
-- name: Set port 25 incoming
+- name: Open port 25 incoming
   iptables:
     chain: INPUT
     destination_port: 25
@@ -24,8 +24,9 @@
     - ipv4
     - ipv6
   notify: save iptables
+  when: incoming_email == '1'
 
-- name: Reply to port 25 incoming
+- name: Open to port 25 incoming
   iptables:
     chain: OUTPUT
     ctstate: ESTABLISHED
@@ -38,3 +39,4 @@
     - ipv4
     - ipv6
   notify: save iptables
+  when: incoming_email == '1'
