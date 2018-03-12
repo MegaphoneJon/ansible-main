@@ -6,7 +6,7 @@
   notify: restart php-fpm
 
 - name: CLI PHP should have no memory limit
-  lineinfile:
-    dest: /etc/php/7.0/cli/php.ini
-    regexp: "^memory_limit"
-    line: "memory_limit = -1"
+  copy:
+    src: files/99-cli.ini
+    dest: /etc/php/7.0/cli/conf.d
+    mode: 0644
