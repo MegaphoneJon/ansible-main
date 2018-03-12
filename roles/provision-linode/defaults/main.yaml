@@ -5,3 +5,4 @@ inventory_username: 'restuser'
 linode_plan: 0
 linode_id: 0
 linode_api_key: "{{ lookup('passwordstore', 'megaphone/linode/apikey') }}"
+linode_username: jongoldberg
