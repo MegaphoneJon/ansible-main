@@ -1,1 +1,2 @@
 linode_api_key: "{{ lookup('passwordstore', 'acd/linode/apikey') }}"
+linode_username: jongoldbergacd
