@@ -14,15 +14,20 @@
   with_dict: "{{ sites }}"
   notify: restart apache
 
-# This will return 200 in repo_check.results.item.status if the repo exists, 404 if not
-- name: Check if a repo exists on git.megaphonetech.com
+- name: Check if repos exist on gogs - create if not
   uri:
-    url: https://git.megaphonetech.com/api/v1/repos/{{ item.value.git_repo_owner + '/' + item.value.git_repo_name }}
+    url: https://git.megaphonetech.com/api/v1/org/{{ item.value.git_repo_owner }}/repos
+    method: POST
     headers:
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
+    body:
+      name: "{{ item.value.git_repo_name }}"
+      description: "Repo for {{ item.value.git_repo_name }}"
+      private: true
+    body_format: json
   with_dict: "{{ sites }}"
-  register: repo_check
-  failed_when: false
+  register: create_gogs_repo
+  failed_when: not(create_gogs_repo.status == 201 or create_gogs_repo.status == 422)
   tags: debug
 
 - name: Create the folder hierarchy
@@ -60,9 +65,16 @@
 
 # Build a new WP site
 - include_tasks: blank-wp.yml
-  with_items: "{{ repo_check.results }}"
+  with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ ansible_user }}"
-  when: item.status == 404 and item.item.value.cms == 'WordPress'
+#  when: item.status == 201 and item.item.value.cms == 'WordPress'
+#  tags: debug
+
+# Tasks for blank sites regardless of CMS
+- include_tasks: blank-site.yml
+  with_items: "{{ create_gogs_repo.results }}"
+  become_user: "{{ ansible_user }}"
+#  when: item.status == 201
   tags: debug
 
 # TODO
@@ -70,6 +82,6 @@
 
 # For internal (git.megaphonetech.com) repos
 - include_tasks: internal-git.yml
-  with_items: "{{ repo_check.results }}"
+  with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ ansible_user }}"
-  when: item.status == 200
+  when: item.status == 422

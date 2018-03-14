@@ -1,0 +1,17 @@
+*.log
+wp-config.php
+wp-content/advanced-cache.php
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/uploads/
+.htaccess
+.well-known
+wp-cli.local.yml
+
+#CiviCRM
+wp-content/plugins/files/civicrm/
+wp-content/civicrm-custom/ext/cache/
+wp-content/plugins/civicrm/civicrm.settings.php

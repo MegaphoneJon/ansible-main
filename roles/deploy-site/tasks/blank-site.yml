@@ -1,0 +1,39 @@
+- debug: var=item
+- fail:
+- name: Run cv core:install
+  command: "cv core:install --db=mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }}"
+  args:
+    chdir: "{{ item.item.value.civiroot }}"
+    creates: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
+
+- name: git init
+  command:  git init {{ item.item.value.webroot }}
+  args:
+    creates: "{{ item.item.value.webroot }}/.git"
+
+- name: git config user and email
+  blockinfile:
+    path: "{{ item.item.value.webroot }}/.git/config"
+    block: |
+      [user]
+        email = none@megaphonetech.com
+        name = {{ ansible_user }} on {{ item.item.key }}
+
+- name: git add
+  command: git add -A
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+
+- name: git commit
+  command: git commit -m "Initial commit (via Ansible)"
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+
+- name: Set file permissions
+  file:
+    dest: "{{ item.item.value.webroot }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+    recurse: yes
+    mode: ug=rwX
+  become_user: root
