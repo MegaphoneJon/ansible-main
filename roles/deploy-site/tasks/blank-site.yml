@@ -1,5 +1,3 @@
-- debug: var=item
-- fail:
 - name: Run cv core:install
   command: "cv core:install --db=mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }}"
   args:
@@ -11,23 +9,32 @@
   args:
     creates: "{{ item.item.value.webroot }}/.git"
 
-- name: git config user and email
+- name: git config - user, email, remotes
   blockinfile:
     path: "{{ item.item.value.webroot }}/.git/config"
     block: |
       [user]
         email = none@megaphonetech.com
         name = {{ ansible_user }} on {{ item.item.key }}
+      [remote "origin"]
+        url = {{ item.item.value.git_repo_url }}
+        fetch = +refs/heads/*:refs/remotes/origin/*
+        pushurl = {{ item.item.value.git_repo_push_url }}
 
 - name: git add
   command: git add -A
   args:
     chdir: "{{ item.item.value.webroot }}"
+  register: add_result
+  changed_when: add_result.stdout != ''
 
 - name: git commit
   command: git commit -m "Initial commit (via Ansible)"
   args:
     chdir: "{{ item.item.value.webroot }}"
+  register: commit_result
+  changed_when: commit_result.rc == 0
+  failed_when: not(commit_result.rc == 0 or commit_result.stdout == 'On branch master\nnothing to commit, working tree clean')
 
 - name: Set file permissions
   file:
