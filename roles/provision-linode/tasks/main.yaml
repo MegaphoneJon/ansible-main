@@ -26,13 +26,17 @@
     port: 22
   when: linode|changed
 
+- name: Set the inventory hostname to the Linode IP address if it exists
+  set_fact:
+    inventory_hostname: "{{ linode.instance.ipv4 }}"
+  when: linode.instance is defined
+
 # If this returns true, skip the rest of provisioning.
 - name: Check if Ansible user exists
-  command: ssh -q -o BatchMode=yes -o ConnectTimeout=3 {{ ansible_user_2 }}@{{ linode.instance.ipv4 }} "echo OK"
+  command: ssh -q -o BatchMode=yes -o ConnectTimeout=3 {{ ansible_user_2 }}@{{ inventory_hostname }} "echo OK"
   changed_when: false
   failed_when: false
   register: check_ansible_user
-  when: linode|changed
 
 - block:
   - name: get keys for known_hosts
@@ -52,7 +56,7 @@
       set output $expect_out(1,string)
       send "logout\n"
       expect -re "login: $"
-      set output2 [exec echo $output | sed "s/\u001b...;105H//g" | sed "s/\b//g" | sed "s/localhost//g" | grep -v #]
+      set output2 [exec echo $output | sed "s/\u001b...;10.H//g" | sed "s/\b//g" | sed "s/localhost//g" | grep -v #]
       puts $output2
       exit
     args:
