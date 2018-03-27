@@ -97,6 +97,19 @@
   with_items: "{{ ip_versions }}"
   notify: save iptables
 
+# The next two tasks are necessary for SSH tunnelling.
+- name: Accept all on localhost incoming
+  iptables:
+    in_interface: lo
+    chain: INPUT
+    jump: ACCEPT
+
+- name: Accept all on localhost outgoing
+  iptables:
+    out_interface: lo
+    chain: OUTPUT
+    jump: ACCEPT
+
 
 - name: iptables - drop anything else incoming
   iptables:
