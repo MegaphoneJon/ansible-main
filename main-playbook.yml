@@ -29,7 +29,12 @@
     - drush
     - wp-cli
     - { role: contrib/geerlingguy.security, tags: security }
-    - { role: incoming-smtp, tags: postfix }
     - { role: contrib/geerlingguy.postfix, tags: postfix }
+    - { role: incoming-smtp, tags: postfix }
     - { role: backupninja, tags: backup }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
+
+- hosts: localhosts
+  roles:
+    - { role: deploy-site, tags: deploy-site, when: sites is defined }
+    - upgrade-wp
