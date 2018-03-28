@@ -1,0 +1,2 @@
+---
+ansible_authorized_keys: "{{ lookup('file', 'files/jon_id_rsa.pub') }}"

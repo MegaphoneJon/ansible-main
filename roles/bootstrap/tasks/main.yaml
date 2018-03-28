@@ -29,5 +29,5 @@
     connection: ssh
     authorized_key:
       user: "{{ ansible_user_2 }}"
-      key: "{{ lookup('file', 'files/megaphonetech.pub') }}"
+      key: "{{ ansible_authorized_keys }}"
   when: check_ansible_user.rc is defined and check_ansible_user.rc != 0
