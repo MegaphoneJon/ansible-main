@@ -1,0 +1,9 @@
+---
+- name: Run upgrades
+  #TODO: at some point this shouldn't just work on localhosts
+  hosts: localhosts
+  gather_facts: no
+  connection: local
+
+  roles:
+    - upgrade-wp

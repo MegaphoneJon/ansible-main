@@ -1,0 +1,22 @@
+---
+- name: Get a list of plugins that need updating
+  shell: "wp plugin list | grep all | cut -f 1"
+  args:
+    chdir: "{{ item.value.webroot }}"
+  with_dict: "{{ sites }}"
+  changed_when: false
+  register: plugins_needing_upgrade
+
+- debug: var=item
+  with_subelements:
+    - "{{ plugins_needing_upgrade.results }}"
+    - stdout_lines
+
+# TODO: Check the plugin against the safe upgrade list in defaults/main.yml
+- name: Upgrade plugins
+  command: "wp plugin get {{ item }}"
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+  with_subelements:
+    - "{{ plugins_needing_upgrade.results }}"
+    - stdout_lines

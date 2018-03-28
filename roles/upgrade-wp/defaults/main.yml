@@ -1,0 +1,8 @@
+# Widely used plugins don't need thorough testing; just upgrade them.
+safe_upgrade_plugins:
+  - akismet
+  - all-in-one-seo-pack
+  - siteorigin-panels
+  - so-widgets-bundle
+  - user-role-editor-pro
+  - wp-mail-smtp
