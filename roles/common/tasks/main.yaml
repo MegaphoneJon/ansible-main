@@ -5,16 +5,6 @@
      # 86400 seconds = 24 hours
     cache_valid_time: 86400
 
-# Add Megaphone key to root/Ansible user on all servers
-- name: Add Megaphone keys to "{{ sshuser }}"
-  authorized_key:
-    user: "{{ sshuser }}"
-    key: "{{ item }}"
-  with_file:
-    - files/jon_id_rsa.pub
-    - files/joseph_id_rsa.pub
-  tags: [configuration,users,keys]
-
 - name: Configure the hosts file
   lineinfile:
     path: /etc/hosts
