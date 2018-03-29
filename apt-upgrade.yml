@@ -1,0 +1,12 @@
+---
+# This provisions any VPSes that were defined but not built in server-list
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: apt dist-upgrade everyone
+    apt:
+      name: "*"
+      state: latest
+      autoremove: yes
+      update_cache: yes
