@@ -29,10 +29,28 @@
   changed_when: gogs_result.status == 201
   failed_when: gogs_result.status != 201 and not (gogs_result.json is defined and gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
 
-#TODO: Sometimes we're making a new site
 - name: clone an existing site
   git:
     repo: "{{ item.item.value.git_repo_url }}"
     dest: "{{ item.item.value.gitroot }}"
     version: master
     umask: "0007"
+
+- debug: var=item.item.value.crm_logging_db_name
+  tags: debug
+  
+- name: Add civicrm.settings.php
+  template:
+    src: templates/civicrm.settings.j2
+    dest: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
+    owner: "{{ ansible_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+    mode: 0660
+
+- name: Create wp-config.php
+  shell: |
+    wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {% if item.item.value.cms_table_prefix|default('blank', True) != 'blank' %}--dbprefix={{ item.item.value.cms_table_prefix}}{% endif %} --path={{ item.item.value.webroot }} --extra-php <<PHP
+    define( 'WP_DEBUG', true );
+    define( 'WP_DEBUG_LOG', true );
+  args:
+    creates: "{{ item.item.value.webroot }}/wp-config.php"

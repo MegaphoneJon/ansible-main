@@ -70,7 +70,7 @@ if (!defined('CIVICRM_UF')) {
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
 if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
-  define( 'CIVICRM_UF_DSN'           , 'mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.cms_db_name }}?new_link=true');
+  define( 'CIVICRM_UF_DSN'           , 'mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.cms_db_name }}?new_link=true');
 }
 
 /**
@@ -98,7 +98,7 @@ if (!defined('CIVICRM_DSN')) {
     define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
   }
   else {
-    define('CIVICRM_DSN', 'mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }}?new_link=true');
+    define('CIVICRM_DSN', 'mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }}?new_link=true');
   }
 }
 
@@ -109,7 +109,11 @@ if (!defined('CIVICRM_DSN')) {
  * The CIVICRM_DSN user needs to have the rights to modify the below database schema and be able to write to it.
  */
 if (!defined('CIVICRM_LOGGING_DSN')) {
-  define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
+  {% if item.item.value.crm_logging_db_name|default('CIVICRM_DSN', True) == 'CIVICRM_DSN' %}
+    define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
+  {% else %}
+    define('CIVICRM_LOGGING_DSN', 'mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_logging_db_name }}?new_link=true');
+  {% endif %}
 }
 
 /**
@@ -160,9 +164,10 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
  *
  */
 
+define('CIVICRM_CMSDIR', '{{ item.item.value.webroot }}');
 global $civicrm_root;
 
-$civicrm_root = '{{ item.item.value.civiroot }}';
+$civicrm_root = '{{ item.item.value.civiroot }}/';
 if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
   define( 'CIVICRM_TEMPLATE_COMPILEDIR', '{{ item.item.value.civicrm_files_path }}/templates_c/');
 }
@@ -258,7 +263,7 @@ $civicrm_setting['URL Preferences']['extensionsURL'] = '{{ item.item.value.prima
  * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
  */
 if (!defined('CIVICRM_SITE_KEY')) {
-  define( 'CIVICRM_SITE_KEY', "{{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32') }}");
+  define( 'CIVICRM_SITE_KEY', "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32') }}");
 }
 
 /**

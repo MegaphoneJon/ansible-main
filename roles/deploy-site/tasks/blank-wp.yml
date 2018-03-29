@@ -4,12 +4,12 @@
     creates: "{{ item.item.value.webroot }}/wp-load.php"
 
 - name: Create wp-config.php
-  command: "wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} --path={{ item.item.value.webroot }}"
+  command: "wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} --path={{ item.item.value.webroot }}"
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
 
 - name: Run the WP installer
-  command: "wp core install --url={{ item.item.value.bare_url }} --title='{{ item.item.value.site_title }}' --admin_user=admin --admin_email={{ item.item.value.admin_email }} --admin_password={{ lookup('passwordstore', client + '/' + hostname + '/' + item.item.value.bare_url + '/admin create=true length=32') }}  --path={{ item.item.value.webroot }}"
+  command: "wp core install --url={{ item.item.value.bare_url }} --title='{{ item.item.value.site_title }}' --admin_user=admin --admin_email={{ item.item.value.admin_email }} --admin_password={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/admin create=true length=32') }}  --path={{ item.item.value.webroot }}"
   changed_when: wpinstaller.stdout != "WordPress is already installed."
   register: wpinstaller
 
