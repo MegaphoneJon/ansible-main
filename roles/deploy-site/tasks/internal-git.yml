@@ -35,9 +35,14 @@
     dest: "{{ item.item.value.gitroot }}"
     version: master
     umask: "0007"
+    track_submodules: yes
 
-  tags: debug
-  
+- name: Create CiviCRM uploads folder
+  file:
+    path: "{{ item.item.value.civicrm_settings_php_path }}"
+    state: directory
+  when: item.item.value.civicrm == 'Yes'
+
 - name: Add civicrm.settings.php
   template:
     src: templates/civicrm.settings.j2
@@ -52,3 +57,10 @@
     define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
+
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^127\\.0\\.0\\.1 {{ item.item.value.bare_url }}"
+    line: "127.0.0.1 {{ item.item.value.bare_url }}"
+  become_user: root
