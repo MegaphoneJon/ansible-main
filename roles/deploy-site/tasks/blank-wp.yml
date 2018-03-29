@@ -4,7 +4,9 @@
     creates: "{{ item.item.value.webroot }}/wp-load.php"
 
 - name: Create wp-config.php
-  command: "wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} --path={{ item.item.value.webroot }}"
+  shell: |
+    wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {% if item.item.value.cms_table_prefix|default('blank', True) != 'blank' %}--dbprefix={{ item.item.value.cms_table_prefix}}{% endif %} --path={{ item.item.value.webroot }} --extra-php <<PHP
+    define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
 

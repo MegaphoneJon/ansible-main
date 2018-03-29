@@ -36,7 +36,6 @@
     version: master
     umask: "0007"
 
-- debug: var=item.item.value.crm_logging_db_name
   tags: debug
   
 - name: Add civicrm.settings.php
@@ -50,7 +49,6 @@
 - name: Create wp-config.php
   shell: |
     wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {% if item.item.value.cms_table_prefix|default('blank', True) != 'blank' %}--dbprefix={{ item.item.value.cms_table_prefix}}{% endif %} --path={{ item.item.value.webroot }} --extra-php <<PHP
-    define( 'WP_DEBUG', true );
-    define( 'WP_DEBUG_LOG', true );
+    define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
