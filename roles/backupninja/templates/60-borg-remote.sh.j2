@@ -9,7 +9,7 @@ info "Starting borg backup"
 
 # Run the backup.
 OUTPUT=$( (
-borg create --verbose --stats  --progress --compression lz4         \
+borg create --verbose --stats --compression lz4         \
 --remote-path $REMOTE_PATH \
 $REPOSITORY::'{hostname}-{now:%Y-%m-%d}' \
 /etc \
