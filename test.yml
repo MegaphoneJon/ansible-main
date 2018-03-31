@@ -1,0 +1,7 @@
+---
+# This provisions any VPSes that were defined but not built in server-list
+- hosts: yellow.megaphonetech.com
+  become: yes
+
+  roles:
+  - { role: db-restore, tags: db-restore }
