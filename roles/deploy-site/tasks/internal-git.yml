@@ -57,10 +57,3 @@
     define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
-
-- name: Update /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: "^127\\.0\\.0\\.1 {{ item.item.value.bare_url }}"
-    line: "127.0.0.1 {{ item.item.value.bare_url }}"
-  become_user: root
