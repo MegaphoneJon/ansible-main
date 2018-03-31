@@ -56,12 +56,6 @@
   environment:
     BORG_PASSPHRASE: "{{ lookup('passwordstore', client + '/' + hostname + '/borg/local create=true length=32') }}"
 
-- name: Add the rsync.net public hostkey to known_hosts
-  known_hosts:
-    key: "{{ rsyncnet_public_hostkey }}"
-    name: usw-s008.rsync.net
-    path: /root/.ssh/known_hosts
-
 - name: Check if the remote repo exists
   command: ssh 8139@usw-s008.rsync.net ls -l "{{ client + '-' + hostname + '/config' }}"
   register: remoterepo

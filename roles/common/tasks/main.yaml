@@ -71,3 +71,9 @@
     - "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w"
   become_user: "{{ ansible_user }}"
   tags: [timezone, configuration]
+
+- name: Add the rsync.net public hostkey to known_hosts
+  known_hosts:
+    key: "{{ rsyncnet_public_hostkey }}"
+    name: usw-s008.rsync.net
+  become_user: "{{ ansible_user }}"
