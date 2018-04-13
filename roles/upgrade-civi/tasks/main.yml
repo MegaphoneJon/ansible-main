@@ -1,11 +1,26 @@
 ---
+# There's a helper script in the /helpers dir of this role to return this.
+# Still not sure the best approach to run this remotely,
+# Ooh - but maybe I should JSON-format the output of the helper script to include both name and version.
 - name: Get a list of plugins that need updating
-  shell: "cv api system.check"
-  args:
-    chdir: "{{ item.value.webroot }}"
-  with_dict: "{{ sites }}"
-  changed_when: false
-  register: debug
-  become_user: "{{ item.value.run_as_user }}"
+  register: extensions
 
-- debug: var=debug
+- name: Upgrade extensions
+  command: cv ext:download -f item.name
+  with_dict: extensions
+
+- handler: Run extension db updates
+# cv ext:upgrade-db
+
+- name: Add upgraded extension to git
+  command:
+# git add .
+
+- name: Commit upgraded extention to git
+  command:
+# git commit -m"Updated CiviCRm extension {{ item.name }} to {{ item.version }}
+
+- name: Push to repo
+  command:
+# git push origin master
+
