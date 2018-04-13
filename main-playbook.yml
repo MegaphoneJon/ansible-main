@@ -14,8 +14,8 @@
   roles:
     - { role: firewall-common, tags: firewall }
     - { role: contrib/geerlingguy.apache, tags: apache }
-    - icinga2
-    - cv
+    - { role: icinga2, tags: icinga2 }
+    - { role: cv, tags: cv }
 
 - hosts: testgroup
   become: yes
@@ -43,5 +43,6 @@
     - { role: contrib/geerlingguy.apache-fpm-php , tags: php }
     - { role: php-additional , tags: php }
     - wp-cli
+    - { role: cv, tags: cv }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
 #    - upgrade-wp
