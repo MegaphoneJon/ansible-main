@@ -1,0 +1,11 @@
+---
+- name: Get a list of plugins that need updating
+  shell: "cv api system.check"
+  args:
+    chdir: "{{ item.value.webroot }}"
+  with_dict: "{{ sites }}"
+  changed_when: false
+  register: debug
+  become_user: "{{ item.value.run_as_user }}"
+
+- debug: var=debug
