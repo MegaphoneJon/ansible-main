@@ -73,8 +73,35 @@
     state: directory
 
 - name: Download the latest copy of the database
-  shell: borg extract --strip-components 4 --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.client + '-' + item.item.value.canonical_hostname }}::{{ archive_name.stdout }} var/backups/mysql/sqldump
+  shell: borg extract --strip-components 4 --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.client + '-' + item.item.value.canonical_hostname }}::{{ archive_name.stdout }} var/backups/mysql/sqldump/{{ db_name }}
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+    creates: "{{ db_name }}"
   environment:
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
+  with_items:
+    - "{{ item.item.value.canonical_crm_db_name }}.sql"
+    - "{{ item.item.value.canonical_cms_db_name }}.sql"
+  loop_control:
+    loop_var: db_name
+
+- name: Remove definers from Civi db
+  command: perl -pi -e 's#\/\*\!5001. DEFINER=`.*`@`.*?\*\/##g' {{ item.item.value.canonical_crm_db_name }}.sql
+  args:
+    chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+
+- name: Import the WP database
+  mysql_db:
+    name: "{{ item.item.value.cms_db_name }}"
+    target: "{{ item.item.value.webroot}}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
+    state: import
+    login_user: "{{ item.item.value.db_user }}"
+    login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
+
+- name: Import the Civi database
+  mysql_db:
+    name: "{{ item.item.value.crm_db_name }}"
+    target: "{{ item.item.value.webroot}}/../sql-dumps/{{ item.item.value.canonical_crm_db_name }}.sql"
+    state: import
+    login_user: "{{ item.item.value.db_user }}"
+    login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
