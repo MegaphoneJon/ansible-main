@@ -57,3 +57,24 @@
     define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
+
+# MySQL restore
+# This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
+- name: Get the latest backup archive name
+  shell: borg list --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.client + '-' + item.item.value.canonical_hostname }} | tail -n1 | cut -f 1 -d ' '
+  environment:
+    BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
+  register: archive_name
+  changed_when: false
+
+- name: Create sql-dumps folder
+  file:
+    path: "{{ item.item.value.webroot }}/../sql-dumps"
+    state: directory
+
+- name: Download the latest copy of the database
+  shell: borg extract --strip-components 4 --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.client + '-' + item.item.value.canonical_hostname }}::{{ archive_name.stdout }} var/backups/mysql/sqldump
+  args:
+    chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+  environment:
+    BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
