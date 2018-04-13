@@ -1,26 +1,37 @@
 ---
-# There's a helper script in the /helpers dir of this role to return this.
-# Still not sure the best approach to run this remotely,
-# Ooh - but maybe I should JSON-format the output of the helper script to include both name and version.
 - name: Get a list of plugins that need updating
+  script: helpers/upgradeable-civi.php
+  args:
+    chdir: "{{ item.value.webroot }}"
   register: extensions
+  changed_when: false
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  with_dict: "{{ sites }}"
+
+# TODO: To properly loop over extensions and commit each separately, we'll need to use an include.
+#       Unfortunately, there's no looping over a block.  site-deploy role uses includes similarly.
+- debug: 
+    msg: "{{ item.name }} {{ item.version }}"
+  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
 
 - name: Upgrade extensions
-  command: cv ext:download -f item.name
-  with_dict: extensions
+  debug: 
+    msg: "cv ext:download -f {{ item.id }}"
+  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
 
-- handler: Run extension db updates
+#- handler: Run extension db updates
 # cv ext:upgrade-db
 
-- name: Add upgraded extension to git
-  command:
+#- name: Add upgraded extension to git
+#  command:
 # git add .
 
-- name: Commit upgraded extention to git
-  command:
+#- name: Commit upgraded extention to git
+#  command:
 # git commit -m"Updated CiviCRm extension {{ item.name }} to {{ item.version }}
 
-- name: Push to repo
-  command:
+#- name: Push to repo
+#  command:
 # git push origin master
 
