@@ -6,4 +6,6 @@
   connection: local
 
   roles:
-    - upgrade-wp
+    - { role: upgrade-wp, tags: upgrade-wp }
+    - { role: upgrade-civi, tags: upgrade-civi }
+
