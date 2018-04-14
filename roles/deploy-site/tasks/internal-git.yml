@@ -97,24 +97,26 @@
   with_items:
     - "{{ item.item.value.canonical_crm_db_name }}.sql"
     - "{{ item.item.value.canonical_cms_db_name }}.sql"
+  register: db_downloaded
   loop_control:
     loop_var: db_name
-  when: not archive_name.skipped
+  when: archive_name.skipped is not defined
 
+# Don't do these other steps if a) there's no db backup in borg, b) the db is already downloaded.
 - name: Remove definers from Civi db
   command: perl -pi -e 's#\/\*\!5001. DEFINER=`.*`@`.*?\*\/##g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-  when: not archive_name.skipped
+  when: archive_name.skipped is not defined and db_downloaded.changed
 
-- name: Import the WP database
+- name: Import the CMS database
   mysql_db:
     name: "{{ item.item.value.cms_db_name }}"
     target: "{{ item.item.value.webroot}}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: not archive_name.skipped
+  when: archive_name.skipped is not defined and db_downloaded.changed
 
 - name: Import the Civi database
   mysql_db:
@@ -123,4 +125,4 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: not archive_name.skipped
+  when: archive_name.skipped is not defined and db_downloaded.changed
