@@ -1,3 +1,7 @@
+- name: Show the site in question
+  debug:
+    msg: Operating on "{{ item.item.key }}"
+
 - name: Get the home directory
   user:
     name: "{{ ansible_user }}"
