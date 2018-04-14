@@ -51,12 +51,22 @@
     group: "{{ item.item.value.run_as_user }}"
     mode: 0660
 
+- name: Add settings.php
+  template:
+    src: templates/settings.j2
+    dest: "{{ item.item.value.webroot }}/sites/default/settings.php"
+    owner: "{{ ansible_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+    mode: 0660
+  when: item.item.value.cms == 'Drupal'
+
 - name: Create wp-config.php
   shell: |
     wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {% if item.item.value.cms_table_prefix|default('blank', True) != 'blank' %}--dbprefix={{ item.item.value.cms_table_prefix}}{% endif %} --path={{ item.item.value.webroot }} --extra-php <<PHP
     define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
+  when: item.item.value.cms == 'WordPress'
 
 # MySQL restore
 # This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
@@ -66,6 +76,7 @@
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
   register: archive_name
   changed_when: false
+  when: item.item.value.canonical_hostname
 
 - name: Create sql-dumps folder
   file:
@@ -84,11 +95,13 @@
     - "{{ item.item.value.canonical_cms_db_name }}.sql"
   loop_control:
     loop_var: db_name
+  when: not archive_name.skipped
 
 - name: Remove definers from Civi db
   command: perl -pi -e 's#\/\*\!5001. DEFINER=`.*`@`.*?\*\/##g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+  when: not archive_name.skipped
 
 - name: Import the WP database
   mysql_db:
@@ -97,6 +110,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
+  when: not archive_name.skipped
 
 - name: Import the Civi database
   mysql_db:
@@ -105,3 +119,4 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
+  when: not archive_name.skipped
