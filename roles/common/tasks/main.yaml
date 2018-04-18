@@ -70,7 +70,6 @@
     - "[git.megaphonetech.com]:10022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLuEP2fW8Eycdbeo0XWihr63zj6yCTcCjxh4C4i3c8p2O44mKRjVhxOSSBQQxZNUKeJYAGTuWh+EPW71KADzXv0="
     - "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w"
   become_user: "{{ ansible_user }}"
-  tags: [timezone, configuration]
 
 - name: Add the rsync.net public hostkey to known_hosts
   known_hosts:
