@@ -16,21 +16,21 @@
     - { role: contrib/geerlingguy.apache, tags: apache }
     - { role: icinga2, tags: icinga2 }
     - { role: cv, tags: cv }
+    - { role: contrib/geerlingguy.mysql, tags: mysql }
 
 - hosts: testgroup
   become: yes
   roles:
-    - { role: contrib/geerlingguy.mysql, tags: mysql }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-fpm-php , tags: php }
     - { role: php-additional , tags: php }
     # these next two are certified for use in the lamp group buy depend on php which isn't.
     - { role: contrib/geerlingguy.composer, tags: composer}
-    - drush
-    - wp-cli
+    - { role: drush, tags: drush}
+    - { role: wp-cli, tags: wp-cli}
     - { role: contrib/geerlingguy.security, tags: security }
+    - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
     - { role: contrib/geerlingguy.postfix, tags: postfix }
-    - { role: incoming-smtp, tags: postfix }
     - { role: backupninja, tags: backup }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
 
