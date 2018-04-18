@@ -2,15 +2,32 @@
   debug:
     msg: Operating on "{{ item.item.key }}"
 
+- name: Add the web user and create public key
+  user:
+    name: "{{ item.item.value.run_as_user }}"
+    generate_ssh_key: yes
+    home: "/home/{{ item.item.value.run_as_user }}"
+  become_user: root
+
 - name: Get the home directory
   user:
-    name: "{{ ansible_user }}"
+    name: "{{ item.item.value.run_as_user }}"
   register: userinfo
 
-- name: Get the Ansible user's SSH key
+- name: Add gogs keys to web user known_hosts
+  known_hosts:
+    name: "[git.megaphonetech.com]:10022"
+    key: "{{ inner_item }}"
+  loop_control:
+    loop_var: inner_item
+  with_items:
+    - "[git.megaphonetech.com]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgNwIe3TBtRHtkwoHL2TG84/f039hgzqVbN0z4sk1UHPZr4rxFinGCGjedzE+adVucqr/gemPnETfashTujcPyZZkwPn2dQNx0HuPHw3H+cqXqKt03fsgPcerqsqvFS509pcblmP5vtJLF4uVgbh6TLmZiObMuiIYe9VTyZSXo67DTt/K6SSgwyUFldqJIJQA+DO1nXoSYSJ4fP1DDPdue0RTL06VtlnUL2w9iHrOgVRY1KqAtpnGRslKx5c3L8+9EBMdJWM1CPK11vkvyf8LnYwuCH4V7w0rVs2QAE9Abm4g4HiE4wql5QJrjCi/cq/1doeY9KXxFb8SOTtZBk5Nn"
+    - "[git.megaphonetech.com]:10022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLuEP2fW8Eycdbeo0XWihr63zj6yCTcCjxh4C4i3c8p2O44mKRjVhxOSSBQQxZNUKeJYAGTuWh+EPW71KADzXv0="
+    - "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w"
+
+- name: Get the web user's SSH key
   slurp:
     src: "{{ userinfo.home }}/.ssh/id_rsa.pub"
-  become: no
   register: key
 
 # Gogs thinks the key exists if the title matches an existing key.
@@ -25,7 +42,7 @@
     method: POST
     body_format: json
     body:
-      title: "{{ ansible_user + '@' + inventory_hostname_short + ' ' + key_md5 }}"
+      title: "{{ item.item.value.run_as_user + '@' + inventory_hostname_short + ' ' + key_md5 }}"
       key: "{{ key['content'] | b64decode }}"
     headers:
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
@@ -51,18 +68,20 @@
   template:
     src: templates/civicrm.settings.j2
     dest: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
-    owner: "{{ ansible_user }}"
+    owner: "{{ item.item.value.run_as_user }}"
     group: "{{ item.item.value.run_as_user }}"
     mode: 0660
+  become_user: root
 
 - name: Add settings.php
   template:
     src: templates/settings.j2
     dest: "{{ item.item.value.webroot }}/sites/default/settings.php"
-    owner: "{{ ansible_user }}"
+    owner: "{{ item.item.value.run_as_user }}"
     group: "{{ item.item.value.run_as_user }}"
     mode: 0660
   when: item.item.value.cms == 'Drupal'
+  become_user: root
 
 - name: Create wp-config.php
   shell: |
@@ -80,7 +99,9 @@
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
   register: archive_name
   changed_when: false
+  fail_when: archive_name.stderr == 'passphrase supplied in BORG_PASSPHRASE or by BORG_PASSCOMMAND is incorrect.'
   when: item.item.value.canonical_hostname
+  become_user: root
 
 - name: Create sql-dumps folder
   file:
@@ -101,6 +122,7 @@
   loop_control:
     loop_var: db_name
   when: archive_name.skipped is not defined
+  become_user: root
 
 # Don't do these other steps if a) there's no db backup in borg, b) the db is already downloaded.
 - name: Remove definers from Civi db
