@@ -56,7 +56,7 @@
     dest: "{{ item.item.value.gitroot }}"
     version: master
     umask: "0007"
-    track_submodules: yes
+    track_submodules: no
 
 - name: Create CiviCRM uploads folder
   file:
@@ -92,15 +92,24 @@
   when: item.item.value.cms == 'WordPress'
 
 # MySQL restore
+- name: Check if db dump files already exist
+  stat:
+    path: "{{ item.item.value.webroot }}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
+  register: db_dump_exists
+
 # This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
 - name: Get the latest backup archive name
   shell: borg list --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.client + '-' + item.item.value.canonical_hostname }} | tail -n1 | cut -f 1 -d ' '
   environment:
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
+  args:
+    chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+    # Doesn't really create this file, but we want to skip if the file exists
+    creates: "{{ item.item.value.canonical_cms_db_name }}.sql"
   register: archive_name
   changed_when: false
   failed_when: archive_name.stderr == 'passphrase supplied in BORG_PASSPHRASE or by BORG_PASSCOMMAND is incorrect.'
-  when: item.item.value.canonical_hostname
+  when: db_dump_exists.stat.exists == false and item.item.value.canonical_hostname
   become_user: root
 
 - name: Create sql-dumps folder
@@ -141,9 +150,9 @@
   when: archive_name.skipped is not defined and db_downloaded.changed
 
 - name: Do a search/replace for the primary URL
-  command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.canonical_url }}"
+  command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
   args:
-    chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+    chdir: "{{ item.item.value.webroot }}"
   when: item.item.value.cms == 'WordPress'
 
 - name: Import the Civi database
