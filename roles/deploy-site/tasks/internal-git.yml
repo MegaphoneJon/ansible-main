@@ -99,7 +99,7 @@
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
   register: archive_name
   changed_when: false
-  fail_when: archive_name.stderr == 'passphrase supplied in BORG_PASSPHRASE or by BORG_PASSCOMMAND is incorrect.'
+  failed_when: archive_name.stderr == 'passphrase supplied in BORG_PASSPHRASE or by BORG_PASSCOMMAND is incorrect.'
   when: item.item.value.canonical_hostname
   become_user: root
 
