@@ -140,6 +140,12 @@
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
   when: archive_name.skipped is not defined and db_downloaded.changed
 
+- name: Do a search/replace for the primary URL
+  command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.canonical_url }}"
+  args:
+    chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+  when: item.item.value.cms == 'WordPress'
+
 - name: Import the Civi database
   mysql_db:
     name: "{{ item.item.value.crm_db_name }}"
