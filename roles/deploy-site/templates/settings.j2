@@ -642,3 +642,9 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  * @see drupal_clean_css_identifier()
  */
 # $conf['allow_css_double_underscores'] = TRUE;
+$databases['default']['default']['prefix']= array(
+  'default' => '',
+{% for table_name in civi_table_names.stdout_lines %}
+'{{ table_name }}'                              => '`{{ item.item.value.crm_db_name }}`.',
+{% endfor %}
+);

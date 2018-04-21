@@ -64,33 +64,6 @@
     state: directory
   when: item.item.value.civicrm == 'Yes'
 
-- name: Add civicrm.settings.php
-  template:
-    src: templates/civicrm.settings.j2
-    dest: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
-    owner: "{{ item.item.value.run_as_user }}"
-    group: "{{ item.item.value.run_as_user }}"
-    mode: 0660
-  become_user: root
-
-- name: Add settings.php
-  template:
-    src: templates/settings.j2
-    dest: "{{ item.item.value.webroot }}/sites/default/settings.php"
-    owner: "{{ item.item.value.run_as_user }}"
-    group: "{{ item.item.value.run_as_user }}"
-    mode: 0660
-  when: item.item.value.cms == 'Drupal'
-  become_user: root
-
-- name: Create wp-config.php
-  shell: |
-    wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {% if item.item.value.cms_table_prefix|default('blank', True) != 'blank' %}--dbprefix={{ item.item.value.cms_table_prefix}}{% endif %} --path={{ item.item.value.webroot }} --extra-php <<PHP
-    define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
-  args:
-    creates: "{{ item.item.value.webroot }}/wp-config.php"
-  when: item.item.value.cms == 'WordPress'
-
 # MySQL restore
 - name: Check if db dump files already exist
   stat:
@@ -163,3 +136,41 @@
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
   when: archive_name.skipped is not defined and db_downloaded.changed
+
+- name: Do a search/replace for the primary URL
+  command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+  when: item.item.value.cms == 'WordPress'
+
+- name: Add civicrm.settings.php
+  template:
+    src: templates/civicrm.settings.j2
+    dest: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
+    owner: "{{ item.item.value.run_as_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+    mode: 0660
+  become_user: root
+
+- name: Get table names for Views integration
+  command: "mysql -u{{ item.item.value.db_user }} -p{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {{ item.item.value.crm_db_name }} --skip-column-names --silent -e 'show tables'"
+  register: civi_table_names
+  when: item.item.value.cms == 'Drupal' or item.item.value.cms == 'Backdrop'
+  changed_when: false
+
+- name: Add settings.php
+  template:
+    src: templates/settings.j2
+    dest: "{{ item.item.value.webroot }}/sites/default/settings.php"
+    owner: "{{ item.item.value.run_as_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+  when: item.item.value.cms == 'Drupal'
+  become_user: root
+
+- name: Create wp-config.php
+  shell: |
+    wp config create --dbname={{ item.item.value.cms_db_name }} --dbuser={{ item.item.value.db_user }} --dbpass={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }} {% if item.item.value.cms_table_prefix|default('blank', True) != 'blank' %}--dbprefix={{ item.item.value.cms_table_prefix}}{% endif %} --path={{ item.item.value.webroot }} --extra-php <<PHP
+    define( 'WP_SITEURL', '{{ item.item.value.primary_url }}' );
+  args:
+    creates: "{{ item.item.value.webroot }}/wp-config.php"
+  when: item.item.value.cms == 'WordPress'
