@@ -1,7 +1,9 @@
 ---
 # This provisions any VPSes that were defined but not built in server-list
-- hosts: yellow.megaphonetech.com
+- hosts: all
   become: yes
 
-  roles:
-  - { role: db-restore, tags: db-restore }
+  tasks:
+  - debug: var=ansible_hostname
+  - debug: var=hostname
+  - debug: var=inventory_hostname
