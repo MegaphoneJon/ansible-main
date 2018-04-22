@@ -72,16 +72,16 @@
 
   - name: remove existing known_hosts by hostname
     known_hosts:
-      name: "{{ inventory_hostname }}"
-      key: "{{ inventory_hostname + item }}"
+      name: "{{ fqdn }}"
+      key: "{{ fqdn + item }}"
       path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
       state: absent
     with_items: "{{ definitive_keys.stdout_lines }}"
 
   - name: update the local known_hosts by hostname
     known_hosts:
-      name: "{{ inventory_hostname }}"
-      key: "{{ inventory_hostname + item }}"
+      name: "{{ fqdn }}"
+      key: "{{ fqdn + item }}"
       path: "{{ lookup('env','HOME') }}/.ssh/known_hosts"
     with_items: "{{ definitive_keys.stdout_lines }}"
 
@@ -132,7 +132,7 @@
     when: linode.instance is defined and (linode.instance.id|string != linode_id|string)
 
   - name: Update MFPL DNS
-    local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ inventory_hostname }}" "{{ linode.instance.ipv4 }}"
+    local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ fqdn }}" "{{ linode.instance.ipv4 }}"
     with_items: groups['linode']
     register: dnshelper_result
     when: linode.instance is defined

@@ -96,4 +96,4 @@ ICINGA2_API_USER=backupninja
 ICINGA2_SERVER_ADDRESS=orange.megaphonetech.com
 ICINGA2_API_PORT=5665
 ICINGA2_API_PASSWORD={{ lookup('passwordstore', 'megaphone/icinga2/api') }}
-ICINGA2_HOSTNAME={{ inventory_hostname }}
+ICINGA2_HOSTNAME={{ fqdn }}
