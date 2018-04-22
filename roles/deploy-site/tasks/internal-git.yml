@@ -125,7 +125,7 @@
   command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
   args:
     chdir: "{{ item.item.value.webroot }}"
-  when: item.item.value.cms == 'WordPress'
+  when: item.item.value.cms == 'WordPress' and item.item.value.canonical_primary_url
 
 - name: Import the Civi database
   mysql_db:
