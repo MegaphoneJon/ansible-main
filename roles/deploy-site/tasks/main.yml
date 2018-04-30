@@ -108,6 +108,7 @@
   become_user: root
   with_dict: "{{ sites }}"
 
+
 - name: Grant www-data user access to the webroot
   acl:
     path: "{{ item.value.webroot }}"
@@ -115,7 +116,14 @@
     etype: user
     permissions: rx
     recursive: yes
+    default: yes
     state: present
+  become_user: root
+  with_dict: "{{ sites }}"
+
+- name: Deal with the Ansible ACL bug
+  command: setfacl -R -m user:www-data:rx,d:user:www-data:rx "{{ item.value.webroot }}"
+  changed_when: false
   become_user: root
   with_dict: "{{ sites }}"
 

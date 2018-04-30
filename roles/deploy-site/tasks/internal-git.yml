@@ -67,6 +67,7 @@
   file:
     path: "{{ item.item.value.webroot }}/../sql-dumps"
     state: directory
+    mode: 02770
 
 # This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
 - name: Get the latest backup archive name
