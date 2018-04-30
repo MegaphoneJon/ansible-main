@@ -98,6 +98,27 @@
   loop_control:
     label: "{{ item.key }}"
 
+- name: Grant www-data user access to the parent folder
+  acl:
+    path: "{{ item.value.webroot }}/.."
+    entity: www-data
+    etype: user
+    permissions: rx
+    state: present
+  become_user: root
+  with_dict: "{{ sites }}"
+
+- name: Grant www-data user access to the webroot
+  acl:
+    path: "{{ item.value.webroot }}"
+    entity: www-data
+    etype: user
+    permissions: rx
+    recursive: yes
+    state: present
+  become_user: root
+  with_dict: "{{ sites }}"
+
 # MySQL
 - name: Create CMS database
   mysql_db:
