@@ -2,7 +2,7 @@
   DocumentRoot {{ item.value.webroot }}
   ServerName {{ item.key }}
 
-  ProxyPassMatch ^/(.*\.php(/.*)?)$ "unix:/var/run/php/php-fpm.sock|fcgi://localhost{{ item.value.webroot }}"
+  ProxyPassMatch ^/(.*\.php(/.*)?)$ "unix:/var/run/php/php-fpm-{{ item.key }}.sock|fcgi://localhost{{ item.value.webroot }}"
   RedirectMatch 404 /\.git
 <Directory "{{ item.value.webroot }}">
   AllowOverride All
