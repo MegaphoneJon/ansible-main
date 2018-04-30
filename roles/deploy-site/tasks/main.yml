@@ -1,4 +1,45 @@
 ---
+- name: Create the run_as_user
+  user:
+    name: "{{ item.value.run_as_user }}"
+    shell: /bin/nologin
+    generate_ssh_key: yes
+    home: "/home/{{ item.value.run_as_user }}"
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Get users to add to the new group
+  set_fact:
+    userlist: "{{ userlist|default([]) + [ item.value.name ] }}"
+  with_dict: "{{ mtcusers }}"
+
+- name: Get list of groups to add to users
+  set_fact:
+    grouplist: "{{ grouplist|default([]) + [ item.value.run_as_user ] }}"
+  with_dict: "{{ sites }}"
+
+- name: Add Megaphone staff to the newly-created group
+  user:
+    name: "{{ item[0] }}"
+    append: yes
+    groups:
+      - "{{ item[1] }}"
+  with_nested:
+    - "{{ userlist }}"
+    - "{{ grouplist }}"
+
+- name: Create a php-fpm pool
+  # How do we make that "7.0" below a variable?
+  template:
+    src: templates/php-pool.j2
+    dest: /etc/php/7.0/fpm/pool.d/{{ item.value.run_as_user }}.conf
+  with_dict: "{{ sites }}"
+  notify: restart php-fpm
+  loop_control:
+    label: "{{ item.key }}"
+
+
 - name: Create vhost conf (Apache)
   template:
     src: templates/vhost.conf.j2
@@ -104,9 +145,6 @@
   when: item.status == 201
   loop_control:
     label: "{{ item.item.key }}"
-
-# TODO
-# Next 3 steps ensure the Ansible user's deploy key is on each gogs repo
 
 # For internal (git.megaphonetech.com) repos
 - name: Build sites from existing git repo

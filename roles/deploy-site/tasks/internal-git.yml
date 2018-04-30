@@ -2,13 +2,6 @@
   debug:
     msg: Operating on "{{ item.item.key }}"
 
-- name: Add the web user and create public key
-  user:
-    name: "{{ item.item.value.run_as_user }}"
-    generate_ssh_key: yes
-    home: "/home/{{ item.item.value.run_as_user }}"
-  become_user: root
-
 - name: Get the home directory
   user:
     name: "{{ item.item.value.run_as_user }}"
