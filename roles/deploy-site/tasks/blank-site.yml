@@ -58,15 +58,6 @@
   changed_when: commit_result.rc == 0
   failed_when: not(commit_result.rc == 0 or commit_result.stdout == 'On branch master\nnothing to commit, working tree clean')
 
-- name: git push
-  command: git push --set-upstream origin master
-  args:
-    chdir: "{{ item.item.value.webroot }}"
-  register: push_result
-  when: item.item.value.git_repo_push_url | search("ssh://")
-  changed_when: push_result.rc == 0
-  failed_when: not(push_result.rc == 0)
-
 - name: Set file permissions (again)
   file:
     dest: "{{ item.item.value.webroot }}"
@@ -75,3 +66,12 @@
     recurse: yes
     mode: ug=rwX
   become_user: root
+
+- name: git push
+  command: git push --set-upstream origin master
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+  register: push_result
+  when: item.item.value.git_repo_push_url | search("ssh://")
+  changed_when: push_result.rc == 0
+  failed_when: not(push_result.rc == 0)
