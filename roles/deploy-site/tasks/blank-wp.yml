@@ -20,43 +20,24 @@
   args:
     creates: "{{ item.item.value.webroot }}/wp-content/plugins/wp-cli-login-server"
 
-- name: Check out civicrm-setup
-  git:
-    repo: https://github.com/civicrm/civicrm-setup
-    dest: /opt/civicrm-setup
-  become_user: root
-  when: item.item.value.civicrm == 'Yes'
+- name: Set the WP .gitignore
+  copy:
+    src: files/wp-gitignore
+    dest: "{{ item.item.value.webroot }}/.gitignore"
 
-- name: Download the latest tarball
+- name: Download the latest Civi archive
   get_url:
     url: https://download.civicrm.org/latest/civicrm-STABLE-wordpress.zip
     dest: /tmp/civicrm-STABLE-wordpress.zip
   when: item.item.value.civicrm == 'Yes'
 
-- name: Create CiviCRM folder
-  file:
-    path: "{{ item.item.value.civiroot }}"
-    state: directory
-  when: item.item.value.civicrm == 'Yes'
-
-- name: Unzip the tarball
+- name: Unarchive the tarball
   unarchive:
     src: /tmp/civicrm-STABLE-wordpress.zip
     dest: "{{ item.item.value.civiroot }}/../.."
     remote_src: yes
     creates: "{{ item.item.value.civiroot }}/composer.json"
   when: item.item.value.civicrm == 'Yes'
-
-- name: Create CiviCRM uploads folder
-  file:
-    path: "{{ item.item.value.civicrm_settings_php_path }}"
-    state: directory
-  when: item.item.value.civicrm == 'Yes'
-
-- name: Set the WP .gitignore
-  copy:
-    src: files/wp-gitignore
-    dest: "{{ item.item.value.webroot }}/.gitignore"
 
 - name: Enable CiviCRM
   command: "wp plugin activate civicrm --path={{ item.item.value.webroot }}"

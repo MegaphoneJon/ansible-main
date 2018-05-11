@@ -1,0 +1,8 @@
+# Ignore configuration files that may contain sensitive information.
+sites/*/settings*.php
+sites/*/civicrm.settings*.php
+sites/all/civicrm/extensions/cache/*
+
+# Ignore paths that contain user-generated content.
+sites/*/files
+sites/*/private

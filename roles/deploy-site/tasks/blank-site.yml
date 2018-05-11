@@ -1,5 +1,27 @@
+- name: Check out civicrm-setup
+  git:
+    repo: https://github.com/civicrm/civicrm-setup
+    dest: /opt/civicrm-setup
+  become_user: root
+  when: item.item.value.civicrm == 'Yes'
+
+- name: Create CiviCRM uploads folder
+  file:
+    path: "{{ item.item.value.civicrm_settings_php_path }}"
+    state: directory
+  when: item.item.value.civicrm == 'Yes'
+
+- name: Set file permissions
+  file:
+    dest: "{{ item.item.value.webroot }}"
+    owner: "{{ item.item.value.run_as_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+    recurse: yes
+    mode: ug=rwX
+  become_user: root
+
 - name: Run cv core:install
-  command: "cv core:install --db=mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }}"
+  command: "cv core:install --db=mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}@localhost/{{ item.item.value.crm_db_name }} --cms-base-url={{ item.item.value.primary_url }}"
   args:
     chdir: "{{ item.item.value.civiroot }}"
     creates: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
@@ -36,7 +58,16 @@
   changed_when: commit_result.rc == 0
   failed_when: not(commit_result.rc == 0 or commit_result.stdout == 'On branch master\nnothing to commit, working tree clean')
 
-- name: Set file permissions
+- name: git push
+  command: git push --set-upstream origin master
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+  register: push_result
+  when: item.item.value.git_repo_push_url | search("ssh://")
+  changed_when: push_result.rc == 0
+  failed_when: not(push_result.rc == 0)
+
+- name: Set file permissions (again)
   file:
     dest: "{{ item.item.value.webroot }}"
     owner: "{{ item.item.value.run_as_user }}"

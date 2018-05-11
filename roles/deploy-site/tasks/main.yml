@@ -18,6 +18,8 @@
   set_fact:
     grouplist: "{{ grouplist|default([]) + [ item.value.run_as_user ] }}"
   with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 - name: Add Megaphone staff to the newly-created group
   user:
@@ -107,6 +109,8 @@
     state: present
   become_user: root
   with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 
 - name: Grant www-data user access to the webroot
@@ -120,12 +124,25 @@
     state: present
   become_user: root
   with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 - name: Deal with the Ansible ACL bug
   command: setfacl -R -m user:www-data:rx,d:user:www-data:rx "{{ item.value.webroot }}"
   changed_when: false
   become_user: root
   with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Create CiviCRM folder
+  file:
+    path: "{{ item.value.civiroot }}"
+    state: directory
+  when: item.value.civicrm == 'Yes'
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 # MySQL
 - name: Create CMS database
@@ -163,6 +180,15 @@
   with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ item.item.value.run_as_user }}"
   when: item.status == 201 and item.item.value.cms == 'WordPress'
+  loop_control:
+    label: "{{ item.item.key }}"
+
+# Build a new D7 site
+- name: Create fresh Drupal 7 sites
+  include_tasks: blank-drupal7.yml
+  with_items: "{{ create_gogs_repo.results }}"
+  become_user: "{{ item.item.value.run_as_user }}"
+  when: item.status == 201 and item.item.value.cms == 'Drupal'
   loop_control:
     label: "{{ item.item.key }}"
 
