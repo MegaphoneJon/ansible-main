@@ -58,16 +58,19 @@
   when: item.item.value.civicrm == 'Yes'
 
 # MySQL restore
+- name: Create sql-dumps folder
+  file:
+    owner: "{{ item.item.value.run_as_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+    path: "{{ item.item.value.webroot }}/../sql-dumps"
+    state: directory
+    mode: 02770
+  become_user: root
+
 - name: Check if db dump files already exist
   stat:
     path: "{{ item.item.value.webroot }}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
   register: db_dump_exists
-
-- name: Create sql-dumps folder
-  file:
-    path: "{{ item.item.value.webroot }}/../sql-dumps"
-    state: directory
-    mode: 02770
 
 # This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
 - name: Get the latest backup archive name

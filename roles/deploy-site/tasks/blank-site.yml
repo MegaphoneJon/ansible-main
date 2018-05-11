@@ -5,6 +5,15 @@
   become_user: root
   when: item.item.value.civicrm == 'Yes'
 
+- name: Create CiviCRM folder
+  file:
+    path: "{{ item.value.civiroot }}"
+    state: directory
+  when: item.value.civicrm == 'Yes'
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
 - name: Create CiviCRM uploads folder
   file:
     path: "{{ item.item.value.civicrm_settings_php_path }}"

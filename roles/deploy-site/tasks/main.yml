@@ -135,15 +135,6 @@
   loop_control:
     label: "{{ item.key }}"
 
-- name: Create CiviCRM folder
-  file:
-    path: "{{ item.value.civiroot }}"
-    state: directory
-  when: item.value.civicrm == 'Yes'
-  with_dict: "{{ sites }}"
-  loop_control:
-    label: "{{ item.key }}"
-
 # MySQL
 - name: Create CMS database
   mysql_db:
@@ -169,6 +160,17 @@
     priv: "{{ item.value.cms_db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,LOCK TABLES,CREATE TEMPORARY TABLES,CREATE VIEW/{{ item.value.crm_db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,LOCK TABLES,CREATE TEMPORARY TABLES,TRIGGER,CREATE ROUTINE,ALTER ROUTINE,CREATE VIEW,SHOW VIEW,REFERENCES{% if item.value.crm_logging_db_name|default('blank', True) != 'blank' %}/{{ item.value.crm_logging_db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,LOCK TABLES,CREATE TEMPORARY TABLES,TRIGGER,CREATE ROUTINE,ALTER ROUTINE,CREATE VIEW,REFERENCES{% endif %}"
     host: 'localhost'
     state: present
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Set file owner
+  file:
+    dest: "{{ item.value.webroot }}"
+    owner: "{{ item.value.run_as_user }}"
+    group: "{{ item.value.run_as_user }}"
+    recurse: yes
+  become_user: root
   with_dict: "{{ sites }}"
   loop_control:
     label: "{{ item.key }}"
