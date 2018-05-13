@@ -7,16 +7,20 @@
     name: "{{ item.item.value.run_as_user }}"
   register: userinfo
 
-- name: Add gogs keys to web user known_hosts
+# Add any hosts that submodules might come from via SSH - e.g. github
+- name: Add keys to web user known_hosts
   known_hosts:
-    name: "[git.megaphonetech.com]:10022"
-    key: "{{ inner_item }}"
+    name: "{{ inner_item.host }}"
+    key: "{{ inner_item.key }}"
   loop_control:
     loop_var: inner_item
   with_items:
-    - "[git.megaphonetech.com]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgNwIe3TBtRHtkwoHL2TG84/f039hgzqVbN0z4sk1UHPZr4rxFinGCGjedzE+adVucqr/gemPnETfashTujcPyZZkwPn2dQNx0HuPHw3H+cqXqKt03fsgPcerqsqvFS509pcblmP5vtJLF4uVgbh6TLmZiObMuiIYe9VTyZSXo67DTt/K6SSgwyUFldqJIJQA+DO1nXoSYSJ4fP1DDPdue0RTL06VtlnUL2w9iHrOgVRY1KqAtpnGRslKx5c3L8+9EBMdJWM1CPK11vkvyf8LnYwuCH4V7w0rVs2QAE9Abm4g4HiE4wql5QJrjCi/cq/1doeY9KXxFb8SOTtZBk5Nn"
-    - "[git.megaphonetech.com]:10022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLuEP2fW8Eycdbeo0XWihr63zj6yCTcCjxh4C4i3c8p2O44mKRjVhxOSSBQQxZNUKeJYAGTuWh+EPW71KADzXv0="
-    - "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w"
+    - { host: "[git.megaphonetech.com]:10022", key: "[git.megaphonetech.com]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgNwIe3TBtRHtkwoHL2TG84/f039hgzqVbN0z4sk1UHPZr4rxFinGCGjedzE+adVucqr/gemPnETfashTujcPyZZkwPn2dQNx0HuPHw3H+cqXqKt03fsgPcerqsqvFS509pcblmP5vtJLF4uVgbh6TLmZiObMuiIYe9VTyZSXo67DTt/K6SSgwyUFldqJIJQA+DO1nXoSYSJ4fP1DDPdue0RTL06VtlnUL2w9iHrOgVRY1KqAtpnGRslKx5c3L8+9EBMdJWM1CPK11vkvyf8LnYwuCH4V7w0rVs2QAE9Abm4g4HiE4wql5QJrjCi/cq/1doeY9KXxFb8SOTtZBk5Nn" }
+    - { host: "[git.megaphonetech.com]:10022", key: "[git.megaphonetech.com]:10022 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLuEP2fW8Eycdbeo0XWihr63zj6yCTcCjxh4C4i3c8p2O44mKRjVhxOSSBQQxZNUKeJYAGTuWh+EPW71KADzXv0=" }
+    - { host: "[git.megaphonetech.com]:10022", key: "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w" }
+    - { host: "github.com", key: "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" }
+    - { host: "[git.colet.space]:10022", key: "[git.colet.space]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCotp3vQdI4NZStUFeFzj7LExAyPBbKOe+97wY2Mx0f4U3ZtyYn1AGhfWiccp5jzkM3kE6Nq/iaJWVZ02JxSAQxsGgh7fn7vCzNnv7FJAFmEXC9QvV3RfjwTLAfPXd6FdPsl4bmXhabTgifbWHUujnC1yoktjgbTk0oXJ/tGJ0Xi7s3vGMKCqOQsjpNeBtyuL3ik43h4HJHgMs0GAgNNrdOcDr10dl9/6quWZOGgNfShrzHTn+Ms7zI8kavD1xBtgNIfKdXPBn8A3hglQrttIj5XxBGQ2oS+ArizvGiZrRS5yQ89ZmJ0xNjEjxiO8do2X5GQqFLnVZVWwiOj7Qd4HVB" }
+
 
 - name: Get the web user's SSH key
   slurp:
