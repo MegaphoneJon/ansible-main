@@ -1,3 +1,7 @@
+- name: Show the site in question
+  debug:
+    msg: Operating on "{{ item.item.key }}"
+
 - name: Download wordpress into /srv/wordpress using wp[-cli] command as the wordpress user
   command: "wp core download --path={{ item.item.value.webroot }}"
   args:

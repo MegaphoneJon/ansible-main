@@ -1,3 +1,7 @@
+- name: Show the site in question
+  debug:
+    msg: Operating on "{{ item.item.key }}"
+
 - name: Check if Drupal is already set up.
   stat: "path={{ item.item.value.webroot }}/index.php"
   register: drupal_site

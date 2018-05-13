@@ -181,7 +181,7 @@
   include_tasks: blank-wp.yml
   with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ item.item.value.run_as_user }}"
-  when: item.status == 201 and item.item.value.cms == 'WordPress'
+  when: (item.status == 201 or item.item.value.internal_repo != "1") and item.item.value.cms == 'WordPress'
   loop_control:
     label: "{{ item.item.key }}"
 
@@ -190,7 +190,7 @@
   include_tasks: blank-drupal7.yml
   with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ item.item.value.run_as_user }}"
-  when: item.status == 201 and item.item.value.cms == 'Drupal'
+  when: (item.status == 201 or item.item.value.internal_repo != "1") and item.item.value.cms == 'Drupal'
   loop_control:
     label: "{{ item.item.key }}"
 
