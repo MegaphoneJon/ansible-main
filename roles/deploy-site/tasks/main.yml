@@ -199,7 +199,7 @@
   include_tasks: blank-site.yml
   with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ item.item.value.run_as_user }}"
-  when: item.status == 201
+  when: (item.status == 201 or item.item.value.internal_repo != "1")
   loop_control:
     label: "{{ item.item.key }}"
 

@@ -7,15 +7,11 @@
   register: drupal_site
   ignore_errors: true
 
-- name: Fail if Drupal exists
-  fail:
-    msg: "Drupal already exists - don't create a new site."
-  when: drupal_site.stat.exists
-
 - name: Download Drupal 7
   command: "drush dl drupal-7 -y --destination={{ item.item.value.webroot }}/.. --drupal-project-rename=htdocs"
   args:
     creates: "{{ item.item.value.webroot }}/wp-load.php"
+  when: drupal_site.stat.exists == false
 
 - name: Install Drupal with drush.
   command: >
@@ -27,6 +23,7 @@
     --db-url=mysql://{{ item.item.value.db_user }}:{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql create=true length=32') }}@localhost/{{ item.item.value.cms_db_name }}
   args:
     chdir: "{{ item.item.value.webroot }}"
+  when: drupal_site.stat.exists == false
 
 - name: Set the D7 .gitignore
   copy:
@@ -37,7 +34,7 @@
   get_url:
     url: https://download.civicrm.org/latest/civicrm-STABLE-drupal.tar.gz
     dest: /tmp/civicrm-STABLE-drupal.tar.gz
-  when: item.item.value.civicrm == 'Yes'
+  when: drupal_site.stat.exists == false and item.item.value.civicrm == 'Yes'
 
 - name: Unarchive the tarball
   unarchive:
@@ -45,4 +42,4 @@
     dest: "{{ item.item.value.webroot }}/sites/all/modules"
     remote_src: yes
     creates: "{{ item.item.value.civiroot }}/composer.json"
-  when: item.item.value.civicrm == 'Yes'
+  when: drupal_site.stat.exists == false and item.item.value.civicrm == 'Yes'
