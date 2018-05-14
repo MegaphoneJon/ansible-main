@@ -1,0 +1,9 @@
+- name: Set a drushrc.php
+  template:
+    src: templates/drushrc.j2
+    dest: "{{ item.item.value.webroot }}/sites/default/drushrc.php"
+    owner: "{{ item.item.value.run_as_user }}"
+    group: "{{ item.item.value.run_as_user }}"
+  when: item.item.value.cms == 'Drupal'
+  become_user: root
+
