@@ -203,20 +203,20 @@
   loop_control:
     label: "{{ item.item.key }}"
 
-# For internal (git.megaphonetech.com) repos
-- name: Build sites from existing git repo
-  include_tasks: internal-git.yml
-  with_items: "{{ create_gogs_repo.results }}"
-  become_user: "{{ item.item.value.run_as_user }}"
-  when: item.status == 422 and item.item.value.internal_repo == "1"
-  loop_control:
-    label: "{{ item.item.key }}"
-
 # All Drupal sites
 - name: Drupal tasks
   include_tasks: drupal7.yml
   with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ item.item.value.run_as_user }}"
   when: item.item.value.cms == 'Drupal'
+  loop_control:
+    label: "{{ item.item.key }}"
+
+# For internal (git.megaphonetech.com) repos
+- name: Build sites from existing git repo
+  include_tasks: internal-git.yml
+  with_items: "{{ create_gogs_repo.results }}"
+  become_user: "{{ item.item.value.run_as_user }}"
+  when: item.status == 422 and item.item.value.internal_repo == "1"
   loop_control:
     label: "{{ item.item.key }}"
