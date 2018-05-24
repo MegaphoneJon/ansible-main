@@ -1,8 +1,7 @@
 #!/usr/bin/php
 <?php
 
-const ENDPOINT = 'https://crm.megaphonetech.com/rest/';
-const USERNAME = 'restuser';
+require('gethosts.cfg.php');
 
 function run($argv) {
   if (empty($argv[1])) {
@@ -51,8 +50,10 @@ run($argv);
  * Outputs a hierarchical array of children, suitable for merging into the taxonomy.
  */
 function buildGroupHierarchy($groups) {
+  $hierarchicalList = [];
   foreach ($groups as $k => $group) {
     foreach ($groups as $childKey => $childGroup) {
+      $hierarchicalList[$group->name] = [];
       if ($childGroup->parent == $group->tid) {
         $hierarchicalList[$group->name]['children'][] = $childGroup->name;
       }
@@ -92,6 +93,7 @@ function buildServerList($servers, $websites) {
 
 function post($curlHeaders, $operation, $postFields = NULL) {
   $curlHeaders[] = 'Content-Type: application/json';
+  $curlHeaders[] = 'Accept: application/json';
   $curlOptions = [
     CURLOPT_HTTPHEADER => $curlHeaders,
     CURLOPT_RETURNTRANSFER => TRUE,
@@ -107,6 +109,7 @@ function post($curlHeaders, $operation, $postFields = NULL) {
 }
 
 function get($curlHeaders, $operation, $body = NULL) {
+  $curlHeaders[] = 'Accept: application/json';
   $curlOptions = [
     CURLOPT_HTTPHEADER => $curlHeaders,
     CURLOPT_RETURNTRANSFER => TRUE,
