@@ -10,6 +10,7 @@ outgoing_ports:
   - { port: 80, protocol: tcp, name: 'HTTP' }
   - { port: 443, protocol: tcp, name: 'HTTPS' }
   - { port: 465, protocol: tcp, name: 'SMTPS' }
+  - { port: 587, protocol: tcp, name: 'SMTP TLS' }
   - { port: 5665, protocol: tcp, name: 'Icinga2' }
   - { port: 10022, protocol: tcp, name: 'Megaphone git SSH' }
   - { port: 53, protocol: udp, name: 'DNS' }
