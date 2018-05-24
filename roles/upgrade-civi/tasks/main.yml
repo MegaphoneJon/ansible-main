@@ -1,24 +1,90 @@
 ---
-- name: Get a list of plugins that need updating
-  script: helpers/upgradeable-civi.php
-  args:
-    chdir: "{{ item.value.webroot }}"
-  register: extensions
-  changed_when: false
+- name: Get the latest CiviCRM version number
+  local_action:
+    module: uri
+    url: http://latest.civicrm.org/stable.php
+    return_content: yes
+  run_once: true
+  register: civi_ver
+
+# TODO: Check alternate URLs where my custom distmaker tarballs might exist
+
+# https://download.civicrm.org/latest has stable version names, but I want to know whether I already have the same version already, so I do this version-specific approach.
+- name: Download stable versions of Civi
+  local_action:
+    module: get_url
+    url: "https://download.civicrm.org/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  run_once: true
+  with_items:
+    - "civicrm-{{ civi_ver.content }}-drupal.tar.gz"
+    - "civicrm-{{ civi_ver.content }}-backdrop.tar.gz"
+    - "civicrm-{{ civi_ver.content }}-wordpress.zip"
+
+- name: Back up the databases
+  mysql_db:
+    state: dump
+    name: "{{ item.value.crm_db_name }}"
+    target: "{{ item.value.webroot }}/../sql-dumps/{{ item.value.crm_db_name }}.pre-{{civi_ver.content}}.sql.gz"
+  with_dict: "{{ sites }}"
+  become: yes
+  when: item.value.contract_type | search("Civi Maintenance") 
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Unarchive the files into civiroot (.tar.gz)
+  unarchive:
+    src: "/tmp/civicrm-{{ civi_ver.content }}-{{ item.value.cms|lower }}.tar.gz"
+    dest: "{{ item.value.civiroot }}/.."
+  with_dict: "{{ sites }}"
   become: yes
   become_user: "{{ item.value.run_as_user }}"
+  when: item.value.cms != 'WordPress' and item.value.contract_type | search("Civi Maintenance") 
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Unarchive the files into civiroot (.zip)
+  unarchive:
+    src: "/tmp/civicrm-{{ civi_ver.content }}-{{ item.value.cms|lower }}.zip"
+    dest: "{{ item.value.civiroot }}/../.."
   with_dict: "{{ sites }}"
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  when: item.value.cms == 'WordPress' and item.value.contract_type | search("Civi Maintenance") 
+  loop_control:
+    label: "{{ item.key }}"
+
+# TODO: This cv command seems broken, not Ansible-related
+#- name: Upgrade the Civi DB
+#  command: "cv upgrade:db --cwd {{ item.value.webroot }}"
+#  with_dict: "{{ sites }}"
+#  become: yes
+#  become_user: "{{ item.value.run_as_user }}"
+#  when: item.value.contract_type | search("Civi Maintenance") 
+#  loop_control:
+#    label: "{{ item.key }}"
+  
+
+#- name: Get a list of plugins that need updating
+#  script: helpers/upgradeable-civi.php
+#  args:
+#    chdir: "{{ item.value.webroot }}"
+#  register: extensions
+#  changed_when: false
+#  become: yes
+#  become_user: "{{ item.value.run_as_user }}"
+#  with_dict: "{{ sites }}"
 
 # TODO: To properly loop over extensions and commit each separately, we'll need to use an include.
 #       Unfortunately, there's no looping over a block.  site-deploy role uses includes similarly.
-- debug: 
-    msg: "{{ item.name }} {{ item.version }}"
-  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
+#- debug: 
+#    msg: "{{ item.name }} {{ item.version }}"
+#  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
 
-- name: Upgrade extensions
-  debug: 
-    msg: "cv ext:download -f {{ item.id }}"
-  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
+#- name: Upgrade extensions
+#  debug: 
+#    msg: "cv ext:download -f {{ item.id }}"
+#  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
 
 #- handler: Run extension db updates
 # cv ext:upgrade-db
