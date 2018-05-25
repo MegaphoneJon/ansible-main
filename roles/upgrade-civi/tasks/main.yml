@@ -39,7 +39,7 @@
   with_dict: "{{ sites }}"
   become: yes
   become_user: "{{ item.value.run_as_user }}"
-  when: item.value.cms != 'WordPress' and item.value.contract_type | search("Civi Maintenance") 
+  when: item.value.cms != 'WordPress' and item.value.contract_type | search("Civi Maintenance")
   loop_control:
     label: "{{ item.key }}"
 
@@ -50,19 +50,19 @@
   with_dict: "{{ sites }}"
   become: yes
   become_user: "{{ item.value.run_as_user }}"
-  when: item.value.cms == 'WordPress' and item.value.contract_type | search("Civi Maintenance") 
+  when: item.value.cms == 'WordPress' and item.value.contract_type | search("Civi Maintenance")
   loop_control:
     label: "{{ item.key }}"
 
 # TODO: This cv command seems broken, not Ansible-related
-#- name: Upgrade the Civi DB
-#  command: "cv upgrade:db --cwd {{ item.value.webroot }}"
-#  with_dict: "{{ sites }}"
-#  become: yes
-#  become_user: "{{ item.value.run_as_user }}"
-#  when: item.value.contract_type | search("Civi Maintenance") 
-#  loop_control:
-#    label: "{{ item.key }}"
+- name: Upgrade the Civi DB
+  command: "cv upgrade:db --cwd {{ item.value.webroot }}"
+  with_dict: "{{ sites }}"
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  when: item.value.contract_type | search("Civi Maintenance")
+  loop_control:
+    label: "{{ item.key }}"
   
 
 #- name: Get a list of plugins that need updating
