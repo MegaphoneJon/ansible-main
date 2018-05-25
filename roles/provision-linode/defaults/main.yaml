@@ -1,6 +1,6 @@
-#defaults for crm.megaphonetech.com REST API
-inventory_rest_endpoint: 'https://crm.megaphonetech.com/rest/'
-inventory_username: 'restuser'
+#defaults for CRM REST API
+inventory_rest_endpoint: "{{ lookup('pipe', 'php -f gethosts.cfg.php ENDPOINT') }}"
+inventory_username: "{{ lookup('pipe', 'php -f gethosts.cfg.php USERNAME') }}"
 #Linode
 linode_plan: 0
 linode_id: 0
