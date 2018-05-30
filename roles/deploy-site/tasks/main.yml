@@ -84,7 +84,7 @@
     body_format: json
   with_dict: "{{ sites }}"
   register: create_gogs_repo
-  failed_when: not(create_gogs_repo.status == 201 or create_gogs_repo.status == 422)
+  failed_when: not(create_gogs_repo.status == 201 or create_gogs_repo.status == 422 or create_gogs_repo.status == 403)
   loop_control:
     label: "{{ item.key }}"
 
@@ -217,6 +217,6 @@
   include_tasks: internal-git.yml
   with_items: "{{ create_gogs_repo.results }}"
   become_user: "{{ item.item.value.run_as_user }}"
-  when: item.status == 422 and item.item.value.internal_repo == "1"
+  when: (item.status == 422 or item.status == 403) and item.item.value.internal_repo == "1"
   loop_control:
     label: "{{ item.item.key }}"
