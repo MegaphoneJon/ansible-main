@@ -11,7 +11,7 @@
 
 - name: Get users to add to the new group
   set_fact:
-    userlist: "{{ userlist|default([]) + [ item.value.name ] }}"
+    userlist: "{{ userlist|default([]) + [ item.value.name ] + [ ansible_user ] }}"
   with_dict: "{{ mtcusers }}"
 
 - name: Get list of groups to add to users
