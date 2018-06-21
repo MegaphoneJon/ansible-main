@@ -29,11 +29,12 @@
 
 # Gogs thinks the key exists if the title matches an existing key.
 # So we hash the key to add to the title.
-- name: Get a key checksum
+- name: Get a key hash
   set_fact:
     key_md5: "{{ key['content'] | b64decode | md5 }}"
 
-- name: Set up deploy keys on gogs
+# Deploy keys are read/write on trusted servers, read-only otherwise.
+- name: Set up deploy keys on gitea
   uri:
     url: https://git.megaphonetech.com/api/v1/repos/{{ item.item.value.git_repo_owner + '/' + item.item.value.git_repo_name }}/keys
     method: POST
@@ -41,6 +42,7 @@
     body:
       title: "{{ item.item.value.run_as_user + '@' + inventory_hostname_short + ' ' + key_md5 }}"
       key: "{{ key['content'] | b64decode }}"
+      read_only: "{{ (item.item.value.trusted_server == '1') | ternary(false, true) }}"
     headers:
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
   register: gogs_result
