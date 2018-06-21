@@ -54,7 +54,6 @@
   loop_control:
     label: "{{ item.key }}"
 
-# TODO: This cv command seems broken, not Ansible-related
 - name: Upgrade the Civi DB
   command: "cv upgrade:db --cwd {{ item.value.webroot }}"
   with_dict: "{{ sites }}"
@@ -64,6 +63,59 @@
   loop_control:
     label: "{{ item.key }}"
   
+- name: git config - user/email
+  blockinfile:
+    path: "{{ item.value.webroot }}/.git/config"
+    block: |
+      [user]
+        email = none@megaphonetech.com
+        name = {{ item.value.run_as_user }} on {{ item.key }}
+  with_dict: "{{ sites }}"
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  when: item.value.contract_type | search("Civi Maintenance")
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: git add Civi upgrade
+  command: git add -v -A
+  args:
+    chdir: "{{ item.value.civiroot }}"
+  register: add_result
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  when: item.value.contract_type | search("Civi Maintenance")
+  changed_when: add_result.stdout != ''
+  failed_when: add_result.stderr != ''
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: git commit Civi upgrade
+  command: "git commit -m 'CiviCRM {{ civi_ver.content }}'"
+  args:
+    chdir: "{{ item.value.civiroot }}"
+  register: commit_result
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  when: item.value.contract_type | search("Civi Maintenance")
+  changed_when: commit_result.rc == 0
+  failed_when: not(commit_result.rc == 0 or 'nothing to commit, working tree clean' in commit_result.stdout_lines)
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: git push
+  command: git push --set-upstream origin master
+  args:
+    chdir: "{{ item.value.webroot }}"
+  register: push_result
+  when: item.value.contract_type | search("Civi Maintenance") and item.value.internal_repo == "1" and (item.value.git_repo_push_url | search("ssh://"))
+  changed_when: push_result.rc == 0
+  failed_when: not(push_result.rc == 0)
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 #- name: Get a list of plugins that need updating
 #  script: helpers/upgradeable-civi.php
