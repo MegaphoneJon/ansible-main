@@ -92,6 +92,7 @@
   when: db_dump_exists.stat.exists == false and item.item.value.canonical_hostname
   become_user: root
 
+# Download the borg backup of the db dump if we don't have a db dump already and the borg backup exists.
 - name: Download the latest copy of the database
   shell: borg extract --strip-components 4 --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.canonical_server_client + '-' + item.item.value.canonical_hostname }}::{{ archive_name.stdout }} var/backups/mysql/sqldump/{{ db_name }}
   args:
@@ -108,12 +109,13 @@
   when: archive_name.skipped is not defined
   become_user: root
 
-# Don't do these other steps if a) there's no db backup in borg, b) the db is already downloaded.
+# Don't do these other steps if a) there's no db backup in borg b) the db is already downloaded.
+# FIXME: We don't have a way of telling whether the db dump has been loaded or not, which is what we really need.  Figure out a command to determine that, then change the "when" on the next 3 tasks.
 - name: Remove definers from Civi db
   command: perl -pi -e 's#\/\*\!5001. DEFINER=`.*`@`.*?\*\/##g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-  when: archive_name.skipped is not defined and db_downloaded.changed
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
 
 - name: Import the CMS database
   mysql_db:
@@ -122,7 +124,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: archive_name.skipped is not defined and db_downloaded.changed
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
 
 - name: Do a search/replace for the primary URL
   command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
@@ -137,7 +139,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: archive_name.skipped is not defined and db_downloaded.changed
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
 
 - name: Add civicrm.settings.php
   template:
