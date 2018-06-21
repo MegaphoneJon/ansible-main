@@ -156,6 +156,10 @@
   when: item.item.value.cms == 'Drupal' or item.item.value.cms == 'Backdrop'
   changed_when: false
 
+#TODO: Create a settings template for Backdrop
+#TODO: Create the config folders for Backdrop with appropriate owner/perms
+# config/active, config/staging, both owned/writable by run_as_user
+
 - name: Add settings.php
   template:
     src: templates/settings.j2
