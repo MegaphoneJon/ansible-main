@@ -110,6 +110,8 @@
   args:
     chdir: "{{ item.value.webroot }}"
   register: push_result
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
   when: item.value.contract_type | search("Civi Maintenance") and item.value.internal_repo == "1" and (item.value.git_repo_push_url | search("ssh://"))
   changed_when: push_result.rc == 0
   failed_when: not(push_result.rc == 0)
