@@ -9,6 +9,16 @@
 
 # TODO: Check alternate URLs where my custom distmaker tarballs might exist
 
+- name: check installed CiviCRM version
+  command: mysql {{ item.value.crm_db_name }} -N -s -e'SELECT version from civicrm_domain WHERE id = 1'
+  with_dict: "{{ sites }}"
+  become: yes
+  when: item.value.contract_type | search("Civi Maintenance")
+  loop_control:
+    label: "{{ item.key }}"
+  register: installed_version
+  changed_when: false
+
 # https://download.civicrm.org/latest has stable version names, but I want to know whether I already have the same version already, so I do this version-specific approach.
 - name: Download stable versions of Civi
   local_action:
@@ -21,103 +31,102 @@
     - "civicrm-{{ civi_ver.content }}-backdrop.tar.gz"
     - "civicrm-{{ civi_ver.content }}-wordpress.zip"
 
-- name: Back up the databases
-  mysql_db:
-    state: dump
-    name: "{{ item.value.crm_db_name }}"
-    target: "{{ item.value.webroot }}/../sql-dumps/{{ item.value.crm_db_name }}.pre-{{civi_ver.content}}.sql.gz"
-  with_dict: "{{ sites }}"
-  become: yes
-  when: item.value.contract_type | search("Civi Maintenance") 
-  loop_control:
-    label: "{{ item.key }}"
+# This block is for sites whose version isn't the latest.
+- block:
+  - name: Back up the databases
+    mysql_db:
+      state: dump
+      name: "{{ item.item.value.crm_db_name }}"
+      target: "{{ item.item.value.webroot }}/../sql-dumps/{{ item.item.value.crm_db_name }}.pre-{{civi_ver.content}}.sql.gz"
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    loop_control:
+      label: "{{ item.item.key }}"
 
-- name: Unarchive the files into civiroot (.tar.gz)
-  unarchive:
-    src: "/tmp/civicrm-{{ civi_ver.content }}-{{ item.value.cms|lower }}.tar.gz"
-    dest: "{{ item.value.civiroot }}/.."
-  with_dict: "{{ sites }}"
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.cms != 'WordPress' and item.value.contract_type | search("Civi Maintenance")
-  loop_control:
-    label: "{{ item.key }}"
+  - name: Unarchive the files into civiroot (.tar.gz)
+    unarchive:
+      src: "/tmp/civicrm-{{ civi_ver.content }}-{{ item.item.value.cms|lower }}.tar.gz"
+      dest: "{{ item.item.value.civiroot }}/.."
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    when: item.item.value.cms != 'WordPress'
+    loop_control:
+      label: "{{ item.item.key }}"
 
-- name: Unarchive the files into civiroot (.zip)
-  unarchive:
-    src: "/tmp/civicrm-{{ civi_ver.content }}-{{ item.value.cms|lower }}.zip"
-    dest: "{{ item.value.civiroot }}/../.."
-  with_dict: "{{ sites }}"
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.cms == 'WordPress' and item.value.contract_type | search("Civi Maintenance")
-  loop_control:
-    label: "{{ item.key }}"
+  - name: Unarchive the files into civiroot (.zip)
+    unarchive:
+      src: "/tmp/civicrm-{{ civi_ver.content }}-{{ item.item.value.cms|lower }}.zip"
+      dest: "{{ item.item.value.civiroot }}/../.."
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    when: item.item.value.cms == 'WordPress'
+    loop_control:
+      label: "{{ item.item.key }}"
 
-- name: Upgrade the Civi DB
-  command: "cv upgrade:db --cwd {{ item.value.webroot }}"
-  with_dict: "{{ sites }}"
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.contract_type | search("Civi Maintenance")
-  loop_control:
-    label: "{{ item.key }}"
+  - name: Upgrade the Civi DB
+    command: "cv upgrade:db --cwd {{ item.item.value.webroot }}"
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    loop_control:
+      label: "{{ item.item.key }}"
   
-- name: git config - user/email
-  blockinfile:
-    path: "{{ item.value.webroot }}/.git/config"
-    block: |
-      [user]
-        email = none@megaphonetech.com
-        name = {{ item.value.run_as_user }} on {{ item.key }}
-  with_dict: "{{ sites }}"
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.contract_type | search("Civi Maintenance")
-  loop_control:
-    label: "{{ item.key }}"
+  - name: git config - user/email
+    blockinfile:
+      path: "{{ item.item.value.webroot }}/.git/config"
+      block: |
+        [user]
+          email = none@megaphonetech.com
+          name = {{ item.item.value.run_as_user }} on {{ item.item.key }}
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    loop_control:
+      label: "{{ item.item.key }}"
 
-- name: git add Civi upgrade
-  command: git add -v -A
-  args:
-    chdir: "{{ item.value.civiroot }}"
-  register: add_result
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.contract_type | search("Civi Maintenance")
-  changed_when: add_result.stdout != ''
-  failed_when: add_result.stderr != ''
-  with_dict: "{{ sites }}"
-  loop_control:
-    label: "{{ item.key }}"
+  - name: git add Civi upgrade
+    command: git add -v -A
+    args:
+      chdir: "{{ item.item.value.civiroot }}"
+    register: add_result
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    changed_when: add_result.stdout != ''
+    failed_when: add_result.stderr != ''
+    loop_control:
+      label: "{{ item.item.key }}"
 
-- name: git commit Civi upgrade
-  command: "git commit -m 'CiviCRM {{ civi_ver.content }}'"
-  args:
-    chdir: "{{ item.value.civiroot }}"
-  register: commit_result
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.contract_type | search("Civi Maintenance")
-  changed_when: commit_result.rc == 0
-  failed_when: not(commit_result.rc == 0 or 'nothing to commit, working tree clean' in commit_result.stdout_lines)
-  with_dict: "{{ sites }}"
-  loop_control:
-    label: "{{ item.key }}"
+  - name: git commit Civi upgrade
+    command: "git commit -m 'CiviCRM {{ civi_ver.content }}'"
+    args:
+      chdir: "{{ item.item.value.civiroot }}"
+    register: commit_result
+    with_items: "{{ installed_version.results }}"
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    changed_when: commit_result.rc == 0
+    failed_when: not(commit_result.rc == 0 or 'nothing to commit, working tree clean' in commit_result.stdout_lines)
+    loop_control:
+      label: "{{ item.item.key }}"
 
-- name: git push
-  command: git push --set-upstream origin master
-  args:
-    chdir: "{{ item.value.webroot }}"
-  register: push_result
-  become: yes
-  become_user: "{{ item.value.run_as_user }}"
-  when: item.value.contract_type | search("Civi Maintenance") and item.value.internal_repo == "1" and (item.value.git_repo_push_url | search("ssh://"))
-  changed_when: push_result.rc == 0
-  failed_when: not(push_result.rc == 0)
-  with_dict: "{{ sites }}"
-  loop_control:
-    label: "{{ item.key }}"
+  - name: git push
+    command: git push --set-upstream origin master
+    args:
+      chdir: "{{ item.item.value.webroot }}"
+    register: push_result
+    become: yes
+    become_user: "{{ item.item.value.run_as_user }}"
+    with_items: "{{ installed_version.results }}"
+    when: item.item.value.internal_repo == "1" and (item.item.value.git_repo_push_url | search("ssh://"))
+    changed_when: push_result.rc == 0
+    failed_when: not(push_result.rc == 0)
+    loop_control:
+      label: "{{ item.item.key }}"
+
+  when: item.skipped is not defined and item.stdout != civi_ver.content
 
 #- name: Get a list of plugins that need updating
 #  script: helpers/upgradeable-civi.php
