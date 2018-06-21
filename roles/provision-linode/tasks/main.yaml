@@ -54,9 +54,9 @@
       send "ssh-keyscan localhost\n"
       expect -re "ssh-keyscan localhost\r\n(.*)\r\nroot@.*$prompt"
       set output $expect_out(1,string)
-      send "logout\n"
+      send "\nlogout\n"
       expect -re "login: $"
-      set output2 [exec echo $output | sed "s/\u001b...;10.H//g" | sed "s/\b//g" | sed "s/localhost//g" | grep -v #]
+      set output2 [exec echo $output | sed "s/\u001b\d{3};\d{3}H//g" | sed "s/\b//g" | sed "s/localhost//g" | grep -v #]
       puts $output2
       exit
     args:
