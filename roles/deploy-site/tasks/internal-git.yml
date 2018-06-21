@@ -117,6 +117,12 @@
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
   when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
 
+- name: Fix logging db triggers when using a separate db
+  command: perl -pi -e 's/{{ item.item.value.canonical_crm_logging_db_name }}/{{ item.item.value.crm_logging_db_name }}/g' {{ item.item.value.canonical_crm_db_name }}.sql
+  args:
+    chdir: "{{ item.item.value.webroot }}/../sql-dumps"
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true and item.item.value.canonical_crm_logging_db_name
+
 - name: Import the CMS database
   mysql_db:
     name: "{{ item.item.value.cms_db_name }}"
