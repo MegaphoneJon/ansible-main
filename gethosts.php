@@ -53,7 +53,6 @@ function buildGroupHierarchy($groups) {
   $hierarchicalList = [];
   foreach ($groups as $k => $group) {
     foreach ($groups as $childKey => $childGroup) {
-      $hierarchicalList[$group->name] = [];
       if ($childGroup->parent == $group->tid) {
         $hierarchicalList[$group->name]['children'][] = $childGroup->name;
       }
