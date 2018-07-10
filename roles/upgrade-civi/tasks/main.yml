@@ -128,15 +128,31 @@
 
   when: item.skipped is not defined and item.stdout != civi_ver.content
 
-#- name: Get a list of plugins that need updating
-#  script: helpers/upgradeable-civi.php
-#  args:
-#    chdir: "{{ item.value.webroot }}"
-#  register: extensions
-#  changed_when: false
-#  become: yes
-#  become_user: "{{ item.value.run_as_user }}"
-#  with_dict: "{{ sites }}"
+- name: Get a list of plugins that need updating
+  script: helpers/upgradeable-civi.php
+  args:
+    chdir: "{{ item.value.webroot }}"
+  register: extensions
+  changed_when: false
+  become: yes
+  become_user: "{{ item.value.run_as_user }}"
+  with_dict: "{{ sites }}"
+  when: item.value.contract_type | search("Civi Maintenance")
+  loop_control:
+    label: "{{ item.key }}"
+
+- debug: var=item.stdout
+  with_items: "{{ extensions.results }}"
+  when: item.stdout is defined and item.stdout != "null"
+
+- name: Upgrade Civi extensions
+  include_tasks: civi-extensions.yml
+  with_items: "{{ extensions.results }}"
+  become_user: "{{ item.item.value.run_as_user }}"
+  when: item.stdout is defined and item.stdout != "null"
+  loop_control:
+    label: "{{ item.item.key }}"
+
 
 # TODO: To properly loop over extensions and commit each separately, we'll need to use an include.
 #       Unfortunately, there's no looping over a block.  site-deploy role uses includes similarly.
