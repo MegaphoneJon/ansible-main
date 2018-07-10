@@ -147,15 +147,18 @@
 
 - name: Upgrade Civi extensions
   include_tasks: civi-extensions.yml
-  with_items: "{{ extensions.results }}"
-  become_user: "{{ item.item.value.run_as_user }}"
-  when: item.stdout is defined and item.stdout != "null"
+  with_subelements: 
+    - "{{ extensions.results }}"
+    - stdout_lines
+  become_user: "{{ item.0.item.value.run_as_user }}"
+  when: item.0.stdout is defined and item.0.stdout != "null"
   loop_control:
-    label: "{{ item.item.key }}"
+    label: "{{ item.0.item.key }}"
 
 
 # TODO: To properly loop over extensions and commit each separately, we'll need to use an include.
 #       Unfortunately, there's no looping over a block.  site-deploy role uses includes similarly.
+# TODO2: I think the include needs to use with_subelements, not with_items, to capture both host info and extension info.
 #- debug: 
 #    msg: "{{ item.name }} {{ item.version }}"
 #  with_items: "{{ extensions.results | map(attribute='stdout') | map('from_json') | list }}"
