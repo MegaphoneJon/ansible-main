@@ -116,12 +116,14 @@
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
   when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
+  become_user: root
 
 - name: Fix logging db triggers when using a separate db
   command: perl -pi -e 's/{{ item.item.value.canonical_crm_logging_db_name }}/{{ item.item.value.crm_logging_db_name }}/g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
   when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true and item.item.value.canonical_crm_logging_db_name
+  become_user: root
 
 - name: Import the CMS database
   mysql_db:
@@ -131,12 +133,7 @@
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
   when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
-
-- name: Do a search/replace for the primary URL
-  command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
-  args:
-    chdir: "{{ item.item.value.webroot }}"
-  when: item.item.value.cms == 'WordPress' and item.item.value.canonical_primary_url
+  become_user: root
 
 - name: Import the Civi database
   mysql_db:
@@ -146,6 +143,7 @@
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
   when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
+  become_user: root
 
 - name: Add civicrm.settings.php
   template:
@@ -182,6 +180,12 @@
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
   when: item.item.value.cms == 'WordPress'
+
+- name: Do a search/replace for the primary URL
+  command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+  when: item.item.value.cms == 'WordPress' and item.item.value.canonical_primary_url
 
 - name: Set group write permissions on CiviCRM folders
   file:
