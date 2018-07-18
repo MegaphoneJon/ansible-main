@@ -14,7 +14,6 @@
   roles:
     - { role: firewall-common, tags: firewall }
     - { role: contrib/geerlingguy.apache, tags: apache }
-    - { role: icinga2, tags: icinga2 }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
 
@@ -45,4 +44,5 @@
     - wp-cli
     - { role: cv, tags: cv }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
-#    - upgrade-wp
+    # Run after deploy-site now that it monitors sites
+    - { role: icinga2, tags: icinga2 }
