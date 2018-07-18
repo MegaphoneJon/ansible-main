@@ -3,9 +3,10 @@ object Host "{{ fqdn }}" {
   display_name = "{{ fqdn }}"
   import "generic-host"
 
-  /* This enables communication between the master Icinga and a satellite Icinga on
-     the remote host.  Comment it out if there's no satellite on the remote host. */
+{% if contract_type is search("VPS") %}
+  /* Enable running checks from the primary Icinga on the satellite. */
   vars.client_endpoint = name
+{% endif %}
   
   /* Specify the address attributes for checks e.g. `ssh` or `http`. */
   address = "{{ ansible_host }}"
@@ -21,6 +22,7 @@ object Host "{{ fqdn }}" {
 
   /* Define http vhost attributes for service apply rules in `services.conf`. */
 {% for site in sites.values() %}
+{% if site.contract_type is search("Maintenance") %}
   vars.http_vhosts["{{ site.bare_url }}"] = {
     http_uri = "/"
     http_ssl = true
@@ -29,12 +31,17 @@ object Host "{{ fqdn }}" {
 {% if site.website_string is defined %}
     http_string = "{{ site.website_string }}"
 {% endif %}
-    /* DRUPAL/CIVICRM MONITORING */
-    /* drupal_site_id = "" */
+    /* CMS/CIVICRM MONITORING */
+{% if site.contract_type is search("(Backdrop|Drupal) Maintenance") %}
+    drupal_site_id = ""
+{% endif %}
     cms = "{{ site.cms | lower }}"
+{% if site.contract_type is search("Civi Maintenance") %}
     crm_site_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/sitekey') }}"
     crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/apikey') }}"
+{% endif %}
   }
+{% endif %}
 {% endfor %}
 
   /* Define notification mail attributes for notification apply rules in `notifications.conf`. */
