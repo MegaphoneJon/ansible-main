@@ -46,7 +46,6 @@
   shell: icinga2 pki ticket --cn {{ fqdn }}
   register: ticket
   delegate_to: "{{ primary_icinga_server }}"
-  tags: debug
 
 - name: create pki folder
   file:
@@ -56,7 +55,8 @@
     owner: nagios
     group: nagios
 
-- name: create cert
+# All these references to /etc/icinga2/pki are obsolete in Icinga2 2.8+: https://www.icinga.com/docs/icinga2/latest/doc/16-upgrading-icinga-2/#upgrading-to-2-8-certificate-paths
+- name: Create the satellite's cert
   shell: icinga2 pki new-cert --cn {{ fqdn }} --key /etc/icinga2/pki/{{ fqdn }}.key --cert /etc/icinga2/pki/{{ fqdn }}.crt
 
 - name: Save the primary server's cert as a trustedcert
@@ -66,13 +66,15 @@
   shell: "icinga2 pki request --host {{ primary_icinga_server }} --port 5665 --ticket {{ ticket.stdout }} --key /etc/icinga2/pki/{{ fqdn }}.key --cert /etc/icinga2/pki/{{ fqdn }}.crt --trustedcert /etc/icinga2/pki/trusted-master.crt --ca /etc/icinga2/pki/ca.key"
 
 - name: node setup
-  shell: "icinga2 node setup --ticket {{ ticket.stdout }} --endpoint {{ primary_icinga_server }} --zone {{ fqdn }} --master_host {{ primary_icinga_server }} --trustedcert /etc/icinga2/pki/trusted-master.crt --cn {{ fqdn }}"
+  shell: "icinga2 node setup --ticket {{ ticket.stdout }} --endpoint {{ primary_icinga_server }},{{ primary_icinga_server }},5665 --zone {{ fqdn }} --master_host {{ primary_icinga_server }} --trustedcert /etc/icinga2/pki/trusted-master.crt --cn {{ fqdn }} --accept-commands --accept-config"
+  notify: restart satellite icinga
 
 - name: Harden Icinga2 TLS on satellite
   blockinfile:
     path: /etc/icinga2/features-available/api.conf
     block: |
       tls_protocolmin = "TLSv1.2"
+  notify: restart satellite icinga
 
 - name: Set up zones on the satellite
   blockinfile:
@@ -81,10 +83,13 @@
       object Zone "global-templates" {
            global = true
       }
+  notify: restart satellite icinga
 
 - name: Set up zones on the primary server
   blockinfile:
     path: /etc/icinga2/zones.conf
+    marker_begin: "BEGIN {{ fqdn }}"
+    marker_end: "END {{ fqdn }}"
     block: |
       object Endpoint "{{ fqdn }}" {
       }
@@ -93,11 +98,11 @@
         parent = "master"
       }
   delegate_to: "{{ primary_icinga_server }}"
-  notify: restart icinga
+  notify: restart primary icinga
 
 - name: Create a host file on the primary Icinga
   template:
     src: templates/icinga2.host.j2
     dest: /etc/icinga2/conf.d/hosts/{{ fqdn }}.conf
   delegate_to: "{{ primary_icinga_server }}"
-  notify: restart icinga
+  notify: restart primary icinga
