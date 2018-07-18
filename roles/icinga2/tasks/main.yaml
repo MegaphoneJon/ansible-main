@@ -2,39 +2,32 @@
 - name: Install jessie-backports
   apt_repository: repo="deb http://ftp.debian.org/debian jessie-backports main"
   when: ansible_distribution == 'Debian' and ansible_distribution_major_version == '8'
-  tags: icinga2
 
 - name: Install PPA on xenial
   apt_repository: repo='ppa:formorer/icinga'
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
-  tags: icinga2
   
 - name: Install Icinga2 (non-backport)
   apt: name="icinga2" state=present
   when: not(ansible_distribution == 'Debian' and ansible_distribution_major_version == '8')
-  tags: icinga2
 
 - name: Install Icinga2 (backport)
   apt: name="icinga2" state=present default_release=jessie-backports
   when: ansible_distribution == 'Debian' and ansible_distribution_major_version == '8'
-  tags: icinga2
 
 # Debian installs some some host definitions that interfere with being a satellite; delete them
 - name: remove hosts.conf
   file: path='/etc/icinga2/conf.d/hosts.conf' state=absent
-  tags: icinga2
 
 - name: Enable/start Icinga2 in systemd
   systemd: 
     name: icinga2 
     enabled: yes
     state: started
-  tags: icinga2
 
 - name: Check if check_apt.orig exists
   stat: path=/usr/lib/nagios/plugins/check_apt.orig
   register: check_apt_orig
-  tags: icinga2
 
 - name: Copy check_apt to check_apt.orig
   copy:
@@ -42,10 +35,69 @@
     dest: /usr/lib/nagios/plugins/check_apt.orig
     remote_src: yes
     force: no
-  tags: icinga2
 
 - name: Install updated check_apt
   copy:
     src: files/check_apt
     dest: /usr/lib/nagios/plugins/check_apt
-  tags: icinga2
+
+# Set up the satellite communication.
+- name:  generate a ticket on the primary Icinga
+  shell: icinga2 pki ticket --cn {{ fqdn }}
+  register: ticket
+  delegate_to: "{{ primary_icinga_server }}"
+  tags: debug
+
+- name: create pki folder
+  file:
+    path: /etc/icinga2/pki
+    state: directory
+    mode: 0700
+    owner: nagios
+    group: nagios
+
+- name: create cert
+  shell: icinga2 pki new-cert --cn {{ fqdn }} --key /etc/icinga2/pki/{{ fqdn }}.key --cert /etc/icinga2/pki/{{ fqdn }}.crt
+
+- name: Save the primary server's cert as a trustedcert
+  shell: icinga2 pki save-cert --key /etc/icinga2/pki/{{ fqdn }}.key --cert /etc/icinga2/pki/{{ fqdn }}.crt --trustedcert /etc/icinga2/pki/trusted-master.crt --host {{ primary_icinga_server }}
+
+- name: Request the cert from the primary server
+  shell: "icinga2 pki request --host {{ primary_icinga_server }} --port 5665 --ticket {{ ticket.stdout }} --key /etc/icinga2/pki/{{ fqdn }}.key --cert /etc/icinga2/pki/{{ fqdn }}.crt --trustedcert /etc/icinga2/pki/trusted-master.crt --ca /etc/icinga2/pki/ca.key"
+
+- name: node setup
+  shell: "icinga2 node setup --ticket {{ ticket.stdout }} --endpoint {{ primary_icinga_server }} --zone {{ fqdn }} --master_host {{ primary_icinga_server }} --trustedcert /etc/icinga2/pki/trusted-master.crt --cn {{ fqdn }}"
+
+- name: Harden Icinga2 TLS on satellite
+  blockinfile:
+    path: /etc/icinga2/features-available/api.conf
+    block: |
+      tls_protocolmin = "TLSv1.2"
+
+- name: Set up zones on the satellite
+  blockinfile:
+    path: /etc/icinga2/zones.conf
+    block: |
+      object Zone "global-templates" {
+           global = true
+      }
+
+- name: Set up zones on the primary server
+  blockinfile:
+    path: /etc/icinga2/zones.conf
+    block: |
+      object Endpoint "{{ fqdn }}" {
+      }
+      object Zone "{{ fqdn }}" {
+        endpoints = [ "{{ fqdn }}" ]
+        parent = "master"
+      }
+  delegate_to: "{{ primary_icinga_server }}"
+  notify: restart icinga
+
+- name: Create a host file on the primary Icinga
+  template:
+    src: templates/icinga2.host.j2
+    dest: /etc/icinga2/conf.d/hosts/{{ fqdn }}.conf
+  delegate_to: "{{ primary_icinga_server }}"
+  notify: restart icinga
