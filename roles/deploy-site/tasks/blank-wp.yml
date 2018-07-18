@@ -56,3 +56,9 @@
 
 - name: Enable CiviCRM
   command: "wp plugin activate civicrm --path={{ item.item.value.webroot }}"
+
+# This should go in a generic WP task file, not in blank-wp
+- name: Install the Icinga2 wp-version.php
+  copy:
+    src: files/wp-version.php
+    dest: "{{ item.item.value.webroot }}/wp-version.php"
