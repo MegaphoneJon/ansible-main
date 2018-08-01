@@ -3,7 +3,7 @@ object Host "{{ fqdn }}" {
   display_name = "{{ fqdn }}"
   import "generic-host"
 
-{% if contract_type is search("VPS") %}
+{% if contract_type is defined and contract_type is search("VPS") %}
   /* Enable running checks from the primary Icinga on the satellite. */
   vars.client_endpoint = name
 {% endif %}
