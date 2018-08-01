@@ -89,3 +89,10 @@
   changed_when: push_result.rc == 0
   failed_when: not(push_result.rc == 0)
   become_user: "{{ item.item.value.run_as_user }}"
+
+# Normally this happens on login, but we need to do it now for API key purposes
+- name: Create a CiviCRM contact for the admin user
+  shell: echo '{"contact_type":"Individual", "display_name":"{{ item.item.value.admin_email }}","api_key":"{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/apikey create=true length=32') }}","email":"{{ item.item.value.admin_email }}","options":{"match":"email"}}' | cv api contact.create --in=json
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+# FIXME: We should be generating API keys on all systems, not just new ones. But matching on some other criteria.
