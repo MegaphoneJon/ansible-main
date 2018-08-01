@@ -20,12 +20,14 @@
     - { host: "[git.megaphonetech.com]:10022", key: "[git.megaphonetech.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJoN1UsqLqucSJo4dSum6Xy2qCrlutDAu3wPdprAL4w" }
     - { host: "github.com", key: "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" }
     - { host: "[git.colet.space]:10022", key: "[git.colet.space]:10022 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCotp3vQdI4NZStUFeFzj7LExAyPBbKOe+97wY2Mx0f4U3ZtyYn1AGhfWiccp5jzkM3kE6Nq/iaJWVZ02JxSAQxsGgh7fn7vCzNnv7FJAFmEXC9QvV3RfjwTLAfPXd6FdPsl4bmXhabTgifbWHUujnC1yoktjgbTk0oXJ/tGJ0Xi7s3vGMKCqOQsjpNeBtyuL3ik43h4HJHgMs0GAgNNrdOcDr10dl9/6quWZOGgNfShrzHTn+Ms7zI8kavD1xBtgNIfKdXPBn8A3hglQrttIj5XxBGQ2oS+ArizvGiZrRS5yQ89ZmJ0xNjEjxiO8do2X5GQqFLnVZVWwiOj7Qd4HVB" }
+  become_user: "{{ item.item.value.run_as_user }}"
 
 
 - name: Get the web user's SSH key
   slurp:
     src: "{{ userinfo.home }}/.ssh/id_rsa.pub"
   register: key
+  become_user: "{{ item.item.value.run_as_user }}"
 
 # Gogs thinks the key exists if the title matches an existing key.
 # So we hash the key to add to the title.
@@ -48,6 +50,7 @@
   register: gogs_result
   changed_when: gogs_result.status == 201
   failed_when: gogs_result.status != 201 and not (gogs_result.json is defined and gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: clone an existing site
   git:
@@ -56,12 +59,14 @@
     version: master
     umask: "0007"
     track_submodules: no
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Create CiviCRM uploads folder
   file:
     path: "{{ item.item.value.civicrm_settings_php_path }}"
     state: directory
   when: item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 # MySQL restore
 - name: Create sql-dumps folder
@@ -180,12 +185,14 @@
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
   when: item.item.value.cms == 'WordPress'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Do a search/replace for the primary URL
   command: "wp search-replace {{ item.item.value.canonical_primary_url }} {{ item.item.value.primary_url }}"
   args:
     chdir: "{{ item.item.value.webroot }}"
   when: item.item.value.cms == 'WordPress' and item.item.value.canonical_primary_url
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Set group write permissions on CiviCRM folders
   file:

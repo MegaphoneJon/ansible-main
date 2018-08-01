@@ -10,12 +10,14 @@
     path: "{{ item.item.value.civiroot }}"
     state: directory
   when: item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Create CiviCRM uploads folder
   file:
     path: "{{ item.item.value.civicrm_settings_php_path }}"
     state: directory
   when: item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Set file permissions
   file:
@@ -31,11 +33,13 @@
   args:
     chdir: "{{ item.item.value.civiroot }}"
     creates: "{{ item.item.value.civicrm_settings_php_path }}/civicrm.settings.php"
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: git init
   command:  git init {{ item.item.value.webroot }}
   args:
     creates: "{{ item.item.value.webroot }}/.git"
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: git config - user, email, remotes
   blockinfile:
@@ -48,6 +52,7 @@
         url = {{ item.item.value.git_repo_url }}
         fetch = +refs/heads/*:refs/remotes/origin/*
         pushurl = {{ item.item.value.git_repo_push_url }}
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: git add
   command: git add -A
@@ -55,6 +60,7 @@
     chdir: "{{ item.item.value.webroot }}"
   register: add_result
   changed_when: add_result.stdout != ''
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: git commit
   command: git commit -m "Initial commit (via Ansible)"
@@ -63,6 +69,7 @@
   register: commit_result
   changed_when: commit_result.rc == 0
   failed_when: not(commit_result.rc == 0 or commit_result.stdout == 'On branch master\nnothing to commit, working tree clean')
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Set file permissions (again)
   file:
@@ -81,3 +88,4 @@
   when: item.item.value.internal_repo == "1" and item.item.value.internal_report == "1" and (item.item.value.git_repo_push_url | search("ssh://"))
   changed_when: push_result.rc == 0
   failed_when: not(push_result.rc == 0)
+  become_user: "{{ item.item.value.run_as_user }}"

@@ -13,6 +13,7 @@
   args:
     creates: "{{ item.item.value.webroot }}/wp-load.php"
   when: wp_site.stat.exists == false
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Create wp-config.php
   shell: |
@@ -21,30 +22,35 @@
   args:
     creates: "{{ item.item.value.webroot }}/wp-config.php"
   when: wp_site.stat.exists == false
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Run the WP installer
   command: "wp core install --url={{ item.item.value.bare_url }} --title='{{ item.item.value.site_title }}' --admin_user=admin --admin_email={{ item.item.value.admin_email }} --admin_password={{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/admin create=true length=32') }}  --path={{ item.item.value.webroot }}"
   changed_when: wpinstaller.stdout != "WordPress is already installed."
   register: wpinstaller
   when: wp_site.stat.exists == false
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Install the wp-login companion plugin
   command: "wp login install --activate --path={{ item.item.value.webroot }}"
   args:
     creates: "{{ item.item.value.webroot }}/wp-content/plugins/wp-cli-login-server"
   when: wp_site.stat.exists == false
+  become_user: "{{ item.item.value.run_as_user }}"
 
 # This should go in a generic WP task file, not in blank-wp
 - name: Set the WP .gitignore
   copy:
     src: files/wp-gitignore
     dest: "{{ item.item.value.webroot }}/.gitignore"
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Download the latest Civi archive
   get_url:
     url: https://download.civicrm.org/latest/civicrm-STABLE-wordpress.zip
     dest: /tmp/civicrm-STABLE-wordpress.zip
   when: wp_site.stat.exists == false and item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Unarchive the tarball
   unarchive:
@@ -53,12 +59,15 @@
     remote_src: yes
     creates: "{{ item.item.value.civiroot }}/composer.json"
   when: wp_site.stat.exists == false and item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Enable CiviCRM
   command: "wp plugin activate civicrm --path={{ item.item.value.webroot }}"
+  become_user: "{{ item.item.value.run_as_user }}"
 
 # This should go in a generic WP task file, not in blank-wp
 - name: Install the Icinga2 wp-version.php
   copy:
     src: files/wp-version.php
     dest: "{{ item.item.value.webroot }}/wp-version.php"
+  become_user: "{{ item.item.value.run_as_user }}"

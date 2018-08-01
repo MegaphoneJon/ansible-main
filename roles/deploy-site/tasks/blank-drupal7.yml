@@ -6,12 +6,14 @@
   stat: "path={{ item.item.value.webroot }}/index.php"
   register: drupal_site
   ignore_errors: true
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Download Drupal 7
   command: "drush dl drupal-7 -y --destination={{ item.item.value.webroot }}/.. --drupal-project-rename=htdocs"
   args:
     creates: "{{ item.item.value.webroot }}/wp-load.php"
   when: drupal_site.stat.exists == false
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Install Drupal with drush.
   command: >
@@ -24,17 +26,20 @@
   args:
     chdir: "{{ item.item.value.webroot }}"
   when: drupal_site.stat.exists == false
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Set the D7 .gitignore
   copy:
     src: files/d7-gitignore
     dest: "{{ item.item.value.webroot }}/.gitignore"
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Download the latest Civi tarball
   get_url:
     url: https://download.civicrm.org/latest/civicrm-STABLE-drupal.tar.gz
     dest: /tmp/civicrm-STABLE-drupal.tar.gz
   when: drupal_site.stat.exists == false and item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
 
 - name: Unarchive the tarball
   unarchive:
@@ -43,3 +48,4 @@
     remote_src: yes
     creates: "{{ item.item.value.civiroot }}/composer.json"
   when: drupal_site.stat.exists == false and item.item.value.civicrm == 'Yes'
+  become_user: "{{ item.item.value.run_as_user }}"
