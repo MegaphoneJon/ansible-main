@@ -175,6 +175,12 @@
   loop_control:
     label: "{{ item.key }}"
 
+- name: Create a site key if one doesn't exist.
+  set_fact: dontcare="{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32') }}"
+  with_items: "{{ create_gogs_repo.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+
 # If create_gogs_repo.results.status is 422, the repo existed already.  If 201, it was just created.
 # Build a new WP site
 - name: Create fresh WordPress sites
