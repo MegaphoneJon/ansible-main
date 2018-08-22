@@ -263,7 +263,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
  */
 if (!defined('CIVICRM_SITE_KEY')) {
-  define( 'CIVICRM_SITE_KEY', "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32') }}");
+  define( 'CIVICRM_SITE_KEY', "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32 chars=ascii_letters,digits') }}");
 }
 
 /**

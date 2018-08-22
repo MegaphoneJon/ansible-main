@@ -176,7 +176,7 @@
     label: "{{ item.key }}"
 
 - name: Create a site key if one doesn't exist.
-  set_fact: dontcare="{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32') }}"
+  set_fact: dontcare="{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/sitekey create=true length=32 chars=ascii_letters,digits') }}"
   with_items: "{{ create_gogs_repo.results }}"
   loop_control:
     label: "{{ item.item.key }}"
