@@ -1,4 +1,14 @@
 ---
+- name: Update MFPL DNS
+  local_action: command php "{{ inventory_dir }}/helpers/mfplapi.php" "{{ item.key }}" "{{ item.value.ansible_host }}"
+  register: dnshelper_result
+  #In theory, a better approach is to do a DNS lookup and see if I know how to control that nameserver.
+  when: item.key is search("megaphonetech.com")
+  changed_when: "dnshelper_result.stdout != 'DNS already exists and is correct.'"
+  with_dict: "{{ sites }}"
+  loop_control:
+    label: "{{ item.key }}"
+
 - name: Create the run_as_user
   user:
     name: "{{ item.value.run_as_user }}"
