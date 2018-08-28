@@ -13,7 +13,7 @@
 
   roles:
     - { role: firewall-common, tags: firewall }
-    - { role: contrib/geerlingguy.apache, tags: apache }
+    - { role: contrib/geerlingguy.apache, tags: apache, deploy-site }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
 
