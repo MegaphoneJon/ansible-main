@@ -49,7 +49,7 @@
       Authorization: token {{ lookup('passwordstore', 'megaphone/gogs/api') }}
   register: gogs_result
   changed_when: gogs_result.status == 201
-  failed_when: gogs_result.status != 201 and not (gogs_result.json is defined and gogs_result.json.message is defined and gogs_result.json.message | search("public key already exists"))
+  failed_when: gogs_result.status != 201 and not (gogs_result.json is defined and gogs_result.json.message is defined and gogs_result.json.message is search("public key already exists"))
   become_user: "{{ item.item.value.run_as_user }}"
 
 - name: clone an existing site
@@ -81,7 +81,16 @@
 - name: Check if db dump files already exist
   stat:
     path: "{{ item.item.value.webroot }}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
-  register: db_dump_exists
+  register: db_dump
+
+- name: Update the dump unless it exists and is < 24hrs old
+  assert:
+    that:
+      - "db_dump.stat.exists == true"
+      - "((ansible_date_time.epoch|int - db_dump.stat.mtime) < (60 * 60 * 24))"
+    msg: "yes"
+  failed_when: false
+  register: update_db_dump
 
 # This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
 - name: Get the latest backup archive name
@@ -90,19 +99,16 @@
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.canonical_server_client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-    # Doesn't really create this file, but we want to skip if the file exists
-    creates: "{{ item.item.value.canonical_cms_db_name }}.sql"
   register: archive_name
   changed_when: false
-  when: db_dump_exists.stat.exists == false and item.item.value.canonical_hostname
+  when: update_db_dump.msg == "yes" and item.item.value.canonical_hostname
   become_user: root
 
-# Download the borg backup of the db dump if we don't have a db dump already and the borg backup exists.
+# Download the borg backup of the db dump if we need an update and the borg backup exists.
 - name: Download the latest copy of the database
   shell: borg extract --strip-components 4 --remote-path /usr/local/bin/borg1/borg1 8139@usw-s008.rsync.net:{{ item.item.value.canonical_server_client + '-' + item.item.value.canonical_hostname }}::{{ archive_name.stdout }} var/backups/mysql/sqldump/{{ db_name }}
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-    creates: "{{ db_name }}"
   environment:
     BORG_PASSPHRASE: "{{ lookup('passwordstore', item.item.value.canonical_server_client + '/' + item.item.value.canonical_hostname + '/borg/remote') }}"
   with_items:
@@ -120,14 +126,14 @@
   command: perl -pi -e 's#\/\*\!5001. DEFINER=`.*`@`.*?\*\/##g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes" 
   become_user: root
 
 - name: Fix logging db triggers when using a separate db
   command: perl -pi -e 's/{{ item.item.value.canonical_crm_logging_db_name }}/{{ item.item.value.crm_logging_db_name }}/g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true and item.item.value.canonical_crm_logging_db_name
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes" and item.item.value.canonical_crm_logging_db_name
   become_user: root
 
 - name: Import the CMS database
@@ -137,7 +143,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes"
   become_user: root
 
 - name: Import the Civi database
@@ -147,7 +153,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or db_dump_exists.stat.exists == true
+  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes" 
   become_user: root
 
 - name: Add civicrm.settings.php
