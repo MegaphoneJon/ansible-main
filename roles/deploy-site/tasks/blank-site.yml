@@ -85,7 +85,7 @@
   args:
     chdir: "{{ item.item.value.webroot }}"
   register: push_result
-  when: item.item.value.internal_repo == "1" and item.item.value.internal_report == "1" and (item.item.value.git_repo_push_url | search("ssh://"))
+  when: item.item.value.internal_repo == "1" and (item.item.value.git_repo_push_url is search("ssh://"))
   changed_when: push_result.rc == 0
   failed_when: not(push_result.rc == 0)
   become_user: "{{ item.item.value.run_as_user }}"
