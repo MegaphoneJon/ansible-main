@@ -83,12 +83,11 @@
     path: "{{ item.item.value.webroot }}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
   register: db_dump
 
-# We need to separate the logic of grabbing a backup dump of the db from loading a current dump of the db.
-# Return "yes" to update the db unless all assertions are true.
+# Return yes when we FAIL the assertion, meaning "restore a db backup".
 - name: Update the dump if a canonical db exists unless a dump already exists and is < 24hrs old
   assert:
     that:
-      - "item.item.value.canonical_hostname is none or db_dump.stat.exists == false or (ansible_date_time.epoch|int - db_dump.stat.mtime) < (60 * 60 * 24)"
+      - "item.item.value.canonical_hostname is none or (db_dump.stat.exists == true and (ansible_date_time.epoch|int - db_dump.stat.mtime) < (60 * 60 * 24))"
     msg: "yes"
   failed_when: false
   register: restore_db_backup
@@ -208,3 +207,10 @@
     mode: g+w
     recurse: yes
   become_user: root
+
+- name: Fix wpLoadPhp on copied databases
+  command: "wp cv api setting.create wpLoadPhp={{ item.item.value.webroot }}/wp-load.php"
+  args:
+    chdir: "{{ item.item.value.webroot }}"
+  when: item.item.value.cms == 'WordPress' and restore_db_backup.msg == "yes" and archive_name.skipped is not defined
+  become_user: "{{ item.item.value.run_as_user }}"
