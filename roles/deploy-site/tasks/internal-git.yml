@@ -83,14 +83,15 @@
     path: "{{ item.item.value.webroot }}/../sql-dumps/{{ item.item.value.canonical_cms_db_name }}.sql"
   register: db_dump
 
-- name: Update the dump unless it exists and is < 24hrs old
+# We need to separate the logic of grabbing a backup dump of the db from loading a current dump of the db.
+# Return "yes" to update the db unless all assertions are true.
+- name: Update the dump if a canonical db exists unless a dump already exists and is < 24hrs old
   assert:
     that:
-      - "db_dump.stat.exists == true"
-      - "((ansible_date_time.epoch|int - db_dump.stat.mtime) < (60 * 60 * 24))"
+      - "item.item.value.canonical_hostname is none or db_dump.stat.exists == false or (ansible_date_time.epoch|int - db_dump.stat.mtime) < (60 * 60 * 24)"
     msg: "yes"
   failed_when: false
-  register: update_db_dump
+  register: restore_db_backup
 
 # This is so fucking ugly. Newer versions of borgbackup eliminate the need for piping to tail and cut, but we probably won't have them until Debian 10 ships.
 - name: Get the latest backup archive name
@@ -101,7 +102,7 @@
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
   register: archive_name
   changed_when: false
-  when: update_db_dump.msg == "yes" and item.item.value.canonical_hostname
+  when: restore_db_backup.msg == "yes"
   become_user: root
 
 # Download the borg backup of the db dump if we need an update and the borg backup exists.
@@ -117,7 +118,7 @@
   register: db_downloaded
   loop_control:
     loop_var: db_name
-  when: archive_name.skipped is not defined
+  when: restore_db_backup.msg == "yes" and archive_name.skipped is not defined
   become_user: root
 
 # Don't do these other steps if a) there's no db backup in borg b) the db is already downloaded.
@@ -126,14 +127,14 @@
   command: perl -pi -e 's#\/\*\!5001. DEFINER=`.*`@`.*?\*\/##g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes" 
+  when: restore_db_backup.msg == "yes" and archive_name.skipped is not defined
   become_user: root
 
 - name: Fix logging db triggers when using a separate db
   command: perl -pi -e 's/{{ item.item.value.canonical_crm_logging_db_name }}/{{ item.item.value.crm_logging_db_name }}/g' {{ item.item.value.canonical_crm_db_name }}.sql
   args:
     chdir: "{{ item.item.value.webroot }}/../sql-dumps"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes" and item.item.value.canonical_crm_logging_db_name
+  when: restore_db_backup.msg == "yes" and archive_name.skipped is not defined
   become_user: root
 
 - name: Import the CMS database
@@ -143,7 +144,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes"
+  when: restore_db_backup.msg == "yes" and archive_name.skipped is not defined
   become_user: root
 
 - name: Import the Civi database
@@ -153,7 +154,7 @@
     state: import
     login_user: "{{ item.item.value.db_user }}"
     login_password: "{{ lookup('passwordstore', item.item.value.client + '/' + hostname + '/' + item.item.value.bare_url + '/mysql') }}"
-  when: (archive_name.skipped is not defined and db_downloaded.changed) or update_db_dump.msg == "yes" 
+  when: restore_db_backup.msg == "yes" and archive_name.skipped is not defined
   become_user: root
 
 - name: Add civicrm.settings.php
