@@ -62,8 +62,9 @@
   changed_when: false
   failed_when: false
 
+  # FIXME: Once Debian 10 ships and we have borgbackup 1.1+ on all systems, change the encryption to blake2b.
 - name: Create a borg repo on rsync.net
-  command: "borg init 8139@usw-s008.rsync.net:{{ client + '-' + hostname }} --remote-path=/usr/local/bin/borg1/borg1"
+  command: "borg init 8139@usw-s008.rsync.net:{{ client + '-' + hostname }} -e repokey --remote-path=/usr/local/bin/borg1/borg1"
   environment:
     BORG_PASSPHRASE: "{{ lookup('passwordstore', client + '/' + hostname + '/borg/remote create=true length=32') }}"
   when: remoterepo.rc == 1
