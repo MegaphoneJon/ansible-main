@@ -1,9 +1,12 @@
 ---
 # This provisions any VPSes that were defined but not built in server-list
-- hosts: all
-  become: yes
+- hosts: yellow.megaphonetech.com
 
   tasks:
-  - debug: var=ansible_hostname
-  - debug: var=hostname
-  - debug: var=inventory_hostname
+#  - set_fact:
+#      newpass: "{{ lookup('passwordstore', 'deleteme create=true overwrite=yes length=320 chars=ascii_letters,digits') }}"
+#      newpass: "{{ lookup('passwordstore', 'deleteme create=true overwrite=yes length=320 chars=ascii_letters,digits,.,:,-,_') }}"
+#      newpass: "{{ lookup('passwordstore', 'deleteme create=true overwrite=yes length=320 chars=ascii_letters,digits,punctuation') }}"
+#      newpass: "{{ lookup('passwordstore', 'deleteme create=true overwrite=yes length=320') }}"
+
+  - debug: var=ansible_date_time
