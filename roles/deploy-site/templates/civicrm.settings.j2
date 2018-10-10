@@ -287,7 +287,7 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 
 
 if (!defined('CIVICRM_DOMAIN_ID')) {
-  define( 'CIVICRM_DOMAIN_ID', 1);
+  define( 'CIVICRM_DOMAIN_ID', {{ item.item.value.multisite_domain_id | default(1, true) }});
 }
 
 /**
