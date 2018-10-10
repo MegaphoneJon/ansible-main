@@ -1,7 +1,0 @@
----
-- name: Download cv (CiviCRM CLI tool)
-  get_url:
-    url: https://download.civicrm.org/cv/cv.phar
-    dest: /usr/local/bin/cv
-    mode: 0755
-  tags: cv
