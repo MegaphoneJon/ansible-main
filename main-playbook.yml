@@ -31,6 +31,7 @@
     - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
     - { role: contrib/geerlingguy.postfix, tags: postfix }
     - { role: backupninja, tags: backup }
+    - { role: rsyncnet, tags: backup }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
     # Run after deploy-site now that it monitors sites
     - { role: icinga2, tags: icinga2 }
