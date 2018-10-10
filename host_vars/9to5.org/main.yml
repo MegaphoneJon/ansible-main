@@ -8,7 +8,7 @@ mtcusers:
     groups:
       - sudo
       - www-data
-    password: "$6$pqHuRA74J.LjtD$Py6LbVcX7jDYucCkjktBySpeksLzq2ac8KWVrCLwRL.twOO3gXpcBjIqThyUNjCaVd7d441gpmF8kI9kVCWvA1"
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/jon') }}"
     authorized:
       - files/jon_id_rsa.pub
     hasdotfiles: true
@@ -19,7 +19,7 @@ mtcusers:
     groups:
       - sudo
       - www-data
-    password: "$1$qw/nQAwG$3CmdusM39FkabXBh.V8Rf1"
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joseph') }}"
     authorized:
       - files/joseph_id_rsa.pub
     hasdotfiles: false
@@ -29,7 +29,7 @@ mtcusers:
     groups:
       - sudo
       - www-data
-    password: "$6$/taWgCck.2pJxh6$kWp1ZxyMklSLqBINFAK7JlbpR/VgoXk6Z/rCkL5jdEx8S05YVoKiXzhozXTPDISUnm4jMVeDbSwMwIb7.NtKS1"
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/noah') }}"
     authorized:
       - files/noah_id_rsa.pub
     hasdotfiles: false
