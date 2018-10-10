@@ -1,0 +1,36 @@
+linode_api_key: "{{ lookup('passwordstore', '9to5/linode/apikey') }}"
+linode_username: 9to5admin
+
+mtcusers:
+  Jon:
+    name: jon
+    shell: "/bin/zsh"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/jon') }}"
+    authorized:
+      - files/jon_id_rsa.pub
+    hasdotfiles: true
+    dotfiles: https://github.com/MegaphoneJon/dotfiles.git
+  Joseph:
+    name: joseph
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joseph') }}"
+    authorized:
+      - files/joseph_id_rsa.pub
+    hasdotfiles: false
+  Andy:
+    name: andy
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+      - osdi
+    authorized:
+      - files/andygu_id_rsa.pub
+    hasdotfiles: false
+
