@@ -6,7 +6,7 @@
 
   roles:
     - common
-    - { role: mtcusers, tags: users }
+    - { role: users, tags: users }
 
 - hosts: lamp
   become: yes

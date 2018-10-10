@@ -23,7 +23,7 @@ php_fpm_listen: "/var/run/php/php-fpm.sock"
 #MySQL
 mysql_root_password: "{{ lookup('passwordstore', client + '/' + hostname + '/mysql/root create=true length=32') }}"
 
-mtcusers:
+users:
   Jon:
     name: jon
     shell: "/bin/zsh"

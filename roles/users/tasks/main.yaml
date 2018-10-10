@@ -10,14 +10,14 @@
     groups: "{{ item.value.groups }}"
     password: "{{ item.value.password }}"
     update_password: on_create
-  with_dict: "{{ mtcusers }}"
+  with_dict: "{{ users }}"
 
 - name: Add authorized key
   authorized_key:
     user: "{{ item.0.name }}"
     key: "{{ lookup('file', item.1) }}"
   with_subelements:
-    - "{{ mtcusers }}"
+    - "{{ users }}"
     - authorized
 
 - name: Add sudo group to sudoers
@@ -34,7 +34,7 @@
   when: item.value.dotfiles is defined
   become: yes
   become_user: "{{ item.value.name }}"
-  with_dict: "{{ mtcusers }}"
+  with_dict: "{{ users }}"
   register: git_result
   changed_when: "git_result.after|default('after') != git_result.before|default('before')"
   tags: dotfiles
@@ -44,4 +44,4 @@
   when: item.value.dotfiles is defined
   become: yes
   become_user: "{{ item.value.name }}"
-  with_dict: "{{ mtcusers }}"
+  with_dict: "{{ users }}"

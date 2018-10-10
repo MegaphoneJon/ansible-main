@@ -1,7 +1,7 @@
 linode_api_key: "{{ lookup('passwordstore', '9to5/linode/apikey') }}"
 linode_username: 9to5admin
 
-mtcusers:
+users:
   Jon:
     name: jon
     shell: "/bin/zsh"
