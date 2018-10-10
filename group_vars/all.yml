@@ -1,0 +1,47 @@
+#Icinga2
+primary_icinga_server: 'orange.megaphonetech.com'
+apache_remove_default_vhost: true
+#temp for Apache
+apache_vhosts: []
+#PHP
+php_packages_extra:
+  - php-pear
+  - php-gd
+  - php-imagick
+  - php-mysql
+  - php-curl
+  - php-sqlite3
+  - php-mbstring
+  - php-zip
+
+php_memory_limit: '128M'
+php_max_execution_time: 300
+php_post_max_size: '128M'
+php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_NOTICE" 
+php_enable_php_fpm: true
+php_fpm_listen: "/var/run/php/php-fpm.sock"
+#MySQL
+mysql_root_password: "{{ lookup('passwordstore', client + '/' + hostname + '/mysql/root create=true length=32') }}"
+
+mtcusers:
+  Jon:
+    name: jon
+    shell: "/bin/zsh"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/jon') }}"
+    authorized:
+      - files/jon_id_rsa.pub
+    hasdotfiles: true
+    dotfiles: https://github.com/MegaphoneJon/dotfiles.git
+  Joseph:
+    name: joseph
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joseph') }}"
+    authorized:
+      - files/joseph_id_rsa.pub
+    hasdotfiles: false
