@@ -4,7 +4,12 @@
   group: name=sudo state=present
 
 - name: Add user {{ item.key }}
-  user: name="{{ item.value.name }}" shell="{{ item.value.shell }}" groups="{{ item.value.groups }}" password="{{ item.value.password }}" update_password=on_create
+  user:
+    name: "{{ item.value.name }}"
+    shell: "{{ item.value.shell }}"
+    groups: "{{ item.value.groups }}"
+    password: "{{ item.value.password }}"
+    update_password: on_create
   with_dict: "{{ mtcusers }}"
 
 - name: Add authorized key
