@@ -31,6 +31,30 @@
     - "civicrm-{{ civi_ver.content }}-backdrop.tar.gz"
     - "civicrm-{{ civi_ver.content }}-wordpress.zip"
 
+# This whole idea is better saved for when we refactor sites into their own inventory.
+#- name: Find old database backups
+#  find:
+#    age: 1d
+#    path: "{{ item.item.value.webroot }}/../sql-dumps"
+#    patterns: "{{ item.item.value.crm_db_name }}.pre-*.sql.gz"
+#    age_stamp: ctime
+#  with_items: "{{ installed_version.results }}"
+#  loop_control:
+#    label: "{{ item.item.key }}"
+#  register: old_db_backups
+
+#- debug: var=item
+#  with_items: "{{ old_db_backups }}"
+  
+
+#- name: Delete old database backups
+#  file:
+#    path: "{{ item.item.value.webroot }}/../sql-dumps"
+#    state: absent
+#  with_items: "{{ old_db_backups.files }}"
+
+#- fail:
+
 # This block is for sites whose version isn't the latest.
 - block:
   - name: Back up the databases
