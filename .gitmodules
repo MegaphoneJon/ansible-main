@@ -25,3 +25,27 @@
 [submodule "roles/icinga2-primary"]
 	path = roles/icinga2-primary
 	url = git@github.com:MegaphoneJon/ansible-role-icinga2-primary.git
+[submodule "roles/incoming-smtp"]
+	path = roles/incoming-smtp
+	url = git@github.com:MegaphoneJon/ansible-role-incoming-smtp.git
+[submodule "roles/php-additional"]
+	path = roles/php-additional
+	url = git@github.com:MegaphoneJon/ansible-role-php-additional.git
+[submodule "roles/provision-linode"]
+	path = roles/provision-linode
+	url = git@github.com:MegaphoneJon/ansible-role-provision-linode.git
+[submodule "roles/rsyncnet"]
+	path = roles/rsyncnet
+	url = git@github.com:MegaphoneJon/ansible-role-rsyncnet.git
+[submodule "roles/upgrade-civi"]
+	path = roles/upgrade-civi
+	url = git@github.com:MegaphoneJon/ansible-role-upgrade-civi.git
+[submodule "roles/upgrade-wp"]
+	path = roles/upgrade-wp
+	url = git@github.com:MegaphoneJon/ansible-role-upgrade-wp.git
+[submodule "roles/users"]
+	path = roles/users
+	url = git@github.com:MegaphoneJon/ansible-role-users.git
+[submodule "roles/wp-cli"]
+	path = roles/wp-cli
+	url = git@github.com:MegaphoneJon/ansible-role-wp-cli.git
