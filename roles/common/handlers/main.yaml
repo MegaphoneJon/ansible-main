@@ -1,2 +1,0 @@
-- name: restart crond
-  systemd: name=cron state=restarted

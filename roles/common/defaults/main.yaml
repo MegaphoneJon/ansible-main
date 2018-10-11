@@ -1,3 +1,0 @@
-rsyncnet_public_hostkey: 'usw-s008.rsync.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxhtYvZT6l0qN5JLRhUmG4F2Dpi6h/KV7k6hDRuTQhz'
-#defaults for authorized_key users
-sshuser: root

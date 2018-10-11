@@ -7,3 +7,15 @@
 [submodule "roles/bootstrap"]
 	path = roles/bootstrap
 	url = git@github.com:MegaphoneJon/ansible-role-bootstrap.git
+[submodule "roles/common"]
+	path = roles/common
+	url = git@github.com:MegaphoneJon/ansible-role-common.git
+[submodule "roles/deploy-site"]
+	path = roles/deploy-site
+	url = git@github.com:MegaphoneJon/ansible-role-deploy-site.git
+[submodule "roles/drush"]
+	path = roles/drush
+	url = git@github.com:MegaphoneJon/ansible-role-drush.git
+[submodule "roles/firewall-common"]
+	path = roles/firewall-common
+	url = git@github.com:MegaphoneJon/ansible-role-firewall-comon.git
