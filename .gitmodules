@@ -22,3 +22,6 @@
 [submodule "roles/icinga2-satellite"]
 	path = roles/icinga2-satellite
 	url = git@github.com:MegaphoneJon/ansible-role-icinga2-satellite.git
+[submodule "roles/icinga2-primary"]
+	path = roles/icinga2-primary
+	url = git@github.com:MegaphoneJon/ansible-role-icinga2-primary.git
