@@ -49,3 +49,6 @@
 [submodule "roles/wp-cli"]
 	path = roles/wp-cli
 	url = git@github.com:MegaphoneJon/ansible-role-wp-cli.git
+[submodule "roles/contrib/geerlingguy.apache"]
+	path = roles/contrib/geerlingguy.apache
+	url = https://github.com/geerlingguy/ansible-role-apache.git
