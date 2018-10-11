@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require('gethosts.cfg.php');
+require 'gethosts.cfg.php';
 
 function run($argv) {
   if (empty($argv[1])) {
@@ -13,7 +13,7 @@ function run($argv) {
     case '--list':
     case '--host':
       # Get password from the "pass" utility.
-      exec('pass ls megaphone/crm/restpassword', $password);
+      exec('/usr/bin/pass ls megaphone/crm/restpassword', $password);
       $password = $password[0];
       $headers = login($password);
       // Build a group hierarchy.
