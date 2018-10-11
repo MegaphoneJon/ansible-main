@@ -1,3 +1,9 @@
 [submodule "roles/cv"]
 	path = roles/cv
 	url = git@github.com:MegaphoneJon/ansible-role-cv.git
+[submodule "roles/backupninja"]
+	path = roles/backupninja
+	url = git@github.com:MegaphoneJon/ansible-role-backupninja.git
+[submodule "roles/bootstrap"]
+	path = roles/bootstrap
+	url = git@github.com:MegaphoneJon/ansible-role-bootstrap.git
