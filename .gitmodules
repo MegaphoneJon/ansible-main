@@ -52,3 +52,24 @@
 [submodule "roles/contrib/geerlingguy.apache"]
 	path = roles/contrib/geerlingguy.apache
 	url = https://github.com/geerlingguy/ansible-role-apache.git
+[submodule "roles/contrib/geerlingguy.apache-php-fpm"]
+	path = roles/contrib/geerlingguy.apache-php-fpm
+	url = https://github.com/geerlingguy/ansible-role-apache-php-fpm.git
+[submodule "roles/contrib/geerlingguy.composer"]
+	path = roles/contrib/geerlingguy.composer
+	url = https://github.com/geerlingguy/ansible-role-composer.git
+[submodule "roles/contrib/geerlingguy.mysql"]
+	path = roles/contrib/geerlingguy.mysql
+	url = https://github.com/geerlingguy/ansible-role-mysql.git
+[submodule "roles/contrib/geerlingguy.php"]
+	path = roles/contrib/geerlingguy.php
+	url = https://github.com/geerlingguy/ansible-role-php.git
+[submodule "roles/contrib/geerlingguy.php-versions"]
+	path = roles/contrib/geerlingguy.php-versions
+	url = https://github.com/geerlingguy/ansible-role-php-versions.git
+[submodule "roles/contrib/geerlingguy.postfix"]
+	path = roles/contrib/geerlingguy.postfix
+	url = https://github.com/geerlingguy/ansible-role-postfix.git
+[submodule "roles/contrib/geerlingguy.security"]
+	path = roles/contrib/geerlingguy.security
+	url = https://github.com/geerlingguy/ansible-role-security.git
