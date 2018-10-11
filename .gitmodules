@@ -19,3 +19,6 @@
 [submodule "roles/firewall-common"]
 	path = roles/firewall-common
 	url = git@github.com:MegaphoneJon/ansible-role-firewall-comon.git
+[submodule "roles/icinga2-satellite"]
+	path = roles/icinga2-satellite
+	url = git@github.com:MegaphoneJon/ansible-role-icinga2-satellite.git
