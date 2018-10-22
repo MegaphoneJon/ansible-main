@@ -45,3 +45,6 @@ users:
     authorized:
       - files/joseph_id_rsa.pub
     hasdotfiles: false
+# deploy-site
+monitoring_user: monitor
+monitoring_email: noreply@megaphonetech.com
