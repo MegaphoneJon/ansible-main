@@ -34,8 +34,8 @@
     - { role: rsyncnet, tags: backup }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
     # Run after deploy-site now that it monitors sites
-    - { role: icinga2-satellite, tags: icinga2 }
-    - { role: icinga2-primary, tags: icinga2 }
+    - { role: icinga2-satellite, tags: [icinga2, icinga2-satellite] }
+    - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }
 
 - hosts: localhosts
   become: yes
