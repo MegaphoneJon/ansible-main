@@ -1,2 +1,11 @@
 rsyncnet_user: "3294"
 rsyncnet_server: "usw-s003.rsync.net"
+
+# behe has gitea on port 10022, so let's customize here.
+incoming_ports:
+  - { port: 22, name: 'SSH' }
+  - { port: 80, name: 'HTTP' }
+  - { port: 443, name: 'HTTPS' }
+  - { port: 5665, name: 'Icinga2' }
+  - { port: 10022, name: 'gitea SSH' }
+
