@@ -1,6 +1,3 @@
-linode_api_key: "{{ lookup('passwordstore', '9to5/linode/apikey') }}"
-linode_username: 9to5admin
-
 users:
   Jon:
     name: jon
