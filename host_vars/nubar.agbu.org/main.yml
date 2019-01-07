@@ -1,0 +1,2 @@
+linode_api_key: "{{ lookup('passwordstore', 'agbu/linode/apikey') }}"
+linode_username: agbu
