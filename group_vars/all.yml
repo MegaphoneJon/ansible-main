@@ -4,6 +4,8 @@ apache_remove_default_vhost: true
 #temp for Apache
 apache_vhosts: []
 #PHP
+php_version: '7.2'
+php_versions_install_recommends: true
 php_packages_extra:
   - php-pear
   - php-gd
