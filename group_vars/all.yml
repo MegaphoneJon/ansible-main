@@ -8,13 +8,13 @@ php_version: '7.2'
 php_versions_install_recommends: true
 php_packages_extra:
   - php-pear
-  - php-gd
+  - php{{ php_version }}-gd
   - php-imagick
-  - php-mysql
-  - php-curl
-  - php-sqlite3
-  - php-mbstring
-  - php-zip
+  - php{{ php_version }}-mysql
+  - php{{ php_version }}-curl
+  - php{{ php_version }}-sqlite3
+  - php{{ php_version }}-mbstring
+  - php{{ php_version }}-zip
 
 php_memory_limit: '128M'
 php_max_execution_time: 300
