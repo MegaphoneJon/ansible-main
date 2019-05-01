@@ -5,3 +5,4 @@ roles/bootstrap/files
 ansible.cfg
 gethosts.cfg.php
 *retry
+/files
