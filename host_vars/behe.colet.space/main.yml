@@ -9,3 +9,5 @@ incoming_ports:
   - { port: 5665, name: 'Icinga2' }
   - { port: 10022, name: 'gitea SSH' }
 
+# Custom Icinga2 file
+template_src: "files/{{ inventory_hostname }}/templates/icinga2.host.j2"

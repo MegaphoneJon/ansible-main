@@ -49,3 +49,8 @@
     - wp-cli
     - { role: cv, tags: cv }
     - { role: deploy-site, tags: deploy-site, when: sites is defined }
+
+- hosts: nosudo
+  become: no
+  roles:
+    - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }

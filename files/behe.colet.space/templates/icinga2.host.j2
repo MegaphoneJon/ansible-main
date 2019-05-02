@@ -1,0 +1,74 @@
+object Host "{{ fqdn }}" {
+  /* Import the default host template defined in `templates.conf`. */
+  display_name = "{{ fqdn }}"
+  import "generic-host"
+
+{% if contract_type is defined and contract_type is search("VPS") %}
+  /* Enable running checks from the primary Icinga on the satellite. */
+  vars.client_endpoint = name
+{% endif %}
+  
+  /* Specify the address attributes for checks e.g. `ssh` or `http`. */
+  address = "{{ ansible_host }}"
+{% if ipv6 is defined %}
+  address6 = "{{ ipv6 }}"
+{% endif %}
+
+  /* Set custom attribute `os` for hostgroup assignment in `groups.conf`. */
+  vars.os = "Linux"
+
+  /* Used for DNS expiration checks and for DNS blacklist checks */
+  vars.second_level_domains = ["{{ fqdn | regex_search('(?:.+\.)?([^.]+\.(?:com|org|net|coop|space|co.uk|edu))', '\\1') | first }}"]
+
+  /* Define http vhost attributes for service apply rules in `services.conf`. */
+{% if sites is defined %}
+{% for site in sites.values() %}
+{% if site.contract_type is search("Maintenance") %}
+  vars.http_vhosts["{{ site.bare_url }}"] = {
+    http_uri = "{{ site.homepage_uri | default("/",true) }}"
+    http_ssl = true
+    http_vhost = "{{ site.bare_url }}"
+    http_expect = "HTTP/1.1 200 OK"
+{% if site.website_string is defined %}
+    http_string = "{{ site.website_string }}"
+{% endif %}
+{% if site.env == 'Test' %}
+    basic_auth_user = "megaphone"
+    basic_auth_password = "megaphone"
+{% endif %}
+    /* CMS/CIVICRM MONITORING */
+{% if site.contract_type is search("(Backdrop|Drupal) Maintenance") and (site.cms == 'Drupal' or site.cms == 'Backdrop' or site.cms == 'Drupal8') %}
+    drupal_site_id = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/nagioskey') }}"
+{% endif %}
+    cms = "{{ site.cms | lower }}"
+{% if site.contract_type is search("Civi Maintenance") and site.civicrm == 'Yes' %}
+    crm_site_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/sitekey') }}"
+    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/apikey') }}"
+{% endif %}
+  }
+{% endif %}
+{% endfor %}
+{% endif %}
+
+  /* Define notification mail attributes for notification apply rules in `notifications.conf`. */
+  vars.notification["mail"] = {
+
+    groups = [ {{ notification_groups | default('"megaphone"', true) | replace("&quot;",'"') }} ]
+  }
+
+{% if contract_type is defined and contract_type is search("VPS") %}
+  /* LOCAL MONITORING CUSTOM VARS */
+  /* Set a custom value for procs warning */
+  vars.procs_warning = 310
+
+  /* Define disks and attributes for service apply rules in `services.conf`. */
+  vars.disks["disk /"] = {
+    disk_partitions = "/"
+  }
+  vars.mysql_hostname = "localhost"
+  /* END LOCAL MONITORING CUSTOM VARS */
+
+  vars.has_backupninja = true
+{% endif %}
+}
+
