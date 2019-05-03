@@ -1,7 +1,12 @@
-object Host "{{ fqdn }}" {
+object Host "wiscience.wisc.edu" {
   /* Import the default host template defined in `templates.conf`. */
-  display_name = "{{ fqdn }}"
+  display_name = "WISCIENCE live site"
   import "generic-host"
+
+  /* Use a custom check_command - ensure port 443 is open */
+  check_command = "tcp"
+  vars.tcp_address = "wiscience.wisc.edu"
+  vars.tcp_port = 443
 
 {% if contract_type is defined and contract_type is search("VPS") %}
   /* Enable running checks from the primary Icinga on the satellite. */
@@ -9,7 +14,6 @@ object Host "{{ fqdn }}" {
 {% endif %}
   
   /* Specify the address attributes for checks e.g. `ssh` or `http`. */
-  address = "{{ ansible_host }}"
 {% if ipv6 is defined %}
   address6 = "{{ ipv6 }}"
 {% endif %}
@@ -17,8 +21,6 @@ object Host "{{ fqdn }}" {
   /* Set custom attribute `os` for hostgroup assignment in `groups.conf`. */
   vars.os = "Linux"
 
-  /* Used for DNS expiration checks and for DNS blacklist checks */
-  vars.second_level_domains = ["{{ fqdn | regex_search('(?:.+\.)?([^.]+\.(?:com|org|net|coop|space|co.uk|edu))', '\\1') | first }}"]
 
   /* Define http vhost attributes for service apply rules in `services.conf`. */
 {% if sites is defined %}
@@ -29,6 +31,7 @@ object Host "{{ fqdn }}" {
     http_ssl = true
     http_vhost = "{{ site.bare_url }}"
     http_expect = "HTTP/1.1 200 OK"
+    http_address = "128.104.80.63"
 {% if site.website_string is defined %}
     http_string = "{{ site.website_string }}"
 {% endif %}
