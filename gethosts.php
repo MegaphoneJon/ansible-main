@@ -29,7 +29,7 @@ function run($argv) {
       // Get the websites too.
       $resource = 'views/website_list?display_id=services_1';
       if ($argv[1] == '--host' && $argv[2]) {
-        $resource .= "&title=$argv[2]";
+        $resource .= "&combine=$argv[2]";
       }
       $websites = get($headers, $resource, NULL);
       $inventory = buildServerList($servers, $websites);
@@ -43,6 +43,7 @@ function run($argv) {
       help();
   }
 }
+
 run($argv);
 
 /**
@@ -58,6 +59,8 @@ function buildGroupHierarchy($groups) {
       }
     }
   }
+  // Websites are in their own hierarchy.
+  $hierarchicalList['websites'] = [];
   return $hierarchicalList;
 }
 
@@ -82,9 +85,11 @@ function buildServerList($servers, $websites) {
         $inventory['_meta']['hostvars'][$server->fqdn][$key] = $value;
       }
     }
-    foreach ($websites as $website) {
-      $inventory['_meta']['hostvars'][$website->server]['sites'][$website->bare_url] = $website;
-    }
+  }
+  // Websites go in their own group.
+  foreach ($websites as $website) {
+    $inventory['_meta']['hostvars'][$website->bare_url] = $website;
+    $inventory['websites'][] = $website->bare_url;
   }
   return $inventory;
   //return json_encode($inventory);
