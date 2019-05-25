@@ -33,4 +33,22 @@ users:
     authorized:
       - files/noah_id_rsa.pub
     hasdotfiles: false
+  Dana:
+    name: dana
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - files/dana_id_rsa.pub
+    hasdotfiles: false
+  Kevin:
+    name: kevin
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - files/kevin_id_rsa.pub
+    hasdotfiles: false
 
