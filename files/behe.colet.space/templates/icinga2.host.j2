@@ -46,6 +46,7 @@ object Host "{{ fqdn }}" {
     crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/apikey') }}"
 {% endif %}
     exclude = "checkVersion_upgrade,checkVersion_patch,extensionUpdates"
+    check_wp_updates = false
   }
 {% endif %}
 {% endfor %}
