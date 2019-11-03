@@ -67,7 +67,7 @@ function buildGroupHierarchy($groups) {
     }
   }
   // Websites are in their own hierarchy.
-  $hierarchicalList['websites'] = [];
+  $hierarchicalList['websites'] = ['websites-dev', 'websites-test', 'websites-live'];
   return $hierarchicalList;
 }
 
@@ -97,7 +97,8 @@ function buildServerList($servers, $websites) {
   if ($websites) {
     foreach ($websites as $website) {
       $inventory['_meta']['hostvars'][$website->bare_url] = $website;
-      $inventory['websites'][] = $website->bare_url;
+      $websiteGroup = 'websites-' . strtolower($website->env);
+      $inventory[$websiteGroup][] = $website->bare_url;
     }
   }
   return $inventory;
