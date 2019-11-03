@@ -1,7 +1,7 @@
 ---
 - name: Run upgrades
   #TODO: at some point this shouldn't just work on localhosts
-  hosts: localhosts
+  hosts: websites-dev
   gather_facts: no
 
   roles:
