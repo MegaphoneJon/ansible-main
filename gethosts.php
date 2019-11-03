@@ -22,6 +22,7 @@ function run($argv) {
       $groupHierarchy = buildGroupHierarchy($groups);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
+      $titleResource = $urlResource = NULL;
       if ($argv[1] == '--host' && $argv[2]) {
         $resource .= "&title=$argv[2]";
       }
@@ -93,12 +94,13 @@ function buildServerList($servers, $websites) {
     }
   }
   // Websites go in their own group.
-  foreach ($websites as $website) {
-    $inventory['_meta']['hostvars'][$website->bare_url] = $website;
-    $inventory['websites'][] = $website->bare_url;
+  if ($websites) {
+    foreach ($websites as $website) {
+      $inventory['_meta']['hostvars'][$website->bare_url] = $website;
+      $inventory['websites'][] = $website->bare_url;
+    }
   }
   return $inventory;
-  //return json_encode($inventory);
 }
 
 function post($curlHeaders, $operation, $postFields = NULL) {
