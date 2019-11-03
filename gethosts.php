@@ -27,11 +27,17 @@ function run($argv) {
       }
       $servers = get($headers, $resource, NULL);
       // Get the websites too.
+      // Ugh - wish I could use "Views Combined Filter" but it uses WS_CONCAT which makes it impossible to do exact "rquals" searches.
       $resource = 'views/website_list?display_id=services_1';
       if ($argv[1] == '--host' && $argv[2]) {
-        $resource .= "&combine=$argv[2]";
+        $titleResource = $resource . "&title=$argv[2]";
       }
-      $websites = get($headers, $resource, NULL);
+      $websites = get($headers, $titleResource, NULL);
+      // Get websites by bare_url value also.
+      if ($argv[1] == '--host' && $argv[2]) {
+        $urlResource = $resource . "&url=$argv[2]";
+      }
+      $websites = $websites + get($headers, $urlResource, NULL);
       $inventory = buildServerList($servers, $websites);
       $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
       echo $inventory;
