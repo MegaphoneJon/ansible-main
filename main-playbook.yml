@@ -33,7 +33,15 @@
     - { role: contrib/geerlingguy.postfix, tags: postfix }
     - { role: backupninja, tags: backup }
     - { role: rsyncnet, tags: backup }
-    - { role: deploy-site, tags: deploy-site, when: sites is defined }
+
+- hosts: websites
+  become: yes
+  roles:
+    - { role: deploy-site, tags: deploy-site }
+
+- hosts: testgroup
+  become: yes
+  roles:
     # Run after deploy-site now that it monitors sites
     - { role: icinga2-satellite, tags: [icinga2, icinga2-satellite] }
     - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }
@@ -48,7 +56,6 @@
     - { role: php-additional , tags: php }
     - wp-cli
     - { role: cv, tags: cv }
-    - { role: deploy-site, tags: deploy-site, when: sites is defined }
 
 - hosts: nosudo
   become: no
