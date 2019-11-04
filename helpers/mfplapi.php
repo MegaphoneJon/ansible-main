@@ -16,7 +16,13 @@ if (!isset($argv[2])) {
 $params['fqdn'] = $argv[1];
 $params['ipv4'] = $argv[2];
 
-$result = query_dns($params);
+try {
+  $result = query_dns($params);
+}
+catch (Exception $e) {
+  echo 'Error: ', $e->getMessage(), "\n";
+  exit(127);
+}
 list($dns, $item_id) = $result;
 if (!$dns) {
   // DNS not found.
@@ -56,28 +62,33 @@ function write_dns($params, $action, $item_id = NULL) {
   }
   $result = red_api($params['url'], $data);
 }
+
 /**
  * Checks $params['fqdn'] to see if it has an IPv4 address in May First.
  * Returns an IP if one exists, NULL if not.
  */
 function query_dns($params) {
 
+  // Non-A records may exist; we can't have both CNAME and A so we need to check.
   $data = array(
     'action' => 'select',
     'object' => 'item',
     'user_name' => $params['api_user'],
     'user_pass' => $params['api_password'],
     'where:service_id' => 9,
-    'where:hosting_order_id' => $params['hosting_order_id'],
-    'where:dns_type' => 'a',
     'where:dns_fqdn' => $params['fqdn'],
   );
 
   $result = red_api($params['url'], $data);
   $return = NULL;
-  if (isset($result->values[0])) {
-    $return[0] = $result->values[0]->dns_ip;
-    $return[1] = $result->values[0]->item_id;
+  foreach ($result->values as $dnsEntry) {
+    if ($dnsEntry->dns_type == 'cname') {
+      throw new Exception('You can\'t create an A record because a CNAME record already exists');
+    }
+    if ($dnsEntry->dns_type == 'a') {
+      $return[0] = $result->values[0]->dns_ip;
+      $return[1] = $result->values[0]->item_id;
+    }
   }
   return $return;
 }
