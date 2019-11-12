@@ -11,6 +11,7 @@ php_packages_extra:
   - php{{ php_version }}-gd
   - php-imagick
   - php{{ php_version }}-mysql
+  - php{{ php_version }}-bcmath
   - php{{ php_version }}-curl
   - php{{ php_version }}-sqlite3
   - php{{ php_version }}-mbstring
