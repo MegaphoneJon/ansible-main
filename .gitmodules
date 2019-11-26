@@ -73,3 +73,6 @@
 [submodule "roles/contrib/geerlingguy.security"]
 	path = roles/contrib/geerlingguy.security
 	url = https://github.com/geerlingguy/ansible-role-security.git
+[submodule "roles/update-sites"]
+	path = roles/update-sites
+	url = git@github.com:MegaphoneJon/ansible-role-update-sites.git
