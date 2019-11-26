@@ -8,3 +8,16 @@
     - { role: upgrade-wp, tags: upgrade-wp }
     - { role: upgrade-civi, tags: upgrade-civi }
 
+- name: Update test
+  hosts: websites-test
+
+  roles:
+    #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
+    - { role: update-sites, tags: update-test }
+
+- name: Update live
+  hosts: websites-live
+
+  roles:
+    #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
+    - { role: update-sites, tags: update-live}
