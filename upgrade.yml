@@ -1,7 +1,7 @@
 ---
 - name: Run upgrades
   #TODO: at some point this shouldn't just work on localhosts
-  hosts: websites-dev
+  hosts: websites_dev
   gather_facts: no
 
   roles:
@@ -9,14 +9,14 @@
     - { role: upgrade-civi, tags: upgrade-civi }
 
 - name: Update test
-  hosts: websites-test
+  hosts: websites_test
 
   roles:
     #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
     - { role: update-sites, tags: update-test }
 
 - name: Update live
-  hosts: websites-live
+  hosts: websites_live
 
   roles:
     #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }

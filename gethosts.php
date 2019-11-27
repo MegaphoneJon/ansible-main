@@ -40,6 +40,7 @@ function run($argv) {
         $websites = $websites + get($headers, $urlResource, NULL);
       }
       $inventory = buildServerList($servers, $websites);
+      unset($inventory[0]);
       $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
       echo $inventory;
       break;
@@ -67,7 +68,7 @@ function buildGroupHierarchy($groups) {
     }
   }
   // Websites are in their own hierarchy.
-  $hierarchicalList['websites']['children'] = ['websites-dev', 'websites-test', 'websites-live'];
+  $hierarchicalList['websites']['children'] = ['websites_dev', 'websites_test', 'websites_live'];
   return $hierarchicalList;
 }
 
@@ -97,7 +98,7 @@ function buildServerList($servers, $websites) {
   if ($websites) {
     foreach ($websites as $website) {
       $inventory['_meta']['hostvars'][$website->bare_url] = $website;
-      $websiteGroup = 'websites-' . strtolower($website->env);
+      $websiteGroup = 'websites_' . strtolower($website->env);
       $inventory[$websiteGroup][] = $website->bare_url;
     }
   }
