@@ -10,6 +10,7 @@
 
 - name: Update test
   hosts: websites_test
+  gather_facts: no
 
   roles:
     #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
@@ -17,6 +18,7 @@
 
 - name: Update live
   hosts: websites_live
+  gather_facts: no
 
   roles:
     #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
