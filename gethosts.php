@@ -40,12 +40,12 @@ function run($argv) {
         $websites = $websites + get($headers, $urlResource, NULL);
       }
       $inventory = buildServerList($servers, $websites);
-      unset($inventory[0]);
       $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
       echo $inventory;
       break;
 
     default:
+    print_r($argv);
       echo "Unknown command.\n\n";
     case '--help':
       help();
@@ -62,8 +62,8 @@ function buildGroupHierarchy($groups) {
   $hierarchicalList = [];
   foreach ($groups as $k => $group) {
     foreach ($groups as $childKey => $childGroup) {
-      if ($childGroup->parent == $group->tid) {
-        $hierarchicalList[$group->name]['children'][] = $childGroup->name;
+      if ($childGroup['parent'] == $group['tid']) {
+        $hierarchicalList[$group['name']]['children'][] = $childGroup['name'];
       }
     }
   }
@@ -83,23 +83,28 @@ function buildGroupHierarchy($groups) {
  * @return string $inventory This is a JSON-encoded inventory file in the format Ansible expects.
  */
 function buildServerList($servers, $websites) {
-  $inventory[] = [];
+  $inventory = [];
   foreach ($servers as $server) {
-    $inventory[$server->group]['hosts'][] = $server->fqdn;
+    $inventory[$server['group']]['hosts'][] = $server['fqdn'];
     // Pull in all field values as Ansible variables.
     foreach ($server as $key => $value) {
       if (!is_null($value)) {
         $key = str_replace(' ', '_', $key);
-        $inventory['_meta']['hostvars'][$server->fqdn][$key] = $value;
+        $inventory['_meta']['hostvars'][$server['fqdn']][$key] = $value;
       }
     }
   }
   // Websites go in their own group.
   if ($websites) {
     foreach ($websites as $website) {
-      $inventory['_meta']['hostvars'][$website->bare_url] = $website;
-      $websiteGroup = 'websites_' . strtolower($website->env);
-      $inventory[$websiteGroup][] = $website->bare_url;
+      $inventory['_meta']['hostvars'][$website['bare_url']] = $website;
+      $websiteGroup = 'websites_' . strtolower($website['env']);
+      $inventory[$websiteGroup][] = $website['bare_url'];
+      // Also put website data in the metadata of their respective server for building Icinga templates.
+      $parentServer = $inventory['_meta']['hostvars'][$website['server']] ?? NULL;
+      if ($parentServer) {
+        $parentServer[$website['bare_url']] = $website;
+      }
     }
   }
   return $inventory;
@@ -133,7 +138,7 @@ function get($curlHeaders, $operation, $body = NULL) {
   curl_setopt_array($curl, $curlOptions);
   $result = curl_exec($curl);
   curl_close($curl);
-  return json_decode($result);
+  return json_decode($result, TRUE);
 }
 
 /**
