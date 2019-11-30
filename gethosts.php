@@ -103,7 +103,7 @@ function buildServerList($servers, $websites) {
       // Also put website data in the metadata of their respective server for building Icinga templates.
       $parentServer = $inventory['_meta']['hostvars'][$website['server']] ?? NULL;
       if ($parentServer) {
-        $parentServer[$website['bare_url']] = $website;
+        $inventory['_meta']['hostvars'][$website['server']]['sites'][$website['bare_url']] = $website;
       }
     }
   }
