@@ -7,6 +7,8 @@
   roles:
     - common
     - { role: users, tags: users }
+    - { role: backupninja, tags: backup }
+    - { role: rsyncnet, tags: backup }
 
 - hosts: lamp
   become: yes
@@ -16,30 +18,24 @@
     - { role: contrib/geerlingguy.apache, tags: apache, deploy-site }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
-
-- hosts: testgroup
-  become: yes
-  roles:
     - { role: contrib/geerlingguy.php-versions , tags: php }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
     - { role: php-additional , tags: php }
-    # these next two are certified for use in the lamp group buy depend on php which isn't.
     - { role: contrib/geerlingguy.composer, tags: composer}
     - { role: drush, tags: drush}
     - { role: wp-cli, tags: wp-cli}
     - { role: contrib/geerlingguy.security, tags: security }
     - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
     - { role: contrib/geerlingguy.postfix, tags: postfix }
-    - { role: backupninja, tags: backup }
-    - { role: rsyncnet, tags: backup }
 
 - hosts: websites
   become: yes
   roles:
     - { role: deploy-site, tags: deploy-site }
+#    - { role: monitoring, tags: monitoring }
 
-- hosts: testgroup
+- hosts: lamp
   become: yes
   roles:
     # Run after deploy-site now that it monitors sites
