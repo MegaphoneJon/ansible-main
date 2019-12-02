@@ -1,3 +1,9 @@
+#CiviCRM extension blacklist
+extension_blacklist:
+  - stripe
+  - extendedreport
+  - civimobileapi
+
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
 apache_remove_default_vhost: true
@@ -40,6 +46,7 @@ users:
     authorized:
       - files/jon_id_rsa.pub
     hasdotfiles: true
+    oh-my-zsh: true
     dotfiles: https://github.com/MegaphoneJon/dotfiles.git
   Joseph:
     name: joseph
