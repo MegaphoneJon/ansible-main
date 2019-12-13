@@ -1,13 +1,4 @@
 ---
-- name: Run upgrades
-  #TODO: at some point this shouldn't just work on localhosts
-  hosts: websites_dev
-  gather_facts: no
-
-  roles:
-    - { role: upgrade-wp, tags: upgrade-wp }
-    - { role: upgrade-civi, tags: upgrade-civi }
-
 - name: Update test
   hosts: websites_test
 
