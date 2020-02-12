@@ -7,7 +7,7 @@
   roles:
     - common
     - { role: users, tags: users }
-    - { role: backupninja, tags: backup }
+    - { role: backupninja, tags: backup, backupninja }
     - { role: rsyncnet, tags: backup }
 
 - hosts: lamp
