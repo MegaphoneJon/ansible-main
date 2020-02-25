@@ -56,6 +56,9 @@ function write_dns($params, $action, $item_id = NULL) {
     'set:dns_type' => 'a',
     'set:dns_fqdn' => $params['fqdn'],
     'set:dns_ip' => $params['ipv4'],
+    'set:dns_sshfp_algorithm' => '1',
+    'set:dns_sshfp_type' => '1',
+    'set:dns_sshfp_fpr' => '1',
   );
   if ($item_id) {
     $data['where:item_id'] = $item_id;
@@ -81,7 +84,8 @@ function query_dns($params) {
 
   $result = red_api($params['url'], $data);
   $return = NULL;
-  foreach ($result->values as $dnsEntry) {
+  $values = $result->values ?? [];
+  foreach ($values as $dnsEntry) {
     if ($dnsEntry->dns_type == 'cname') {
       throw new Exception('You can\'t create an A record because a CNAME record already exists');
     }
