@@ -32,6 +32,7 @@ object Host "wiscience.wisc.edu" {
     http_vhost = "{{ site.bare_url }}"
     http_expect = "HTTP/1.1 200 OK"
     http_address = "128.104.80.63"
+    http_timeout = 20
 {% if site.website_string is defined %}
     http_string = "{{ site.website_string }}"
 {% endif %}

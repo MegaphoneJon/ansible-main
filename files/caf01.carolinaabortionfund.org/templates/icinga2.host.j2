@@ -1,11 +1,11 @@
-object Host "wwwtest.wiscience.wisc.edu" {
+object Host "caf01.caroliaabortionfund.org" {
   /* Import the default host template defined in `templates.conf`. */
-  display_name = "WISCIENCE test site"
+  display_name = "CAF Azure server"
   import "generic-host"
 
   /* Use a custom check_command - ensure port 443 is open */
   check_command = "tcp"
-  vars.tcp_address = "wwwtest.wiscience.wisc.edu"
+  vars.tcp_address = "caf.megaphonetech.com"
   vars.tcp_port = 443
 
 {% if contract_type is defined and contract_type is search("VPS") %}
@@ -14,6 +14,7 @@ object Host "wwwtest.wiscience.wisc.edu" {
 {% endif %}
   
   /* Specify the address attributes for checks e.g. `ssh` or `http`. */
+  address = "{{ ansible_host }}"
 {% if ipv6 is defined %}
   address6 = "{{ ipv6 }}"
 {% endif %}
@@ -31,8 +32,6 @@ object Host "wwwtest.wiscience.wisc.edu" {
     http_ssl = true
     http_vhost = "{{ site.bare_url }}"
     http_expect = "HTTP/1.1 200 OK"
-    http_address = "128.104.80.142"
-    http_timeout = 20
 {% if site.website_string is defined %}
     http_string = "{{ site.website_string }}"
 {% endif %}
