@@ -1,14 +1,6 @@
 ---
-- name: Update test
-  hosts: websites_test
+- name: Update sites
+  hosts: websites
 
   roles:
-    #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
-    - { role: update-sites, tags: update-test }
-
-- name: Update live
-  hosts: websites_live
-
-  roles:
-    #- { role: vpn-connect, tags: vpn-connect, update-test, update-live }
-    - { role: update-sites, tags: update-live}
+    - { role: update-sites, tags: update-sites }

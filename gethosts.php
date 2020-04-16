@@ -45,7 +45,6 @@ function run($argv) {
       break;
 
     default:
-    print_r($argv);
       echo "Unknown command.\n\n";
     case '--help':
       help();
@@ -98,9 +97,23 @@ function buildServerList($servers, $websites) {
   if ($websites) {
     foreach ($websites as $website) {
       $inventory['_meta']['hostvars'][$website['bare_url']] = $website;
-      $websiteGroup = 'websites_' . strtolower($website['env']);
-      $inventory[$websiteGroup][] = $website['bare_url'];
-      // Also put website data in the metadata of their respective server for building Icinga templates.
+      $envGroup = 'websites_' . strtolower($website['env']);
+      $inventory[$envGroup][] = $website['bare_url'];
+      // Also create maintenance groups.
+      $maintenanceArray = [
+        'maintenance_drupal' => 'Drupal',
+        'maintenance_backdrop' => 'Backdrop',
+        'maintenance_wp' => 'WordPress',
+      ];
+      foreach ($maintenanceArray as $group => $descriptor) {
+        if (strpos($website['contract_type'], $descriptor . ' Maintenance') !== FALSE && $website['cms'] == $descriptor) {
+          $inventory[$group][] = $website['bare_url'];
+        }
+      }
+      if (strpos($website['contract_type'], 'Civi Maintenance') !== false && $website['civicrm'] === 'Yes') {
+        $inventory['maintenance_civi'][] = $website['bare_url'];
+      }
+      // Also put website data in the metadata of their respective server for building Icinga templates.}
       $parentServer = $inventory['_meta']['hostvars'][$website['server']] ?? NULL;
       if ($parentServer) {
         $inventory['_meta']['hostvars'][$website['server']]['sites'][$website['bare_url']] = $website;
