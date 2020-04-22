@@ -1,0 +1,1 @@
+linode_personal_access_token: "{{ lookup('passwordstore', 'ulr/linode/personal_access_token') }}"

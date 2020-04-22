@@ -1,13 +1,2 @@
 linode_api_key: "{{ lookup('passwordstore', 'agbu/linode/apikey') }}"
 linode_username: agbu
-php_version: '7.1'
-php_packages_extra:
-  - php-pear
-  - php{{ php_version }}-gd
-  - php-imagick
-  - php{{ php_version }}-mysql
-  - php{{ php_version }}-curl
-  - php{{ php_version }}-sqlite3
-  - php{{ php_version }}-mbstring
-  - php{{ php_version }}-zip
-  - php{{ php_version }}-mcrypt
