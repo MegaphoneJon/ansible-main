@@ -11,3 +11,25 @@ incoming_ports:
 
 # Custom Icinga2 file
 template_src: "files/{{ inventory_hostname }}/templates/icinga2.host.j2"
+php_version: '7.3'
+php_packages_extra:
+  - php-pear
+  - php-imagick
+  - php{{ php_version }}-bz2
+  - php{{ php_version }}-cli
+  - php{{ php_version }}-curl
+  - php{{ php_version }}-fpm
+  - php{{ php_version }}-gd
+  - php{{ php_version }}-imap
+  - php{{ php_version }}-intl
+  - php{{ php_version }}-json
+  - php{{ php_version }}-ldap
+  - php{{ php_version }}-mbstring
+  - php{{ php_version }}-mysql
+  - php{{ php_version }}-opcache
+  - php{{ php_version }}-readline
+  - php{{ php_version }}-soap
+  - php{{ php_version }}-sqlite3
+  - php{{ php_version }}-xml
+  - php{{ php_version }}-zip
+
