@@ -1,6 +1,25 @@
 ---
+- name: Run WordPress upgrades
+  #TODO: at some point this shouldn't just work on localhosts
+  hosts: websites_dev:&maintenance_wp
+  gather_facts: no
+
+  roles:
+    - { role: upgrade-wp, tags: upgrade-wp }
+
+
+- name: Run Civi upgrades
+  #TODO: at some point this shouldn't just work on localhosts
+  hosts: websites_dev:&maintenance_civi
+  gather_facts: no
+
+  roles:
+    - { role: upgrade-civi, tags: upgrade-civi }
+
+
 - name: Update sites
-  hosts: websites
+  hosts: websites_test:websites_live
+  gather_facts: no
 
   roles:
     - { role: update-sites, tags: update-sites }
