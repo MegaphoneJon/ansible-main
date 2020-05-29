@@ -1,6 +1,5 @@
 ---
 # This provisions any VPSes that were defined but not built in server-list
-- import_playbook: provision.yml
 - hosts: vps
   become: yes
 
@@ -32,7 +31,10 @@
 - hosts: websites
   become: yes
   roles:
-    - { role: deploy-site, tags: deploy-site }
+    - { role: site-dns, tags: site-dns,deploy-site }
+    - { role: site-user-php-apache, tags: site-user-php-apache,deploy-site }
+    - { role: deploy-site, tags: site-main,deploy-site }
+    - { role: site-wp-monitor, tags: site-wp-monitor,deploy-site }
 #    - { role: monitoring, tags: monitoring }
 
 - hosts: lamp
