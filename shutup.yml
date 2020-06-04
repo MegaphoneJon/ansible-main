@@ -1,0 +1,12 @@
+---
+# This provisions any VPSes that were defined but not built in server-list
+- hosts: websites
+
+  tasks:
+  - name: Shut up about Civi extensions (warnings only, 7 days)
+    command: "cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='extensionUpdates' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    tags: civi-extensions
+
+  - name: Shut up about Civi core updates (warnings only, 7 days)
+    command: "cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkVersion_upgrade' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    tags: civi-core
