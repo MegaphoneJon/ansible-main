@@ -1,7 +1,7 @@
 ---
 - hosts: websites
   become: yes
-  become_user: "{{ run_as_user }}
+  become_user: "{{ run_as_user }}"
 
   tasks:
   - name: Shut up about Civi extensions (warnings only, 7 days)
