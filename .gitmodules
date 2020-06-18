@@ -76,3 +76,6 @@
 [submodule "roles/update-sites"]
 	path = roles/update-sites
 	url = git@github.com:MegaphoneJon/ansible-role-update-sites.git
+[submodule "roles/upgrade-d7"]
+	path = roles/upgrade-d7
+	url = git@github.com:MegaphoneJon/ansible-role-upgrade-d7.git
