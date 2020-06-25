@@ -1,6 +1,5 @@
 #CiviCRM extension blacklist
 extension_blacklist:
-  - stripe
   - civimobileapi
 
 #Icinga2
@@ -81,7 +80,7 @@ users:
     hasdotfiles: false
 # deploy-site
 monitoring_user: monitor
-monitoring_email: noreply@megaphonetech.com
+monitoring_email: jon+monitor@megaphonetech.com
 # backup
 rsyncnet_user: "8139"
 rsyncnet_server: "usw-s008.rsync.net"
