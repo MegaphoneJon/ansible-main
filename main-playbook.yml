@@ -28,16 +28,29 @@
     - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
     - { role: contrib/geerlingguy.postfix, tags: postfix }
 
+- hosts: hestia
+  become: yes
+
+  roles:
+    - { role: cv, tags: cv }
+    - { role: php-additional , tags: php }
+    - { role: contrib/geerlingguy.composer, tags: composer}
+    - { role: drush, tags: drush}
+    - { role: wp-cli, tags: wp-cli}
+    - { role: contrib/geerlingguy.security, tags: security }
+    - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
+    - { role: contrib/geerlingguy.postfix, tags: postfix }
+
 - hosts: websites
   become: yes
   roles:
-    - { role: site-dns, tags: site-dns,deploy-site }
-    - { role: site-user-php-apache, tags: site-user-php-apache,deploy-site }
-    - { role: deploy-site, tags: site-main,deploy-site }
-    - { role: site-wp-monitor, tags: site-wp-monitor,deploy-site }
+    - { role: site-dns, tags: [site-dns, deploy-site] }
+    - { role: site-user-php-apache, tags: [site-user-php-apache, deploy-site] }
+    - { role: deploy-site, tags: [site-main, deploy-site] }
+    - { role: site-wp-monitor, tags: [site-wp-monitor, deploy-site] }
 #    - { role: monitoring, tags: monitoring }
 
-- hosts: lamp
+- hosts: vps
   become: yes
   roles:
     # Run after deploy-site now that it monitors sites
