@@ -1,0 +1,8 @@
+---
+- name: Redirect all postfix mail to Mailhog
+  lineinfile:
+    dest: /etc/postfix/main.cf
+    regexp: '^relayhost = '
+    line: relayhost = [127.0.0.1]:1025
+  become: yes
+  notify: restart postfix
