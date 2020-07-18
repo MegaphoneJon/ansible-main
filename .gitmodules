@@ -79,3 +79,9 @@
 [submodule "roles/upgrade-d7"]
 	path = roles/upgrade-d7
 	url = git@github.com:MegaphoneJon/ansible-role-upgrade-d7.git
+[submodule "roles/contrib/geerlingguy.mailhog"]
+	path = roles/contrib/geerlingguy.mailhog
+	url = https://github.com/geerlingguy/ansible-role-mailhog.git
+[submodule "roles/contrib/geerlingguy.daemonize"]
+	path = roles/contrib/geerlingguy.daemonize
+	url = https://github.com/geerlingguy/ansible-role-daemonize.git
