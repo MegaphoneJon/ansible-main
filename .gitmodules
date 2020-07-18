@@ -88,3 +88,6 @@
 [submodule "roles/site-drupal-monitor"]
 	path = roles/site-drupal-monitor
 	url = https://github.com/MegaphoneJon/ansible-role-site-drupal-monitor.git
+[submodule "roles/site-wp-monitor"]
+	path = roles/site-wp-monitor
+	url = https://github.com/MegaphoneJon/ansible-role-site-wp-monitor.git
