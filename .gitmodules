@@ -91,3 +91,6 @@
 [submodule "roles/site-wp-monitor"]
 	path = roles/site-wp-monitor
 	url = https://github.com/MegaphoneJon/ansible-role-site-wp-monitor.git
+[submodule "roles/localhost-bootstrap"]
+	path = roles/localhost-bootstrap
+	url = https://github.com/MegaphoneJon/ansible-role-localhost-bootstrap.git

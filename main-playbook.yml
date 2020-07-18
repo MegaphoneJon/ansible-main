@@ -62,6 +62,7 @@
   become: yes
   roles:
     - common
+    - { role: localhost-bootstrap, tags: localhost-bootstrap }
     - { role: contrib/geerlingguy.apache, tags: apache }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
