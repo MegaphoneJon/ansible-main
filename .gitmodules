@@ -85,3 +85,6 @@
 [submodule "roles/contrib/geerlingguy.daemonize"]
 	path = roles/contrib/geerlingguy.daemonize
 	url = https://github.com/geerlingguy/ansible-role-daemonize.git
+[submodule "roles/site-drupal-monitor"]
+	path = roles/site-drupal-monitor
+	url = https://github.com/MegaphoneJon/ansible-role-site-drupal-monitor.git

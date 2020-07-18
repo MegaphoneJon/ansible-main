@@ -48,6 +48,7 @@
     - { role: site-user-php-apache, tags: [site-user-php-apache, deploy-site] }
     - { role: deploy-site, tags: [site-main, deploy-site] }
     - { role: site-wp-monitor, tags: [site-wp-monitor, deploy-site] }
+    - { role: site-drupal-monitor, tags: [site-drupal-monitor, deploy-site] }
 #    - { role: monitoring, tags: monitoring }
 
 - hosts: vps
@@ -67,6 +68,9 @@
     - { role: php-additional , tags: php }
     - wp-cli
     - { role: cv, tags: cv }
+    - { role: contrib/geerlingguy.mailhog, tags: mailhog }
+    - { role: contrib/geerlingguy.postfix, tags: postfix }
+    - { role: mailhog-postfix, tags: mailhog-postfix }
 
 - hosts: nosudo
   become: no
