@@ -18,7 +18,7 @@
 	url = https://github.com/MegaphoneJon/ansible-role-drush.git
 [submodule "roles/firewall-common"]
 	path = roles/firewall-common
-	url = https://github.com/MegaphoneJon/ansible-role-firewall-comon.git
+	url = https://github.com/MegaphoneJon/ansible-role-firewall-common.git
 [submodule "roles/icinga2-satellite"]
 	path = roles/icinga2-satellite
 	url = https://github.com/MegaphoneJon/ansible-role-icinga2-satellite.git
