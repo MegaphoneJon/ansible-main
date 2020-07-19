@@ -86,6 +86,7 @@ function buildServerList($servers, $websites) {
   foreach ($servers as $server) {
     // Don't get any localhosts besides your own.
     if ($server['group'] == 'localhosts' && $server['hostname'] !== gethostname()) {
+      $ignoredServers[$server['hostname']] = TRUE;
       continue;
     }
     $inventory[$server['group']]['hosts'][] = $server['fqdn'];
@@ -100,6 +101,10 @@ function buildServerList($servers, $websites) {
   // Websites go in their own group.
   if ($websites) {
     foreach ($websites as $website) {
+      // Ignore localhost sites not on this localhost.
+      if ($ignoredServers[$website['server']] ?? FALSE) {
+        continue;
+      }
       $inventory['_meta']['hostvars'][$website['bare_url']] = $website;
       $envGroup = 'websites_' . strtolower($website['env']);
       $inventory[$envGroup][] = $website['bare_url'];
