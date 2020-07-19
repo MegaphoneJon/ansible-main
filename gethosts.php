@@ -84,6 +84,10 @@ function buildGroupHierarchy($groups) {
 function buildServerList($servers, $websites) {
   $inventory = [];
   foreach ($servers as $server) {
+    // Don't get any localhosts besides your own.
+    if ($server['group'] == 'localhosts' && $server['hostname'] !== gethostname()) {
+      continue;
+    }
     $inventory[$server['group']]['hosts'][] = $server['fqdn'];
     // Pull in all field values as Ansible variables.
     foreach ($server as $key => $value) {
