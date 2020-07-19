@@ -1,0 +1,3 @@
+---
+
+ansible_authorized_keys: "{{ lookup('file', 'files/' + {{ ansible_user }} + '_id_rsa.pub') }}"
