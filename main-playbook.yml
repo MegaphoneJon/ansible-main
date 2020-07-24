@@ -72,6 +72,8 @@
     - { role: contrib/geerlingguy.mailhog, tags: mailhog }
     - { role: contrib/geerlingguy.postfix, tags: postfix }
     - { role: mailhog-postfix, tags: mailhog-postfix }
+    - { role: backupninja, tags: backup, backupninja }
+    - { role: rsyncnet, tags: backup }
 
 - hosts: nosudo
   become: no
