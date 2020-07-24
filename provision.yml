@@ -1,6 +1,6 @@
 ---
 - name: Provision VMs
-  hosts: vps
+  hosts: vps:localhosts
   vars:
     ansible_user: root
   gather_facts: no
