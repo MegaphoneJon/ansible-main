@@ -45,7 +45,7 @@ users:
       - www-data
     password: "{{ lookup('passwordstore', 'megaphone/ansible/users/jon') }}"
     authorized:
-      - files/jon_id_rsa.pub
+      - https://ssh.megaphonetech.com/jon_id_rsa.pub
     hasdotfiles: true
     oh-my-zsh: true
     dotfiles: https://github.com/MegaphoneJon/dotfiles.git
@@ -57,7 +57,7 @@ users:
       - www-data
     password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joseph') }}"
     authorized:
-      - files/joseph_id_rsa.pub
+      - https://ssh.megaphonetech.com/joseph_id_rsa.pub
     hasdotfiles: false
   Irene:
     name: irene
@@ -67,7 +67,7 @@ users:
       - www-data
     password: "{{ lookup('passwordstore', 'megaphone/ansible/users/irene') }}"
     authorized:
-      - files/irene_id_rsa.pub
+      - https://ssh.megaphonetech.com/irene_id_rsa.pub
     hasdotfiles: false
   Dennis:
     name: dennis
@@ -77,7 +77,7 @@ users:
       - www-data
     password: "{{ lookup('passwordstore', 'megaphone/ansible/users/dennis') }}"
     authorized:
-      - files/dennis_id_rsa.pub
+      - https://ssh.megaphonetech.com/dennis_id_rsa.pub
     hasdotfiles: false
 # deploy-site
 monitoring_user: monitor
