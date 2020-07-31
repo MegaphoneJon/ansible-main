@@ -69,7 +69,8 @@
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
     - { role: php-additional , tags: php }
-    - wp-cli
+    - { role: drush, tags: drush}
+    - { role: wp-cli, tags: wp-cli}
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mailhog, tags: mailhog }
     - { role: contrib/geerlingguy.postfix, tags: postfix }
