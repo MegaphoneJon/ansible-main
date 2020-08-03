@@ -94,3 +94,12 @@
 [submodule "roles/localhost-bootstrap"]
 	path = roles/localhost-bootstrap
 	url = https://github.com/MegaphoneJon/ansible-role-localhost-bootstrap.git
+[submodule "roles/site-cron"]
+	path = roles/site-cron
+	url = https://github.com/MegaphoneJon/ansible-role-site-cron.git
+[submodule "roles/apache-additional"]
+	path = roles/apache-additional
+	url = https://github.com/MegaphoneJon/ansible-role-apache-additional.git
+[submodule "roles/site-user-php-apache"]
+	path = roles/site-user-php-apache
+	url = https://github.com/MegaphoneJon/ansible-role-site-user-php-apache.git
