@@ -103,3 +103,6 @@
 [submodule "roles/site-user-php-apache"]
 	path = roles/site-user-php-apache
 	url = https://github.com/MegaphoneJon/ansible-role-site-user-php-apache.git
+[submodule "roles/site-habitat"]
+	path = roles/site-habitat
+	url = https://github.com/MegaphoneJon/site-habitat.git

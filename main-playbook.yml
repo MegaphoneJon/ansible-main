@@ -51,6 +51,7 @@
     - { role: site-wp-monitor, tags: [site-wp-monitor, deploy-site] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor, deploy-site] }
     - { role: site-cron, tags: [site-cron, deploy-site] }
+    - { role: site-habitat, tags: [site-habitat, deploy-site] }
 #    - { role: monitoring, tags: monitoring }
 
 - hosts: vps
