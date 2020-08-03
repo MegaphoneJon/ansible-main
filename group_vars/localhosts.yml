@@ -1,3 +1,6 @@
 ---
 
 ansible_authorized_keys: "{{ lookup('file', 'files/' + {{ ansible_user }} + '_id_rsa.pub') }}"
+mysql_packages:
+  - mariadb-client
+  - mariadb-server
