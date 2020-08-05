@@ -2,6 +2,5 @@ roles/common/files
 roles/users/files
 roles/bootstrap/files
 *swp
-ansible.cfg
 gethosts.cfg.php
 *retry
