@@ -21,7 +21,7 @@
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
     - { role: php-additional , tags: php }
-    - { role: apache-additional , tags: [apache, apache-additional] }
+#    - { role: apache-additional , tags: [apache, apache-additional] }
     - { role: contrib/geerlingguy.composer, tags: composer}
     - { role: drush, tags: drush}
     - { role: wp-cli, tags: wp-cli}
@@ -46,7 +46,7 @@
   become: yes
   roles:
     - { role: site-dns, tags: [site-dns, deploy-site] }
-    - { role: site-user-php-apache, tags: [site-user-php-apache, deploy-site] }
+    - { role: site-user-php-apache, tags: [site-upa, deploy-site] }
     - { role: deploy-site, tags: [site-main, deploy-site] }
     - { role: site-wp-monitor, tags: [site-wp-monitor, deploy-site] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor, deploy-site] }
