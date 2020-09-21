@@ -106,3 +106,9 @@
 [submodule "roles/site-habitat"]
 	path = roles/site-habitat
 	url = https://github.com/MegaphoneJon/site-habitat.git
+[submodule "roles/site-mysql"]
+	path = roles/site-mysql
+	url = https://github.com/MegaphoneJon/ansible-role-site-mysql.git
+[submodule "roles/site-gitea"]
+	path = roles/site-gitea
+	url = https://github.com/MegaphoneJon/ansible-role-site-gitea.git

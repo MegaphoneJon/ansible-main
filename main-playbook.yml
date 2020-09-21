@@ -47,6 +47,8 @@
   roles:
     - { role: site-dns, tags: [site-dns, deploy-site] }
     - { role: site-user-php-apache, tags: [site-upa, deploy-site] }
+    - { role: site-mysql, tags: [site-mysql, deploy-site] }
+    - { role: site-gitea, tags: [site-gitea, deploy-site] }
     - { role: deploy-site, tags: [site-main, deploy-site] }
     - { role: site-wp-monitor, tags: [site-wp-monitor, deploy-site] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor, deploy-site] }
