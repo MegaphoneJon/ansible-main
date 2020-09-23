@@ -1,0 +1,8 @@
+---
+# This provisions any VPSes that were defined but not built in server-list
+- hosts: maintenance_drupal:maintenance_wp:maintenance_backdrop:!websites_dev
+
+  tasks:
+  - name: Recheck uncommitted git
+    command: "/usr/lib/nagios/plugins/check_git -s -d {{ webroot }} -n {{ bare_url }} -l /var/log/git/{{ bare_url }}.log"
+    become: yes
