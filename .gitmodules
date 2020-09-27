@@ -112,3 +112,6 @@
 [submodule "roles/site-gitea"]
 	path = roles/site-gitea
 	url = https://github.com/MegaphoneJon/ansible-role-site-gitea.git
+[submodule "roles/site-db-sync"]
+	path = roles/site-db-sync
+	url = https://github.com/MegaphoneJon/ansible-role-site-db-sync.git
