@@ -84,18 +84,21 @@ function buildGroupHierarchy($groups) {
 function buildServerList($servers, $websites) {
   $inventory = [];
   foreach ($servers as $server) {
-    // Don't get any localhosts besides your own.
-    if ($server['group'] == 'localhosts' && $server['hostname'] !== gethostname()) {
-      $ignoredServers[$server['hostname']] = TRUE;
-      continue;
-    }
-    $inventory[$server['group']]['hosts'][] = $server['fqdn'];
     // Pull in all field values as Ansible variables.
     foreach ($server as $key => $value) {
       if (!is_null($value)) {
         $key = str_replace(' ', '_', $key);
         $inventory['_meta']['hostvars'][$server['fqdn']][$key] = $value;
       }
+    }
+    $groups = explode(', ', $server['group']);
+    foreach ($groups as $group) {
+      // Don't get any localhosts besides your own.
+      if ($group == 'localhosts' && $server['hostname'] !== gethostname()) {
+        $ignoredServers[$server['hostname']] = TRUE;
+        continue 2;
+      }
+      $inventory[$group]['hosts'][] = $server['fqdn'];
     }
   }
   // Websites go in their own group.

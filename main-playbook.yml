@@ -28,6 +28,7 @@
     - { role: contrib/geerlingguy.security, tags: security }
     - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
     - { role: contrib/geerlingguy.postfix, tags: postfix }
+    - { role: openvpn-server, tags: openvpn-server }
 
 - hosts: hestia
   become: yes
