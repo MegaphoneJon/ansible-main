@@ -94,3 +94,8 @@
   gather_facts: no
   roles:
     - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }
+
+- hosts: redis
+  become: yes
+  roles:
+    - { role: contrib/geerlingguy.redis, tags: redis }
