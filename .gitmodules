@@ -115,3 +115,6 @@
 [submodule "roles/site-db-sync"]
 	path = roles/site-db-sync
 	url = https://github.com/MegaphoneJon/ansible-role-site-db-sync.git
+[submodule "roles/site-permissions"]
+	path = roles/site-permissions
+	url = https://github.com/MegaphoneJon/ansible-role-site-permissions.git
