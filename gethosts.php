@@ -59,11 +59,10 @@ run($argv);
  */
 function buildGroupHierarchy($groups) {
   $hierarchicalList = [];
-  foreach ($groups as $k => $group) {
-    foreach ($groups as $childKey => $childGroup) {
-      if ($childGroup['parent'] == $group['tid']) {
-        $hierarchicalList[$group['name']]['children'][] = $childGroup['name'];
-      }
+  $groupTids = array_combine(array_column($groups, 'tid'), array_column($groups, 'name'));
+  foreach ($groups as $group) {
+    if ($groupTids[$group['parent']]) {
+      $hierarchicalList[$groupTids[$group['parent']]]['children'][] = $group['name'];
     }
   }
   // Websites are in their own hierarchy.
@@ -91,6 +90,7 @@ function buildServerList($servers, $websites) {
         $inventory['_meta']['hostvars'][$server['fqdn']][$key] = $value;
       }
     }
+    // Put servers in groups.
     $groups = explode(', ', $server['group']);
     foreach ($groups as $group) {
       // Don't get any localhosts besides your own.
@@ -108,7 +108,16 @@ function buildServerList($servers, $websites) {
       if ($ignoredServers[$website['server']] ?? FALSE) {
         continue;
       }
+
       $inventory['_meta']['hostvars'][$website['bare_url']] = $website;
+      // Put sites in groups per the "website_groups" field.
+      $websiteGroups = explode(', ', $website['website_groups']) ?? NULL;
+      foreach ($websiteGroups as $websiteGroup) {
+        if ($websiteGroup) {
+          $inventory[$websiteGroup][] = $website['bare_url'];
+        }
+      }
+      // Put sites in groups based on environment.
       $envGroup = 'websites_' . strtolower($website['env']);
       $inventory[$envGroup][] = $website['bare_url'];
       // Also create maintenance groups.
