@@ -4,6 +4,7 @@ extension_blacklist:
 
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
+primary_icinga_server_ip: '173.255.234.245'
 apache_remove_default_vhost: true
 #temp for Apache
 apache_vhosts: []
