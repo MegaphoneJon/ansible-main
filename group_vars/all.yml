@@ -1,6 +1,6 @@
 #CiviCRM extension blacklist
 extension_blacklist:
-  - civimobileapi
+  - none
 
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
