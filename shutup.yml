@@ -6,8 +6,10 @@
   tasks:
   - name: Shut up about Civi extensions (warnings only, 7 days)
     command: "cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkExtensionsUpdates' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    when: civicrm == 'Yes'
     tags: civi-extensions
 
   - name: Shut up about Civi core updates (warnings only, 7 days)
     command: "cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkVersion_upgrade' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    when: civicrm == 'Yes'
     tags: civi-core
