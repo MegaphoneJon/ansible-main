@@ -61,7 +61,7 @@ function buildGroupHierarchy($groups) {
   $hierarchicalList = [];
   $groupTids = array_combine(array_column($groups, 'tid'), array_column($groups, 'name'));
   foreach ($groups as $group) {
-    if ($groupTids[$group['parent']]) {
+    if ($groupTids[$group['parent']] ?? FALSE) {
       $hierarchicalList[$groupTids[$group['parent']]]['children'][] = $group['name'];
     }
   }
