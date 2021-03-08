@@ -1,2 +1,0 @@
-linode_api_key: "{{ lookup('passwordstore', 'gf/linode/apikey') }}"
-linode_username:  groundswellplusaction

@@ -1,0 +1,5 @@
+# Block HTTP/HTTPS, allow OpenVPN
+incoming_ports:
+  - { port: 22, protocol: tcp, name: 'SSH' }
+  - { port: 1194, protocol: udp, name: 'OpenVPN' }
+  - { port: 5665, protocol: tcp, name: 'Icinga2' }

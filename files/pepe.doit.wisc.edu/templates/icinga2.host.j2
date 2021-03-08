@@ -47,7 +47,9 @@ object Host "reg.delta.wisc.edu" {
     cms = "{{ site.cms | lower }}"
 {% if site.contract_type is search("Civi Maintenance") and site.civicrm == 'Yes' %}
     crm_site_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/sitekey') }}"
-    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/apikey') }}"
+    {% if site.canonical_bare_url is defined %}
+    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + site.canonical_server + '/' + site.canonical_bare_url + '/civicrm_api_key') }}"
+    {% endif %}
 {% endif %}
   }
 {% endif %}
