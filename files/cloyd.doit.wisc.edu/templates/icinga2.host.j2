@@ -42,7 +42,7 @@ object Host "wwwtest.wiscience.wisc.edu" {
 {% endif %}
     /* CMS/CIVICRM MONITORING */
 {% if site.contract_type is search("(Backdrop|Drupal) Maintenance") and (site.cms == 'Drupal' or site.cms == 'Backdrop' or site.cms == 'Drupal8') %}
-    drupal_site_id = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/nagioskey') }}"
+    drupal_site_id = "{{ lookup('passwordstore', site.client + '/' + site.canonical_hostname + '/' + site.canonical_bare_url + '/nagioskey') }}"
 {% endif %}
     cms = "{{ site.cms | lower }}"
 {% if site.contract_type is search("Civi Maintenance") and site.civicrm == 'Yes' %}
