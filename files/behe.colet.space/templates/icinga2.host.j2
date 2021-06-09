@@ -3,7 +3,7 @@ object Host "{{ fqdn }}" {
   display_name = "{{ fqdn }}"
   import "generic-host"
 
-{% if contract_type is defined and contract_type is search("VPS") %}
+{% if contract_type is defined and contract_type is search("VPS") and "nosudo" not in group_names %}
   /* Enable running checks from the primary Icinga on the satellite. */
   vars.client_endpoint = name
 {% endif %}
@@ -18,7 +18,7 @@ object Host "{{ fqdn }}" {
   vars.os = "Linux"
 
   /* Used for DNS expiration checks and for DNS blacklist checks */
-  vars.second_level_domains = ["{{ fqdn | regex_search('(?:.+\.)?([^.]+\.(?:com|org|net|coop|space|co.uk|edu))', '\\1') | first }}"]
+  vars.second_level_domains = ["{{ fqdn | regex_search('(?:.+\.)?([^.]+\.(?:com|org|net|coop|space|co.uk|edu|info|us))', '\\1') | first }}"]
 
   /* Define http vhost attributes for service apply rules in `services.conf`. */
 {% if sites is defined %}
@@ -43,12 +43,15 @@ object Host "{{ fqdn }}" {
     cms = "{{ site.cms | lower }}"
 {% if site.contract_type is search("Civi Maintenance") and site.civicrm == 'Yes' %}
     crm_site_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/sitekey') }}"
-    {% if site.canonical_bare_url is defined %}
-    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + site.canonical_server + '/' + site.canonical_bare_url + '/civicrm_api_key') }}"
-    {% else %}
-    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/apikey') }}"
-    {% endif %}
+    {% if site.canonical_bare_url != None -%}
+    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + site.canonical_hostname + '/' + site.canonical_bare_url + '/civicrm_api_key') }}"
+    {% else -%}
+    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/civicrm_api_key') }}"
+    {% endif -%}
 {% endif %}
+{% if site.bare_url in groups['nextcloud'] -%}
+    nextcloud = true
+{% endif -%}
     exclude = "checkVersion_upgrade,checkVersion_patch,extensionUpdates"
     check_wp_updates = false
   }
@@ -58,11 +61,9 @@ object Host "{{ fqdn }}" {
 
   /* Define notification mail attributes for notification apply rules in `notifications.conf`. */
   vars.notification["mail"] = {
-
     groups = [ {{ notification_groups | default('"megaphone"', true) | replace("&quot;",'"') }} ]
   }
-
-{% if contract_type is defined and contract_type is search("VPS") %}
+{% if contract_type is defined and contract_type is search("VPS") and "nosudo" not in group_names %}
   /* LOCAL MONITORING CUSTOM VARS */
   /* Set a custom value for procs warning */
   vars.procs_warning = 310
