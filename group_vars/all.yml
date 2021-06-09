@@ -9,14 +9,15 @@ apache_remove_default_vhost: true
 #temp for Apache
 apache_vhosts: []
 #PHP
-php_version: '7.3'
-php_default_version_debian: '7.3'
+php_version: '7.4'
+php_default_version_debian: '7.4'
 php_versions_install_recommends: true
 php_packages_extra:
   - php-pear
   - php{{ php_version }}-gd
   - php-imagick
   - php{{ php_version }}-mysql
+  - php{{ php_version }}-imagick
   - php{{ php_version }}-bcmath
   - php{{ php_version }}-curl
   - php{{ php_version }}-sqlite3
@@ -26,6 +27,7 @@ php_packages_extra:
   - php{{ php_version }}-intl
   - php{{ php_version }}-gmp
   - php{{ php_version }}-bz2
+  - php{{ php_version }}-soap
 
 php_memory_limit: '128M'
 php_max_execution_time: 300
