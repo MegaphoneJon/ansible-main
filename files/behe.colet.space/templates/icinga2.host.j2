@@ -52,7 +52,7 @@ object Host "{{ fqdn }}" {
 {% if site.bare_url in groups['nextcloud'] -%}
     nextcloud = true
 {% endif -%}
-    exclude = "checkVersion_upgrade,checkVersion_patch,extensionUpdates"
+    exclude = "checkVersion_upgrade,checkVersion_patch,checkExtensionsUpdates"
     check_wp_updates = false
   }
 {% endif %}

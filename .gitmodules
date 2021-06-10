@@ -118,3 +118,9 @@
 [submodule "roles/site-permissions"]
 	path = roles/site-permissions
 	url = https://github.com/MegaphoneJon/ansible-role-site-permissions.git
+[submodule "roles/site-standard-extensions"]
+	path = roles/site-standard-extensions
+	url = git@github.com:MegaphoneJon/ansible-role-site-standard-extensions.git
+[submodule "roles/fail2ban"]
+	path = roles/fail2ban
+	url = git@github.com:MegaphoneJon/ansible-role-fail2ban.git
