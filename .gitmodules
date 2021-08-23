@@ -124,3 +124,6 @@
 [submodule "roles/fail2ban"]
 	path = roles/fail2ban
 	url = git@github.com:MegaphoneJon/ansible-role-fail2ban.git
+[submodule "roles/site-robots-txt"]
+	path = roles/site-robots-txt
+	url = git@github.com:MegaphoneJon/ansible-role-site-robots-txt.git
