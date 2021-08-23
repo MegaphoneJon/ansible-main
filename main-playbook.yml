@@ -4,7 +4,7 @@
   become: yes
 
   roles:
-    - common
+    - { role: common, tags: common }
     - { role: users, tags: users }
     - { role: backupninja, tags: [backup, backupninja] }
     - { role: rsyncnet, tags: backup }
@@ -17,7 +17,7 @@
     - { role: contrib/geerlingguy.apache, tags: [apache, deploy-site] }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
-    - { role: contrib/geerlingguy.php-versions , tags: php }
+    - { role: contrib/geerlingguy.php-versions , tags: [php, php-versions] }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
     - { role: php-additional , tags: php }
