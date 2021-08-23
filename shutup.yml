@@ -5,17 +5,22 @@
 
   tasks:
   - name: Shut up about Civi extensions (warnings only, 7 days)
-    command: "cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkExtensionsUpdates' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkExtensionsUpdates' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    when: civicrm == 'Yes'
+    tags: civi-extensions
+
+  - name: Shut up about Civi extensions (allavailableupgrades) (warnings only, 7 days)
+    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='allavailableupgrades' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
     when: civicrm == 'Yes'
     tags: civi-extensions
 
   - name: Shut up about Civi core updates (warnings only, 7 days)
-    command: "cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkVersion_upgrade' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkVersion_upgrade' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
     when: civicrm == 'Yes'
     tags: civi-core
 
   - name: Collect last 10 errors in watchdog
-    command: "drush --root='{{ webroot }}' watchdog:show --severity=3"
+    shell: "PATH=$HOME/bin:$PATH;drush --root='{{ webroot }}' watchdog:show --severity=3"
     when: cms == 'Drupal' or cms == 'Drupal8'
     register: drushmessages
     tags: clear-drush, show-drush
@@ -28,6 +33,6 @@
     changed_when: false
 
   - name: Clear errors in watchdog
-    command: "drush --yes --root='{{ webroot }}' watchdog:delete --severity=3"
+    shell: "PATH=$HOME/bin:$PATH;drush --yes --root='{{ webroot }}' watchdog:delete --severity=3"
     when: cms == 'Drupal' or cms == 'Drupal8' and drushmessages.stdout != ''
     tags: clear-drush
