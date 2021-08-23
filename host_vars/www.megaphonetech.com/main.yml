@@ -1,0 +1,3 @@
+ansible_python_interpreter: /usr/bin/python2.7
+utils_path: $HOME/bin/
+sqldumps_path: $HOME/sql-dumps

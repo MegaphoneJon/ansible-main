@@ -77,5 +77,8 @@ object Host "{{ fqdn }}" {
 
   vars.has_backupninja = true
 {% endif %}
+{% if check_dnsbl is defined -%}
+  vars.check_dnsbl = true
+{% endif %}
 }
 

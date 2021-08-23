@@ -1,0 +1,3 @@
+apache_vhost_extra: |
+  RewriteEngine on
+  RewriteRule ^/led/(.*) network/$1 [R]

@@ -1,0 +1,5 @@
+apache_vhost_extra: |
+  RewriteEngine On
+  RewriteCond %{QUERY_STRING} contact_sub_type=All
+  RewriteRule ^/member-directory$ - [G]
+  RewriteRule "^/vendor/civicrm/civicrm-core/extern/url.php$" "/civicrm/mailing/url" [R]
