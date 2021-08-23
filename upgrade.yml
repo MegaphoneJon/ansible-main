@@ -22,8 +22,7 @@
   gather_facts: no
 
   roles:
-    - { role: upgrade-civi, tags: upgrade-civi }
-
+    - { role: upgrade-civi, tags: upgrade-civi, when: contract_type is search("Civi Maintenance") and freeze_crm != "1" and civicrm == 'Yes' }
 
 - name: Update sites
   hosts: websites_test:websites_live
