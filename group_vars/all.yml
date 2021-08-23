@@ -64,16 +64,6 @@ users:
     authorized:
       - https://ssh.megaphonetech.com/joseph_id_rsa.pub
     hasdotfiles: false
-  Irene:
-    name: irene
-    shell: "/bin/bash"
-    groups:
-      - sudo
-      - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/irene') }}"
-    authorized:
-      - https://ssh.megaphonetech.com/irene_id_rsa.pub
-    hasdotfiles: false
   Dennis:
     name: dennis
     shell: "/bin/bash"
