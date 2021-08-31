@@ -1,10 +1,13 @@
 apache_vhost_extra: |
   RewriteEngine On
+  # Remove trailing apostrophes
+  RewriteCond %{QUERY_STRING} ^(.+)('|%27)$ 
+  RewriteRule ^ %{REQUEST_URI}?%1 [R=301,L,NE]
   RewriteCond %{QUERY_STRING} tid(\[0*\]|%5B0*%5D)=45
   RewriteRule ^(/materials)*/legal-cases.*$ - [G]
   RewriteCond %{QUERY_STRING} sort_by=field_date_value
   RewriteRule ^/taxonomy/term.*$ - [G]
-  RewriteCond %{QUERY_STRING} field_program_or_project_tid=(all|391'|391%27) [OR]
+  RewriteCond %{QUERY_STRING} field_program_or_project_tid=all [OR]
   RewriteCond %{QUERY_STRING} field_resource_type_tid=396 
   RewriteRule ^/library.*$ - [G]
 
