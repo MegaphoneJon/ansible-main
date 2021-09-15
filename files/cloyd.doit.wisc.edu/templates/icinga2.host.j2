@@ -8,7 +8,7 @@ object Host "wwwtest.wiscience.wisc.edu" {
   vars.tcp_address = "wwwtest.wiscience.wisc.edu"
   vars.tcp_port = 443
 
-{% if contract_type is defined and contract_type is search("VPS") %}
+{% if contract_type is defined and contract_type is search("VPS") and "nosudo" not in group_names %}
   /* Enable running checks from the primary Icinga on the satellite. */
   vars.client_endpoint = name
 {% endif %}
@@ -42,17 +42,28 @@ object Host "wwwtest.wiscience.wisc.edu" {
 {% endif %}
     /* CMS/CIVICRM MONITORING */
 {% if site.contract_type is search("(Backdrop|Drupal) Maintenance") and (site.cms == 'Drupal' or site.cms == 'Backdrop' or site.cms == 'Drupal8') %}
+    {% if site.canonical_bare_url != None -%}
     drupal_site_id = "{{ lookup('passwordstore', site.client + '/' + site.canonical_hostname + '/' + site.canonical_bare_url + '/nagioskey') }}"
-{% endif %}
+    {% else -%}
+    drupal_site_id = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/nagioskey') }}"
+    {% endif -%}
+{% endif -%}
     cms = "{{ site.cms | lower }}"
+{% if site.contract_type is not search("WordPress Maintenance") %}
+    check_wp_updates = false
+{% endif -%}
 {% if site.contract_type is search("Civi Maintenance") and site.civicrm == 'Yes' %}
     crm_site_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/sitekey') }}"
-    {% if site.canonical_bare_url is defined %}
-    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + site.canonical_server + '/' + site.canonical_bare_url + '/civicrm_api_key') }}"
-    {% else %}
-    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/apikey') }}"
-    {% endif %}
+    {% if site.canonical_bare_url != None -%}
+    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + site.canonical_hostname + '/' + site.canonical_bare_url + '/civicrm_api_key') }}"
+    {% else -%}
+    crm_api_key = "{{ lookup('passwordstore', site.client + '/' + hostname + '/' + site.bare_url + '/civicrm_api_key') }}"
+    {% endif -%}
 {% endif %}
+{% if site.bare_url in groups['nextcloud'] -%}
+    nextcloud = true
+{% endif -%}
+    site_env = "{{ site.env }}"
   }
 {% endif %}
 {% endfor %}
@@ -60,11 +71,10 @@ object Host "wwwtest.wiscience.wisc.edu" {
 
   /* Define notification mail attributes for notification apply rules in `notifications.conf`. */
   vars.notification["mail"] = {
-
     groups = [ {{ notification_groups | default('"megaphone"', true) | replace("&quot;",'"') }} ]
+    users_non_urgent = [ "jon" ]
   }
-
-{% if contract_type is defined and contract_type is search("VPS") %}
+{% if contract_type is defined and contract_type is search("VPS") and "nosudo" not in group_names %}
   /* LOCAL MONITORING CUSTOM VARS */
   /* Set a custom value for procs warning */
   vars.procs_warning = 310
@@ -77,6 +87,9 @@ object Host "wwwtest.wiscience.wisc.edu" {
   /* END LOCAL MONITORING CUSTOM VARS */
 
   vars.has_backupninja = true
+{% endif %}
+{% if check_dnsbl is defined -%}
+  vars.check_dnsbl = true
 {% endif %}
 }
 
