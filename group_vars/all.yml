@@ -1,3 +1,6 @@
+# fail2ban greenlist
+greenlist_ips:
+  - 69.122.128.206
 #CiviCRM extension blacklist
 extension_blacklist:
   - none
