@@ -127,3 +127,6 @@
 [submodule "roles/site-robots-txt"]
 	path = roles/site-robots-txt
 	url = https://github.com/MegaphoneJon/ansible-role-site-robots-txt.git
+[submodule "roles/site-postinstall-config"]
+	path = roles/site-postinstall-config
+	url = git@github.com:MegaphoneJon/ansible-role-site-postinstall-config.git

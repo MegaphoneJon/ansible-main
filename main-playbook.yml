@@ -59,6 +59,7 @@
     - { role: site-db-sync, tags: [site-db-sync] }
     - { role: deploy-site, tags: [site-main] }
     - { role: site-permissions, tags: [site-permissions] }
+    - { role: site-postinstall-config, tags: [site-postinstall-config] }
     - { role: site-standard-extensions, tags: [site-standard-extensions] }
     - { role: site-wp-monitor, tags: [site-wp-monitor] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
