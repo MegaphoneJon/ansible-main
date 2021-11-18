@@ -1,13 +1,44 @@
 ---
 - hosts: websites
-  become: yes
-  become_user: "{{ run_as_user }}"
+  # become: yes
+  # become_user: "{{ run_as_user }}"
+  gather_facts: no
+
+  vars:
+    ajaxDict:
+      drupal: sites/all/modules/civicrm/extern/rest.php
+      drupal8: libraries/civicrm/extern/rest.php
+      backdrop: modules/civicrm/extern/rest.php
+      wordpress: wp-json/civicrm/v3/rest
+      joomla: administrator/components/com_civicrm/civicrm/extern/rest.php
+    endpoint: '{{ ajaxDict[cms | lower] }}'
+    crm_api_key: "{{ lookup('passwordstore', client + '/' + (canonical_hostname | default(hostname, true)) + '/' + (canonical_bare_url | default(bare_url, true)) + '/civicrm_api_key') }}"
+    crm_site_key: "{{ lookup('passwordstore', client + '/' + hostname + '/' + bare_url + '/sitekey') }}"
+    temp:
+      name: checkExtensionsUpdates
+      ignore_severity: 3
+      hush_until: "{{ '%Y-%m-%d' | strftime( (lookup('pipe', 'date +%s') | int) + ( 86400 * 7 ) ) }}"
 
   tasks:
+
   - name: Shut up about Civi extensions (warnings only, 7 days)
-    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkExtensionsUpdates' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
+    uri:
+      url: "{{ primary_url }}/{{ endpoint }}"
+      method: POST
+      body:
+        XDEBUG_SESSION: VSCODE
+        entity: StatusPreference
+        action: create
+        json: "{{ temp | to_json }}"
+        api_key: "{{ crm_api_key }}"
+        key: "{{ crm_site_key }}"
+      body_format: form-urlencoded
+      return_content: yes
+    delegate_to: 127.0.0.1
     when: civicrm == 'Yes'
     tags: civi-extensions
+
+  - fail:
 
   - name: Shut up about Civi extensions (allavailableupgrades) (warnings only, 7 days)
     shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='allavailableupgrades' hush_until='{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}'" 
