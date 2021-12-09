@@ -7,7 +7,7 @@
   vars:
     ajaxDict:
       drupal: sites/all/modules/civicrm/extern/rest.php
-      drupal8: libraries/civicrm/extern/rest.php
+      drupal8: civicrm/ajax/rest
       backdrop: modules/civicrm/extern/rest.php
       wordpress: wp-json/civicrm/v3/rest
       joomla: administrator/components/com_civicrm/civicrm/extern/rest.php
@@ -29,6 +29,8 @@
         api_key: "{{ crm_api_key }}"
         key: "{{ crm_site_key }}"
       body_format: form-urlencoded
+      url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
     delegate_to: 127.0.0.1
     when: civicrm == 'Yes'
     tags: civi-extensions
@@ -44,6 +46,8 @@
         api_key: "{{ crm_api_key }}"
         key: "{{ crm_site_key }}"
       body_format: form-urlencoded
+      url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
     delegate_to: 127.0.0.1
     when: civicrm == 'Yes'
     tags: civi-extensions
@@ -60,6 +64,8 @@
         api_key: "{{ crm_api_key }}"
         key: "{{ crm_site_key }}"
       body_format: form-urlencoded
+      url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
     delegate_to: 127.0.0.1
     when: civicrm == 'Yes'
     tags: civi-core
