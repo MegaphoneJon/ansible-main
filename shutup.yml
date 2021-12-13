@@ -32,7 +32,7 @@
       url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
       url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
     delegate_to: 127.0.0.1
-    when: civicrm == 'Yes'
+    when: civicrm == 'Yes' and cms != 'Drupal8'
     tags: civi-extensions
 
   - name: Shut up about Civi extensions (allavailableupgrades) (warnings only, 7 days)
@@ -49,9 +49,22 @@
       url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
       url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
     delegate_to: 127.0.0.1
-    when: civicrm == 'Yes'
+    when: civicrm == 'Yes' and cms != 'Drupal8'
     tags: civi-extensions
 
+  - name: Shut up about Civi extensions (warnings only, 7 days) (D8)
+    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkExtensionsUpdates' hush_until='{{ seven_days_hence }}'"
+    become: true
+    become_user: "{{ run_as_user }}"
+    when: civicrm == 'Yes' and cms == 'Drupal8'
+    tags: civi-extensions
+
+  - name: Shut up about Civi extensions (allavailableupgrades) (warnings only, 7 days) (D8)
+    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='allavailableupgrades' hush_until='{{ seven_days_hence }}'" 
+    become: true
+    become_user: "{{ run_as_user }}"
+    when: civicrm == 'Yes' AandND cms == 'Drupal8'
+    tags: civi-extensions
 
   - name: Shut up about Civi core updates (warnings only, 7 days)
     uri:
@@ -67,8 +80,15 @@
       url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
       url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
     delegate_to: 127.0.0.1
-    when: civicrm == 'Yes'
+    when: civicrm == 'Yes' and cms != 'Drupal8'
     tags: civi-core
+
+  - name: Shut up about Civi core updates (warnings only, 7 days) (D8)
+    shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='checkVersion_upgrade' hush_until='{{ seven_days_hence }}'"
+    become: true
+    become_user: "{{ run_as_user }}"
+    when: civicrm == 'Yes' and cms == 'Drupal8'
+    tags: civi-core  
 
   - name: Collect last 10 errors in watchdog
     shell: "PATH=$HOME/bin:$PATH;drush --root='{{ webroot }}' watchdog:show --severity=3"
