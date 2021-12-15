@@ -63,7 +63,7 @@
     shell: "PATH=$HOME/bin:$PATH;cv --cwd='{{ webroot }}' api StatusPreference.create ignore_severity=3 name='allavailableupgrades' hush_until='{{ seven_days_hence }}'" 
     become: true
     become_user: "{{ run_as_user }}"
-    when: civicrm == 'Yes' AandND cms == 'Drupal8'
+    when: civicrm == 'Yes' and cms == 'Drupal8'
     tags: civi-extensions
 
   - name: Shut up about Civi core updates (warnings only, 7 days)
