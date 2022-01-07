@@ -71,6 +71,12 @@ object Host "{{ fqdn }}" {
   /* Define disks and attributes for service apply rules in `services.conf`. */
   vars.disks["disk /"] = {
     disk_partitions = "/"
+{% if disk_warning_percent is defined %}
+    disk_wfree = "{{ disk_warning_percent }}%"
+{% endif %}
+{% if disk_critical_percent is defined %}
+    disk_cfree = "{{ disk_critical_percent }}%"
+{% endif %}
   }
   vars.mysql_hostname = "localhost"
   /* END LOCAL MONITORING CUSTOM VARS */
