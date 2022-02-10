@@ -11,3 +11,6 @@
       autoremove: yes
       update_cache: yes
     when: contract_type is defined and contract_type is search("VPS")
+#    register: aptresults
+
+  - debug: var=aptresults[8:11]
