@@ -32,4 +32,7 @@ php_packages_extra:
   - php{{ php_version }}-sqlite3
   - php{{ php_version }}-xml
   - php{{ php_version }}-zip
+greenlist_ips:
+  - 69.122.128.206
+  - 68.192.46.116
 
