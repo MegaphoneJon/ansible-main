@@ -130,3 +130,6 @@
 [submodule "roles/site-postinstall-config"]
 	path = roles/site-postinstall-config
 	url = https://github.com/MegaphoneJon/ansible-role-site-postinstall-config.git
+[submodule "roles/modsecurity"]
+	path = roles/modsecurity
+	url = https://github.com/MegaphoneJon/ansible-role-modsecurity.git
