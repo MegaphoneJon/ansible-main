@@ -45,6 +45,9 @@ php_fpm_listen: "/var/run/php/php-fpm.sock"
 mysql_root_password: "{{ lookup('passwordstore', client + '/' + hostname + '/mysql/root create=true length=32') }}"
 sqldumps_path: "{{ webroot }}/../sql-dumps"
 
+# MySQL tunings
+mysql_group_concat_max_len: "15000"
+
 users:
   Jon:
     name: jon
