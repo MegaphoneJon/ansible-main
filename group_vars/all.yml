@@ -47,6 +47,8 @@ sqldumps_path: "{{ webroot }}/../sql-dumps"
 
 # MySQL tunings
 mysql_group_concat_max_len: "15000"
+mysql_tmp_table_size: 128M 
+mysql_max_heap_table_size: 128M
 
 users:
   Jon:
