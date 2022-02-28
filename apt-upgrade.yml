@@ -11,6 +11,8 @@
       autoremove: yes
       update_cache: yes
     when: contract_type is defined and contract_type is search("VPS")
-#    register: aptresults
+    register: aptresults
 
-  - debug: var=aptresults[8:11]
+  - name: Show upgraded packages
+    debug:
+      msg: "{{ aptresults.stdout_lines[8:11] }}"
