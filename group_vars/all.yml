@@ -50,6 +50,7 @@ sqldumps_path: "{{ webroot }}/../sql-dumps"
 mysql_group_concat_max_len: "15000"
 mysql_tmp_table_size: 128M 
 mysql_max_heap_table_size: 128M
+mysql_innodb_log_file_size: "512M"
 
 users:
   Jon:
@@ -73,6 +74,16 @@ users:
     password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joseph') }}"
     authorized:
       - https://ssh.megaphonetech.com/joseph_id_rsa.pub
+    hasdotfiles: false
+  Brienne:
+    name: brienne 
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/brienne') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/brienne_id_rsa.pub
     hasdotfiles: false
   Dennis:
     name: dennis
