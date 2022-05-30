@@ -1,6 +1,3 @@
-linode_api_key: "{{ lookup('passwordstore', '9to5/linode/apikey') }}"
-linode_username: 9to5admin
-
 users:
   Jon:
     name: jon
@@ -51,4 +48,23 @@ users:
     authorized:
       - https://ssh.megaphonetech.com/kevin_id_rsa.pub
     hasdotfiles: false
-
+  Brienne:
+    name: brienne
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/brienne') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/brienne_id_rsa.pub
+    hasdotfiles: false
+  Dennis:
+    name: dennis
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/dennis') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/dennis_id_rsa.pub
+    hasdotfiles: false
