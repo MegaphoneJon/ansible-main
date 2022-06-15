@@ -93,6 +93,10 @@ function buildServerList($servers, $websites) {
     // Put servers in groups.
     $groups = explode(', ', $server['group']);
     foreach ($groups as $group) {
+      // Don't create a "blank" group.
+      if (!$group) {
+        continue;
+      }
       // Don't get any localhosts besides your own.
       if ($group == 'localhosts' && $server['hostname'] !== gethostname()) {
         $ignoredServers[$server['hostname']] = TRUE;
