@@ -1,3 +1,4 @@
+local_borg_dir: /var/backups/borg
 users:
   Jon:
     name: jon
