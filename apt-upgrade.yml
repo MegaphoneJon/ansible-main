@@ -16,3 +16,4 @@
   - name: Show upgraded packages
     debug:
       msg: "{{ aptresults.stdout_lines[8:11] }}"
+    when: aptresults.changed == true
