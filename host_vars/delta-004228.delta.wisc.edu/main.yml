@@ -1,0 +1,4 @@
+mysql_packages:
+  - mariadb-common
+  - mariadb-server-10.3
+  - mariadb-client-10.3
