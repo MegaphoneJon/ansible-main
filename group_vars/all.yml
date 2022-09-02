@@ -1,3 +1,4 @@
+ansible_authorized_keys: "https://ssh.megaphonetech.com/megaphonetech.pub"
 ansible_python_interpreter: /usr/bin/python3
 # fail2ban greenlist
 greenlist_ips:
