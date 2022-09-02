@@ -6,3 +6,4 @@
   - name: Recheck uncommitted git
     command: "/usr/lib/nagios/plugins/check_git -s -d {{ webroot }} -n {{ bare_url }} -l /var/log/git/{{ bare_url }}.log"
     become: yes
+    become_user: "{{ run_as_user }}"
