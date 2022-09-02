@@ -59,3 +59,13 @@ users:
     authorized:
       - https://ssh.megaphonetech.com/seamus_id_rsa.pub
     hasdotfiles: false
+  Brienne:
+    name: brienne
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - https://ssh.megaphonetech.com/brienne_id_rsa.pub
+    hasdotfiles: false
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/brienne') }}"

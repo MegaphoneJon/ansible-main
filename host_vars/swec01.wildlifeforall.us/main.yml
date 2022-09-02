@@ -20,6 +20,26 @@ users:
     authorized:
       - https://ssh.megaphonetech.com/joseph_id_rsa.pub
     hasdotfiles: false
+  Brienne:
+    name: brienne
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+      - swec
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/brienne') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/brienne_id_rsa.pub
+  Dennis:
+    name: dennis
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+      - swec
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/dennis') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/dennis_id_rsa.pub
   Charles:
     name: charles
     shell: "/bin/bash"

@@ -1,4 +1,0 @@
-# Because we're running Ubuntu
-mysql_packages:
-  - mariadb-client
-  - mariadb-server
