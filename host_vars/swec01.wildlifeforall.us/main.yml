@@ -1,45 +1,4 @@
-users:
-  Jon:
-    name: jon
-    shell: "/bin/zsh"
-    groups:
-      - sudo
-      - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/jon') }}"
-    authorized:
-      - https://ssh.megaphonetech.com/jon_id_rsa.pub
-    hasdotfiles: true
-    dotfiles: https://github.com/MegaphoneJon/dotfiles.git
-  Joseph:
-    name: joseph
-    shell: "/bin/bash"
-    groups:
-      - sudo
-      - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joseph') }}"
-    authorized:
-      - https://ssh.megaphonetech.com/joseph_id_rsa.pub
-    hasdotfiles: false
-  Brienne:
-    name: brienne
-    shell: "/bin/bash"
-    groups:
-      - sudo
-      - www-data
-      - swec
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/brienne') }}"
-    authorized:
-      - https://ssh.megaphonetech.com/brienne_id_rsa.pub
-  Dennis:
-    name: dennis
-    shell: "/bin/bash"
-    groups:
-      - sudo
-      - www-data
-      - swec
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/dennis') }}"
-    authorized:
-      - https://ssh.megaphonetech.com/dennis_id_rsa.pub
+additional_users:
   Charles:
     name: charles
     shell: "/bin/bash"

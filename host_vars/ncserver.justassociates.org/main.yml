@@ -1,0 +1,42 @@
+additional_users:
+  Mark:
+    name: libkuman
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - https://ssh.megaphonetech.com/libkuman_id_rsa.pub
+    hasdotfiles: false
+  Jack:
+    name: jack
+    state: absent
+    remove: yes
+  Angel:
+    name: angel
+    state: absent
+    remove: yes
+  Jamila:
+    name: jamila
+    state: absent
+    remove: yes
+  Jessie:
+    name: jessie
+    state: absent
+    remove: yes
+  Jess:
+    name: jess
+    state: absent
+    remove: yes
+  Kristin:
+    name: kristin
+    state: absent
+    remove: yes
+  Nina:
+    name: nina
+    state: absent
+    remove: yes
+  Hannah:
+    name: hannah-pt
+    state: absent
+    remove: yes
