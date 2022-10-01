@@ -102,3 +102,6 @@ monitoring_email: jon+monitor@megaphonetech.com
 # backup
 rsyncnet_user: "8139"
 rsyncnet_server: "usw-s008.rsync.net"
+# basic auth for test sites
+basic_auth_name: "megaphone"
+basic_auth_password: "megaphone"
