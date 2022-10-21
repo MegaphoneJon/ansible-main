@@ -1,7 +1,0 @@
-users:
-  Dennis:
-    name: dposorio
-    shell: "/bin/bash"
-    groups:
-      - sudo
-      - www-data

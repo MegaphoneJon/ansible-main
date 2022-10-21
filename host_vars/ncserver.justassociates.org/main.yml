@@ -40,3 +40,7 @@ additional_users:
     name: hannah-pt
     state: absent
     remove: yes
+  Eric:
+    name: eric
+    state: absent
+    remove: yes
