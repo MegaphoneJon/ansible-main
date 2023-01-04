@@ -7,7 +7,7 @@
     - { role: common, tags: common }
     - { role: users, tags: users }
     - { role: backupninja, tags: [backup, backupninja] }
-    - { role: rsyncnet, tags: backup }
+    - { role: rsyncnet, tags: [backup, rsyncnet] }
 
 - hosts: lamp
   become: yes
@@ -30,6 +30,7 @@
     - { role: contrib/geerlingguy.postfix, tags: postfix }
     - { role: fail2ban, tags: fail2ban}
     - { role: modsecurity, tags: modsecurity}
+    - { role: mysql-firewall, tags: mysql-firewall}
 
 - hosts: openvpn
   become: yes

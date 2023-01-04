@@ -133,3 +133,6 @@
 [submodule "roles/modsecurity"]
 	path = roles/modsecurity
 	url = https://github.com/MegaphoneJon/ansible-role-modsecurity.git
+[submodule "roles/mysql-firewall"]
+	path = roles/mysql-firewall
+	url = https://github.com/MegaphoneJon/ansible-mysql-firewall.git
