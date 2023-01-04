@@ -1,5 +1,5 @@
 ---
-ansible_authorized_keys: "https://ssh.megaphonetech.com/{{ ansible_user }}_id_rsa.pub"
+ansible_authorized_keys: "https://ssh.megaphonetech.com/{{ lookup('env','USER') }}_id_rsa.pub"
 mysql_packages:
   - mariadb-client
   - mariadb-server

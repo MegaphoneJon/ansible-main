@@ -59,7 +59,7 @@
     - { role: site-mysql, tags: [site-mysql] }
     - { role: site-gitea, tags: [site-gitea] }
     - { role: deploy-site, tags: [site-main] }
-    - { role: site-db-sync, tags: [site-db-sync] }
+    - { role: site-db-sync-initial, tags: [site-db-sync-initial] }
     - { role: site-permissions, tags: [site-permissions] }
     - { role: site-postinstall-config, tags: [site-postinstall-config] }
     - { role: site-standard-extensions, tags: [site-standard-extensions] }
