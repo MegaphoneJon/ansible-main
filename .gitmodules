@@ -136,3 +136,6 @@
 [submodule "roles/mysql-firewall"]
 	path = roles/mysql-firewall
 	url = https://github.com/MegaphoneJon/ansible-mysql-firewall.git
+[submodule "roles/site-db-sync-initial"]
+	path = roles/site-db-sync-initial
+	url = https://github.com/MegaphoneJon/ansible-role-site-db-sync-initial
