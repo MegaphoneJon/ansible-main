@@ -1,0 +1,5 @@
+---
+- hosts: websites
+  become: yes
+  roles:
+    - { role: site-db-sync, tags: [site-db-sync] }
