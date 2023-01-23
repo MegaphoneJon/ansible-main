@@ -14,7 +14,7 @@ apache_remove_default_vhost: true
 #temp for Apache
 apache_vhosts: []
 #PHP
-php_version: '7.4'
+php_version: '8.1'
 php_default_version_debian: '7.4'
 php_versions_install_recommends: true
 php_packages_extra:
@@ -83,5 +83,5 @@ monitoring_email: jon+monitor@megaphonetech.com
 rsyncnet_user: "8139"
 rsyncnet_server: "usw-s008.rsync.net"
 # basic auth for test sites
-basic_auth_name: "megaphone"
-basic_auth_password: "megaphone"
+default_basic_auth_name: "megaphone"
+default_basic_auth_password: "megaphone"
