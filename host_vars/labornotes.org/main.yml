@@ -1,0 +1,367 @@
+apache_vhost_extra: |
+  RewriteEngine on
+
+  # Store Front
+  RewriteCond %{HTTP_HOST} ^store\.labornotes\.org [or]
+  RewriteCond %{HTTP_HOST} ^www.store\.labornotes\.org
+  RewriteRule ^/(.*) https://labornotes.org/store [L,R]
+
+  # Work Rights Press
+  RewriteCond %{HTTP_HOST} ^workrightspress\.com [or]
+  RewriteCond %{HTTP_HOST} ^www\.workrightspress\.com
+  RewriteRule ^/(.*) https://labornotes.org/store/books/work-rights-press [L,R]
+
+  # Troublemakers Handbook 2
+  #Some rewrite rules in this file were disabled on your HTTPS site,
+  #because they have the potential to create redirection loops.
+  RewriteCond %{REQUEST_URI} ^/a-troublemakers-handbook-2\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-handbook-2 [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/a-troublemakers-handbook-2\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-handbook-2 [L,R]
+
+  # Best-sellers Triple Play
+  RewriteCond %{REQUEST_URI} ^/best-sellers-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/best-sellers-triple-play [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/best-sellers-bundle.html
+  RewriteRule ^/(.*) https://labornotes.org/store/best-sellers-triple-play [L,R]
+
+  # Budding Troublemakers Bundle
+  RewriteCond %{REQUEST_URI} ^/budding-troublemakers-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/budding-troublemakers-bundle [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/budding-troublemakers-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/budding-troublemakers-bundle [L,R]
+
+  # Bundles of Trouble
+  RewriteCond %{REQUEST_URI} ^/bundles-of-trouble-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/bundle-trouble [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/bundles-of-trouble-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/bundle-trouble [L,R]
+
+  # Cold-Weather Troublemaking Special
+  RewriteCond %{REQUEST_URI} ^/cold-weather-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/cold-weather-troublemaking-special [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/cold-weather-bundle\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/cold-weather-troublemaking-special [L,R]
+
+  # Democracy is Power
+  RewriteCond %{REQUEST_URI} ^/democracy-is-power\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/democracy-power [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/democracy-is-power\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/democracy-power [L,R]
+
+  # Don't Mourn Organize - Bumper Sticker
+  RewriteCond %{REQUEST_URI} ^/dont-mourn-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/dont-mourn-organize-bumper-sticker [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/dont-mourn-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/dont-mourn-organize-bumper-sticker [L,R]
+
+  # Embedded with Organized Labor
+  RewriteCond %{REQUEST_URI} ^/embedded-with-organized-labor\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/embedded-organized-labor [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/embedded-with-organized-labor\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/embedded-organized-labor [L,R]
+
+  # Fitted Troublemakers Union T-shirt
+  RewriteCond %{REQUEST_URI} ^/fitted-troublemakers-union-tee\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/fitted-troublemakers-union-t-shirt [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/fitted-troublemakers-union-tee\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/fitted-troublemakers-union-t-shirt [L,R]
+
+  # Just Cause: A Union Guide To Winning Discipline Cases
+  RewriteCond %{REQUEST_URI} ^/just-cause-a-union-guide-to-winning-disciplinary-cases\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/just-cause [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/just-cause-a-union-guide-to-winning-disciplinary-cases\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/just-cause [L,R]
+
+  # Kids Troublemakers Union T-Shirt
+  RewriteCond %{REQUEST_URI} ^/kids-troublemakers-tee\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/kids-troublemakers-union-t-shirt [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/kids-troublemakers-tee\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/kids-troublemakers-union-t-shirt [L,R]
+
+  # La Justicia es para totos - Bumper Sticker
+  RewriteCond %{REQUEST_URI} ^/justice-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/justice-everyone-bumper-sticker [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/justice-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/justice-everyone-bumper-sticker [L,R]
+
+  # Labor Notes Commemorative Poster
+  RewriteCond %{REQUEST_URI} ^/labor-notes-commemorative-poster\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/labor-notes-commemorative-poster [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/labor-notes-commemorative-poster\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/labor-notes-commemorative-poster [L,R]
+
+  # Labor Notes Subscription
+  RewriteCond %{REQUEST_URI} ^/magazine-subscription\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/labor-notes-subscription [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/subscribe/magazine-subscription\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/labor-notes-subscription [L,R]
+
+  # Management the Folks who brought you the Labor Movement - Bumper Sticker
+  RewriteCond %{REQUEST_URI} ^/management-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/management-folks-who-brought-labor-movement-bumper-sticker [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/management-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/management-folks-who-brought-labor-movement-bumper-sticker [L,R]
+
+  # Nuts and Bolts Book Combo
+  RewriteCond %{REQUEST_URI} ^/best-sellers-bundle-193\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/nuts-and-bolts-book-combo [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/best-sellers-bundle-193\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/nuts-and-bolts-book-combo [L,R]
+
+  # Poor Workers' Unions: Rebuilding Labor from Below
+  RewriteCond %{REQUEST_URI} ^/poor-workers-unions-rebuilding-labor-from-below\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/poor-workers-unions [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/poor-workers-unions-rebuilding-labor-from-below\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/poor-workers-unions [L,R]
+
+  # Ramparts of Resistance
+  RewriteCond %{REQUEST_URI} ^/ramparts-of-resistance\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/ramparts-resistance [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/ramparts-of-resistance\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/ramparts-resistance [L,R]
+
+  # Staley
+  RewriteCond %{REQUEST_URI} ^/staley\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/staley [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/staley\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/staley [L,R]
+
+  # Stopping Sexual Harrassment
+  RewriteCond %{REQUEST_URI} ^/stopping-sexual-harrassment\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/stopping-sexual-harassment [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/stopping-sexual-harrassment\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/stopping-sexual-harassment [L,R]
+
+  # Strikes Picketing and Inside Campaigns
+  RewriteCond %{REQUEST_URI} ^/strikes-picketing-inside-campaigns\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/strikes-picketing-and-inside-campaigns [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/strikes-picketing-inside-campaigns\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/strikes-picketing-and-inside-campaigns [L,R]
+
+  # Tax the Rich Bumper Sticker
+  RewriteCond %{REQUEST_URI} ^/tax-the-rich-bumper-sticker\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/tax-rich-bumper-sticker [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/tax-the-rich-bumper-sticker\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/tax-rich-bumper-sticker [L,R]
+
+  # The Cargo Chain
+  RewriteCond %{REQUEST_URI} ^/cargo-chain\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/cargo-chain [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/cargo-chain\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/cargo-chain [L,R]
+
+  # The Civil Wars in U.S. Labor
+  RewriteCond %{REQUEST_URI} ^/civil-wars\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/civil-wars-us-labor [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/civil-wars\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/civil-wars-us-labor [L,R]
+
+  # The Legal Rights of Union Stewards
+  RewriteCond %{REQUEST_URI} ^/legal-rights-union-stewards\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/legal-rights-union-stewards [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/legal-rights-union-stewards\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/legal-rights-union-stewards [L,R]
+
+  # The Next Upsurge
+  RewriteCond %{REQUEST_URI} ^/next-upsurge\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/next-upsurge [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/next-upsurge\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/next-upsurge [L,R]
+
+  # The Steward's Toolbox
+  RewriteCond %{REQUEST_URI} ^/stewards-toolbox\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/stewards-toolbox [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/stewards-toolbox\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/stewards-toolbox [L,R]
+
+  # The Union Steward's Complete Guide 2nd Edition
+  RewriteCond %{REQUEST_URI} ^/the-union-steward-s-complete-guide-2nd-edition\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/union-stewards-complete-guide [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/the-union-steward-s-complete-guide-2nd-edition\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/union-stewards-complete-guide [L,R]
+
+  # Time Out
+  RewriteCond %{REQUEST_URI} ^/time-out\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/time-out [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/time-out\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/time-out [L,R]
+
+  # Troublemaker Union Stickers (4-inch) set of 5
+  RewriteCond %{REQUEST_URI} ^/troublemaker-union-stickers-4-inch-set-of-5\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-handbook-2 [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/troublemaker-union-stickers-4-inch-set-of-5\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-handbook-2 [L,R]
+
+  # Troublemakers Bundle
+  RewriteCond %{REQUEST_URI} ^/troublemakers-bundle-1\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-bundle [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/troublemakers-bundle-1\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-bundle [L,R]
+
+  # Troublemakers Union Buttons Set of 5
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-buttons\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-buttons-set-5 [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/troublemakers-union-buttons\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-buttons-set-5 [L,R]
+
+  # Troublemakers Union Knit Cap
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-knit-cap\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-knit-cap [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/troublemakers-union-knit-cap\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-knit-cap [L,R]
+
+  # Troublemakers Union Magnets Set of 4
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-magnets\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-magnets [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/troublemakers-union-magnets\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-magnets [L,R]
+
+  # Troublemakers Union Pint Glasses
+  RewriteCond %{REQUEST_URI} ^/pint-glasses\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-pint-glass [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/pint-glasses\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-pint-glass [L,R]
+
+  # Troublemakers Union Stickers Large Set of 2
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-stickers-large-set-of-2\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-stickers-large-4-inch [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/troublemakers-union-stickers-large-set-of-2\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-stickers-large-4-inch [L,R]
+
+  # Troublemakers Union Stickers Set of 5
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-stickers\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-stickers-small-2-inch [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/troublemakers-union-stickers\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-stickers-small-2-inch [L,R]
+
+  # Troublemakers Union Travel Mug
+  RewriteCond %{REQUEST_URI} ^/troublemakers-travel-mug\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-travel-mug [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/troublemakers-travel-mug\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-travel-mug [L,R]
+
+  # Troublemakers Union T-Shirt
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-t-shirt\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-t-shirt [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/troublemakers-union-t-shirt\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-t-shirt [L,R]
+
+  # Troublemakers Union T-shirt - Black special edition
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-t-shirt-black-special-edition\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-t-shirt-black-special-edition [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/troublemakers-union-t-shirt-black-special-edition\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-t-shirt-black-special-edition [L,R]
+
+  # Troublemakers Union Zippered Hoodies
+  RewriteCond %{REQUEST_URI} ^/troublemakers-union-zippered-hoodies\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-zippered-hoodies [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/troublemakers-union-zippered-hoodies\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-union-zippered-hoodies [L,R]
+
+  # Troublemakers Unite! T-shirt
+  RewriteCond %{REQUEST_URI} ^/troublemakers-unite-t-shirt\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-unite [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies/troublemakers-unite-t-shirt\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/troublemakers-unite [L,R]
+
+  # U.S. Labor in Trouble and Transition
+  RewriteCond %{REQUEST_URI} ^/u-s-labor-in-trouble-and-transition\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/us-labor-trouble-and-transition [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/u-s-labor-in-trouble-and-transition\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/us-labor-trouble-and-transition [L,R]
+
+  # Unions and Free Trade
+  RewriteCond %{REQUEST_URI} ^/unions-and-free-trade\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/unions-and-free-trade [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/unions-and-free-trade\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/unions-and-free-trade [L,R]
+
+  # Unions The Anti-Theft Device for Working People - Bumper Sticker
+  RewriteCond %{REQUEST_URI} ^/anti-theft-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/union-stewards-complete-guide [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/anti-theft-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/union-stewards-complete-guide [L,R]
+
+  # Why Unions Matter 2nd ed.
+  RewriteCond %{REQUEST_URI} ^/why-unions-matter-2nd-ed\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/why-unions-matter-2nd-edition [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/why-unions-matter-2nd-ed\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/why-unions-matter-2nd-edition [L,R]
+
+  # Workers Unity It Works - Bumper Sticker
+  RewriteCond %{REQUEST_URI} ^/workers-unity-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/worker-unity-it-works-bumper-sticker [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers/workers-unity-bumper\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/worker-unity-it-works-bumper-sticker [L,R]
+
+  # Working Smart
+  RewriteCond %{REQUEST_URI} ^/working-smart\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/working-smart [L,R]
+
+  RewriteCond %{REQUEST_URI} ^/books/working-smart\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/working-smart [L,R]
+
+  # Subscribe catalogue
+  RewriteCond %{REQUEST_URI} ^/subscribe\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/labor-notes-subscription [L,R]
+
+  # books catalogue
+  RewriteCond %{REQUEST_URI} ^/books\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/catalog/books [L,R]
+
+  # buttons stickers mugs pint glasses
+  RewriteCond %{REQUEST_URI} ^/buttons-and-stickers\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/catalog/promotional-items [L,R]
+
+  # tshirts and hoodies catalogue
+  RewriteCond %{REQUEST_URI} ^/t-shirts-and-hoodies\.html
+  RewriteRule ^/(.*) https://labornotes.org/store/catalog/t-shirts-hoodies [L,R]
+
