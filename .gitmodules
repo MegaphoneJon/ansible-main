@@ -139,3 +139,6 @@
 [submodule "roles/site-db-sync-initial"]
 	path = roles/site-db-sync-initial
 	url = https://github.com/MegaphoneJon/ansible-role-site-db-sync-initial
+[submodule "roles/mysql-additional"]
+	path = roles/mysql-additional
+	url = https://github.com/MegaphoneJon/ansible-role-mysql-additional
