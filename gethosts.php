@@ -135,6 +135,10 @@ function buildServerList($servers, $websites) {
           $inventory[$group][] = $website['bare_url'];
         }
       }
+      // Drupal8 hack, sigh. Fix when D7 is no more.
+      if (strpos($website['contract_type'], 'Drupal Maintenance') !== FALSE && $website['cms'] === 'Drupal8') {
+        $inventory['maintenance_drupal8'][] = $website['bare_url'];
+      }
       if (strpos($website['contract_type'], 'Civi Maintenance') !== false && $website['civicrm'] === 'Yes') {
         $inventory['maintenance_civi'][] = $website['bare_url'];
       }
