@@ -1,4 +1,4 @@
 #FIXME: This would probably work with Python 3 if we did pip install PyMySQL.
 ansible_python_interpreter: /usr/bin/python2.7
 utils_path: $HOME/bin/
-sqldumps_path: $HOME/sql-dumps
+sqldumps_path: $HOME/../../backups
