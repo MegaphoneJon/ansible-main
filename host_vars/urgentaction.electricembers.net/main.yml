@@ -1,3 +1,5 @@
 ansible_python_interpreter: /home/urgentaction/bin/ansible-remote/bin/python
 mysql_host: db.electricembers.net
 ansible_port: 21017
+utils_path: $HOME/bin/
+sqldumps_path: $HOME/sql-dumps
