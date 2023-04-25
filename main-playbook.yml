@@ -53,17 +53,17 @@
     - { role: contrib/geerlingguy.postfix, tags: postfix }
 
 - hosts: websites
-  become: yes
+  # become: yes
   roles:
     - { role: site-dns, tags: [site-dns] }
-    - { role: site-user-php-apache, tags: [site-upa] }
-    - { role: site-mysql, tags: [site-mysql] }
+    - { role: site-user-php-apache, tags: [site-upa], become: yes }
+    - { role: site-mysql, tags: [site-mysql], become: yes }
     - { role: site-gitea, tags: [site-gitea] }
     - { role: deploy-site, tags: [site-main] }
     - { role: site-db-sync-initial, tags: [site-db-sync-initial] }
-    - { role: site-permissions, tags: [site-permissions] }
+    - { role: site-permissions, tags: [site-permissions], become: yes }
     - { role: site-postinstall-config, tags: [site-postinstall-config] }
-    - { role: site-standard-extensions, tags: [site-standard-extensions] }
+    - { role: site-standard-extensions, tags: [site-standard-extensions], become: yes }
     - { role: site-wp-monitor, tags: [site-wp-monitor] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
     - { role: site-cron, tags: [site-cron] }
@@ -84,6 +84,7 @@
     - { role: contrib/geerlingguy.apache, tags: apache }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
     - { role: mysql-additional, tags: mysql }
+    - { role: contrib/geerlingguy.php-versions , tags: [php, php-versions] }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
     - { role: php-additional , tags: php }
