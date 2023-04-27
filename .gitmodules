@@ -142,3 +142,6 @@
 [submodule "roles/mysql-additional"]
 	path = roles/mysql-additional
 	url = https://github.com/MegaphoneJon/ansible-role-mysql-additional
+[submodule "roles/site-dns"]
+	path = roles/site-dns
+	url = https://github.com/MegaphoneJon/ansible-role-site-dns
