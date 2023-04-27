@@ -7,14 +7,16 @@ $params['api_password'] = $api_password[0];
 $params['hosting_order_id'] = 1003514;
 $params['url'] = 'https://members.mayfirst.org/cp/api.php';
 
-if (!isset($argv[2])) {
+if (!isset($argv[3])) {
   echo "You need more parameters to execute this command.\n";
-  echo "Usage: mfplapi.php <FQDN> <ip address>\n";
-  echo "E.g.: mfplapi.php orange.megaphonetech.com 1.2.3.4\n";
+  echo "Usage: mfplapi.php <DNSTYPE> <FQDN> <ip address>\n";
+  echo "E.g.: mfplapi.php AAAA orange.megaphonetech.com 1.2.3.4\n";
+  echo "Supported DNS types are currently A and AAAA.\n";
   exit(1);
 }
-$params['fqdn'] = $argv[1];
-$params['ipv4'] = $argv[2];
+$params['dnstype'] = strtolower($argv[1]);
+$params['fqdn'] = $argv[2];
+$params['ip'] = $argv[3];
 
 try {
   $result = query_dns($params);
@@ -29,7 +31,7 @@ if (!$dns) {
   write_dns($params, 'insert');
   exit(0);
 }
-elseif ($dns != $params['ipv4']) {
+elseif ($dns != $params['ip']) {
   // DNS found but doesn't match our provisioning.
   write_dns($params, 'update', $item_id);
   exit(0);
@@ -53,9 +55,9 @@ function write_dns($params, $action, $item_id = NULL) {
     'user_pass' => $params['api_password'],
     'set:service_id' => 9,
     'set:hosting_order_id' => $params['hosting_order_id'],
-    'set:dns_type' => 'a',
+    'set:dns_type' => $params['dnstype'],
     'set:dns_fqdn' => $params['fqdn'],
-    'set:dns_ip' => $params['ipv4'],
+    'set:dns_ip' => $params['ip'],
     'set:dns_sshfp_algorithm' => '1',
     'set:dns_sshfp_type' => '1',
     'set:dns_sshfp_fpr' => '1',
@@ -87,9 +89,9 @@ function query_dns($params) {
   $values = $result->values ?? [];
   foreach ($values as $dnsEntry) {
     if ($dnsEntry->dns_type == 'cname') {
-      throw new Exception('You can\'t create an A record because a CNAME record already exists');
+      throw new Exception('You can\'t create an A/AAAA record because a CNAME record already exists');
     }
-    if ($dnsEntry->dns_type == 'a') {
+    if ($dnsEntry->dns_type == $params['dnstype']) {
       $return[0] = $result->values[0]->dns_ip;
       $return[1] = $result->values[0]->item_id;
     }
