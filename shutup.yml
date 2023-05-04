@@ -6,10 +6,10 @@
 
   vars:
     ajaxDict:
-      drupal: sites/all/modules/civicrm/extern/rest.php
+      drupal: civicrm/ajax/rest
       drupal8: civicrm/ajax/rest
-      backdrop: modules/civicrm/extern/rest.php
-      wordpress: wp-json/civicrm/v3/rest
+      backdrop: civicrm/ajax/rest
+      wordpress: civicrm/ajax/rest
       joomla: administrator/components/com_civicrm/civicrm/extern/rest.php
     endpoint: '{{ ajaxDict[cms | lower] }}'
     crm_api_key: "{{ lookup('passwordstore', client + '/' + (canonical_hostname | default(hostname, true)) + '/' + (canonical_bare_url | default(bare_url, true)) + '/civicrm_api_key') }}"
