@@ -3,7 +3,7 @@ local_borg_dir: /var/backups/borg
 additional_users:
   Noah:
     name: noah
-    shell: "/bin/bash"
+    shell: "/bin/zsh"
     groups:
       - sudo
       - www-data
