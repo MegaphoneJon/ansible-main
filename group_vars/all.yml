@@ -85,3 +85,13 @@ rsyncnet_server: "usw-s008.rsync.net"
 # basic auth for test sites
 default_basic_auth_name: "megaphone"
 default_basic_auth_password: "megaphone"
+# Get WP paid modules by downloading on the sites they're licensed
+wp_paid_modules:
+  elementor-pro: 
+    site: www.reamp.org
+    module_root: /var/www/www.reamp.org/web/wp-content/plugins
+    run_as: reamp
+  gravityforms:
+    site: nwu.org
+    module_root: /var/www/nwu.org/web/wp-content/plugins
+    run_as: nwu
