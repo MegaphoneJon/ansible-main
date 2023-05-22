@@ -2,6 +2,7 @@
 - name: Run Drupal 7 upgrades
   #TODO: at some point this shouldn't just work on localhosts
   hosts: websites_dev:&maintenance_drupal
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
   gather_facts: no
 
   roles:
@@ -10,6 +11,7 @@
 - name: Run WordPress upgrades
   #TODO: at some point this shouldn't just work on localhosts
   hosts: websites_dev:&maintenance_wp
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
   gather_facts: no
 
   roles:
@@ -19,6 +21,7 @@
 - name: Run Civi upgrades
   #TODO: at some point this shouldn't just work on localhosts
   hosts: websites_dev:&maintenance_civi
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
   gather_facts: no
 
   roles:
@@ -26,6 +29,7 @@
 
 - name: Update sites
   hosts: websites_test:websites_live
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
   gather_facts: no
 
   roles:
