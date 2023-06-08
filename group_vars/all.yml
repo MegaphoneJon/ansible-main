@@ -4,8 +4,8 @@ ansible_python_interpreter: /usr/bin/python3
 greenlist_ips:
   - 69.122.128.206
 #CiviCRM extension blacklist
-extension_blacklist:
-  - none
+extension_redlist:
+  - mosaico
 
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
