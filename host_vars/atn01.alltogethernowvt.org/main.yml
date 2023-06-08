@@ -1,0 +1,12 @@
+php_version: '8.1'
+additional_users:
+  Eric:
+    name: eric
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/eric') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/eric_id_rsa.pub
+    hasdotfiles: false
