@@ -1,5 +1,5 @@
 ---
 - hosts: websites
-  become: yes
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
   roles:
     - { role: site-db-sync, tags: [site-db-sync] }
