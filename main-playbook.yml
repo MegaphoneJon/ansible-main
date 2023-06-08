@@ -43,8 +43,8 @@
   become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
   roles:
     - { role: site-dns, tags: [site-dns] }
-    - { role: site-user-php-apache, tags: [site-upa]}
-    - { role: site-mysql, tags: [site-mysql]}
+    - { role: site-user-php-apache, tags: [site-upa], when: run_as_user != ansible_user }
+    - { role: site-mysql, tags: [site-mysql], when: run_as_user != ansible_user }
     - { role: site-gitea, tags: [site-gitea] }
     - { role: deploy-site, tags: [site-main] }
     - { role: site-db-sync-initial, tags: [site-db-sync-initial] }
