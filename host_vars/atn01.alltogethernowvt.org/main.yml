@@ -10,3 +10,13 @@ additional_users:
     authorized:
       - https://ssh.megaphonetech.com/eric_id_rsa.pub
     hasdotfiles: false
+  Vijay:
+    name: vijay
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/vijay') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/vijay_id_rsa.pub
+    hasdotfiles: false
