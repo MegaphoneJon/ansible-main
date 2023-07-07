@@ -5,8 +5,7 @@ greenlist_ips:
   - 69.122.128.206
 #CiviCRM extension blacklist
 extension_redlist:
-  - mosaico
-
+  - none_at_present
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
 primary_icinga_server_ip: '173.255.234.245'
@@ -99,3 +98,15 @@ wp_paid_modules:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: www-data
+  advanced-custom-fields-pro:
+    site: 9to5.org
+    module_root: /var/www/9to5.org/web/wp-content/plugins
+    run_as: 9to5
+  sitepress-multilingual-cms:
+    site: journal.leftroots.net
+    module_root: /home/members/leftroots/sites/journal.leftroots.net/web/wp-content/plugins
+    run_as: journal
+  wpml-string-translation:
+    site: journal.leftroots.net
+    module_root: /home/members/leftroots/sites/journal.leftroots.net/web/wp-content/plugins
+    run_as: journal
