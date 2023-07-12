@@ -53,7 +53,7 @@
     - { role: site-standard-extensions, tags: [site-standard-extensions]}
     - { role: site-wp-monitor, tags: [site-wp-monitor] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
-    - { role: site-cron, tags: [site-cron] }
+    - { role: site-cron, tags: [site-cron], when: run_as_user != ansible_user }
     - { role: site-robots-txt, tags: [site-robots-txt] }
 #    - { role: monitoring, tags: monitoring }
 
