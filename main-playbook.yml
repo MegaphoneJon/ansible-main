@@ -8,12 +8,12 @@
     - { role: users, tags: users }
     - { role: backupninja, tags: [backup, backupninja] }
     - { role: rsyncnet, tags: [backup, rsyncnet] }
+    - { role: firewall-common, tags: firewall }
 
 - hosts: lamp
   become: yes
 
   roles:
-    - { role: firewall-common, tags: firewall }
     - { role: contrib/geerlingguy.apache, tags: [apache, deploy-site] }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
