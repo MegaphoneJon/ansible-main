@@ -6,7 +6,7 @@
   gather_facts: no
 
   roles:
-    - { role: upgrade-d7, tags: upgrade-d7, when: contract_type is search("Drupal Maintenance") and freeze_cms != "1"  }
+    - { role: upgrade-d7, tags: upgrade-d7, when: contract_type is search("Drupal Maintenance") and freeze_cms != "1"  and cms == 'Drupal'}
 
 - name: Run WordPress upgrades
   #TODO: at some point this shouldn't just work on localhosts
@@ -15,7 +15,7 @@
   gather_facts: no
 
   roles:
-    - { role: upgrade-wp, tags: upgrade-wp, when: contract_type is search("WordPress Maintenance") and freeze_cms != "1" }
+    - { role: upgrade-wp, tags: upgrade-wp, when: contract_type is search("WordPress Maintenance") and freeze_cms != "1" and cms == 'WordPress' }
 
 
 - name: Run Civi upgrades
