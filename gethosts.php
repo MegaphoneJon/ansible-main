@@ -89,6 +89,10 @@ function buildServerList($servers, $websites) {
         $key = str_replace(' ', '_', $key);
         $inventory['_meta']['hostvars'][$server['fqdn']][$key] = $value;
       }
+      // Handle non-standard SSH ports.
+      if ($server['security_ssh_port'] != 22) {
+        $inventory['_meta']['hostvars'][$server['fqdn']]['ansible_port'] = $server['security_ssh_port'];
+      }
     }
     // Put servers in groups.
     $groups = explode(', ', $server['group']);
