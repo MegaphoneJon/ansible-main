@@ -5,7 +5,7 @@ greenlist_ips:
   - 69.122.128.206
 #CiviCRM extension blacklist
 extension_redlist:
-  - none_at_present
+  - mosaico
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
 primary_icinga_server_ip: '173.255.234.245'
