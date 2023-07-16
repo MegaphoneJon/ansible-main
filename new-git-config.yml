@@ -1,0 +1,19 @@
+- hosts: all
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
+  tasks:
+  - name: set git remote
+    git_config:
+      name: remote.origin.url
+      value: "{{ git_repo_url }}"
+      scope: local
+      repo: "{{ gitroot }}"
+    become_user: "{{ run_as_user }}"
+
+  - name: set an HTTP git push URL
+    git_config:
+      name: remote.origin.pushurl
+      value: "{{ git_repo_push_url }}"
+      scope: local
+      repo: "{{ gitroot }}"
+    become_user: "{{ run_as_user }}"
+    when: (env == 'Test' or env == 'Live')
