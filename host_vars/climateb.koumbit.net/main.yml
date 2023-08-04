@@ -1,4 +1,3 @@
-php_version: '8.1'
 local_borg_dir: /var/backups/borg
 additional_users:
   Noah:

@@ -16,6 +16,5 @@ additional_users:
     authorized:
       - https://ssh.megaphonetech.com/libkuman_id_rsa.pub
     hasdotfiles: false
-php_version: '7.4'
 greenlist_ips:
   - 24.73.13.145
