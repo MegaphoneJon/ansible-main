@@ -1,0 +1,10 @@
+Alias /criptech/eaat /var/www/microsite.leonardo.info/web
+<Directory "/var/www/microsite.leonardo.info/web">
+  AllowOverride All
+  Options -Indexes
+  <LimitExcept GET POST HEAD OPTIONS>
+    deny from all
+  </LimitExcept>
+  Require all granted
+</Directory>
+
