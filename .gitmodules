@@ -145,3 +145,6 @@
 [submodule "roles/site-dns"]
 	path = roles/site-dns
 	url = https://github.com/MegaphoneJon/ansible-role-site-dns
+[submodule "roles/contrib/geerlingguy.docker"]
+	path = roles/contrib/geerlingguy.docker
+	url = https://github.com/geerlingguy/ansible-role-docker.git
