@@ -1,0 +1,15 @@
+- name: Install promtail config
+  ansible.builtin.template:
+    src: templates/promtail-config.j2
+    dest: /etc/promtail-config.yaml
+    mode: u=rw,g=r,o=r
+
+- name: Install promtail
+  community.docker.docker_container:
+    name: promtail
+    image: grafana/promtail
+    restart_policy: unless-stopped
+    command: -config.file=/mnt/config/promtail-config.yaml
+    volumes:
+      - /var/log:/var/log
+      - /etc/promtail-config.yaml:/mnt/config/promtail-config.yaml

@@ -75,6 +75,15 @@ users:
     authorized:
       - https://ssh.megaphonetech.com/brienne_id_rsa.pub
     hasdotfiles: false
+# Docker
+# Use `docker compose`, not `docker-compose`.
+docker_install_compose_plugin: true
+docker_install_compose: true
+
+# Pip
+pip_install_packages:
+  - name: docker
+
 # deploy-site
 monitoring_user: monitor
 monitoring_email: jon+monitor@megaphonetech.com

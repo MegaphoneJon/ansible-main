@@ -32,6 +32,9 @@
     - { role: fail2ban, tags: fail2ban}
     - { role: modsecurity, tags: modsecurity}
     - { role: mysql-firewall, tags: mysql-firewall}
+    - { role: contrib/geerlingguy.docker, tags: docker}
+    - { role: contrib/geerlingguy.pip, tags: [docker, pip] }
+    - { role: promtail-docker, tags: promtail}
 
 - hosts: openvpn
   become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
