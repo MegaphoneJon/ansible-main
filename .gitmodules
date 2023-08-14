@@ -148,3 +148,6 @@
 [submodule "roles/contrib/geerlingguy.docker"]
 	path = roles/contrib/geerlingguy.docker
 	url = https://github.com/geerlingguy/ansible-role-docker.git
+[submodule "roles/contrib/geerlingguy.pip"]
+	path = roles/contrib/geerlingguy.pip
+	url = https://github.com/geerlingguy/ansible-role-pip.git
