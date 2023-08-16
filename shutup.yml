@@ -31,6 +31,8 @@
       body_format: form-urlencoded
       url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
       url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      headers:
+        X-Requested-With: XMLHttpRequest
     with_items:
       - checkExtensionsUpdates
       - allavailableupgrades
@@ -68,6 +70,8 @@
       body_format: form-urlencoded
       url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
       url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      headers:
+        X-Requested-With: XMLHttpRequest
     with_items:
       - checkVersion_upgrade
       - checkVersion_patch
