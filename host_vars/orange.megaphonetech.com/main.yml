@@ -1,0 +1,12 @@
+additional_users:
+  George:
+    name: george
+    shell: "/bin/bash"
+    groups:
+      - www-data
+      - sos-test
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/george') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/george_id_rsa.pub
+    hasdotfiles: false
+
