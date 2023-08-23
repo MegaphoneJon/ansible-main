@@ -93,6 +93,7 @@
   become: no
   gather_facts: no
   roles:
+    - { role: rsyncnet, tags: [backup, rsyncnet] }
     - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }
 
 - hosts: redis
