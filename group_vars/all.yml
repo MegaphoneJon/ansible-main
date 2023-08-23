@@ -123,3 +123,4 @@ wp_paid_modules:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: www-data
+rsyncnet_public_hostkey: 'usw-s008.rsync.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxhtYvZT6l0qN5JLRhUmG4F2Dpi6h/KV7k6hDRuTQhz'
