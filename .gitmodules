@@ -151,3 +151,9 @@
 [submodule "roles/contrib/geerlingguy.pip"]
 	path = roles/contrib/geerlingguy.pip
 	url = https://github.com/geerlingguy/ansible-role-pip.git
+[submodule "roles/nosudo-backup"]
+	path = roles/nosudo-backup
+	url = https://github.com/MegaphoneJon/ansible-role-nosudo-backup
+[submodule "roles/promtail-docker"]
+	path = roles/promtail-docker
+	url = https://github.com/MegaphoneJon/ansible-role-promtail-docker
