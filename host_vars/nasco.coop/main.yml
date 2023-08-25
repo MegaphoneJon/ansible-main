@@ -1,1 +1,10 @@
 ansible_python_interpreter: /home/nasco/python-venv/bin/python3
+sqldumps_path: /var/local/nasco/sql-dumps
+nosudo_backup_dbs:
+  - nascocoo_drupal7
+  - nascocoo_civicrm
+nosudo_backup_dirs:
+  - /home/nasco
+  - /var/local/nasco
+nosudo_backup_db_user: nascocoo_drupal7
+nosudo_backup_db_password_path: nasco/www/nasco.coop/mysql
