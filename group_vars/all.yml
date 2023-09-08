@@ -100,9 +100,9 @@ wp_paid_modules:
     module_root: /var/www/breaktheshackles.org/web/wp-content/plugins
     run_as: breaktheshackles
   gravityforms:
-    site: nwu.org
-    module_root: /var/www/nwu.org/web/wp-content/plugins
-    run_as: nwu
+    site: justassociates.org
+    module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
+    run_as: jass
   gravityforms-multilingual:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
