@@ -1,4 +1,12 @@
 ---
+- name: Run Drupal 8+ upgrades
+  hosts: websites_dev:&maintenance_drupal8
+  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
+  gather_facts: no
+
+  roles:
+    - { role: upgrade-drupal, tags: upgrade-drupal, when: contract_type is search("Drupal Maintenance") and freeze_cms != "1"  and cms == 'Drupal8'}
+
 - name: Run Drupal 7 upgrades
   #TODO: at some point this shouldn't just work on localhosts
   hosts: websites_dev:&maintenance_drupal
@@ -26,11 +34,3 @@
 
   roles:
     - { role: upgrade-civi, tags: upgrade-civi, when: contract_type is search("Civi Maintenance") and freeze_crm != "1" and civicrm == 'Yes' }
-
-- name: Update sites
-  hosts: websites_test:websites_live
-  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
-  gather_facts: no
-
-  roles:
-    - { role: update-sites, tags: update-sites }
