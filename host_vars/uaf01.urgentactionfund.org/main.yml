@@ -1,0 +1,25 @@
+additional_users:
+  Sofia:
+    name: sofia
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+      - uaf
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/sofia') }}"
+    update_password: always
+    authorized:
+      - https://ssh.megaphonetech.com/sofia_id_rsa.pub
+    hasdotfiles: false
+  Fraser:
+    name: fraser
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+      - uaf
+    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/fraser') }}"
+    update_password: always
+    authorized:
+      - https://ssh.megaphonetech.com/fraser_id_rsa.pub
+    hasdotfiles: false
