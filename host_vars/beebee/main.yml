@@ -1,0 +1,14 @@
+outgoing_ports:
+  - { port: 22, protocol: tcp, name: 'SSH' }
+  - { port: 25, protocol: tcp, name: 'SMTP' }
+  - { port: 80, protocol: tcp, name: 'HTTP' }
+  - { port: 123, protocol: udp, name: 'NTP' }
+  - { port: 443, protocol: tcp, name: 'HTTPS' }
+  - { port: 465, protocol: tcp, name: 'SMTPS' }
+  - { port: 587, protocol: tcp, name: 'SMTP TLS' }
+  - { port: 5665, protocol: tcp, name: 'Icinga2' }
+  - { port: 10022, protocol: tcp, name: 'Megaphone git SSH', state: absent }
+  - { port: 53, protocol: udp, name: 'DNS' }
+  - { port: 993, protocol: tcp, name: 'IMAPS' }
+  - { port: "32400", protocol: tcp, name: 'Plex' }
+  - { port: 3306, protocol: tcp, name: 'SSH in Docker' }
