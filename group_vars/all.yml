@@ -124,3 +124,17 @@ wp_paid_modules:
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: www-data
 rsyncnet_public_hostkey: 'usw-s008.rsync.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxhtYvZT6l0qN5JLRhUmG4F2Dpi6h/KV7k6hDRuTQhz'
+blocked_bots:
+  - MJ12bot
+  - AhrefsBot
+  - dotbot
+  - PetalBot
+  - SemrushBot
+  - MauiBot (crawler.feedback+gamma@gmail.com)
+  - SEOkicks-Robot
+  - Zoominfobot
+  - DataForSeoBot
+  - serpstatbot
+  - Bytedance
+  - Bytespider
+
