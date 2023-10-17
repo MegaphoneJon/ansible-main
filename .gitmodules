@@ -157,3 +157,6 @@
 [submodule "roles/promtail-docker"]
 	path = roles/promtail-docker
 	url = https://github.com/MegaphoneJon/ansible-role-promtail-docker
+[submodule "roles/upgrade-drupal"]
+	path = roles/upgrade-drupal
+	url = https://github.com/MegaphoneJon/ansible-role-upgrade-drupal
