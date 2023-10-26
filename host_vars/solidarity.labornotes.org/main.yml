@@ -1,2 +1,15 @@
 rsyncnet_user: "1418"
 rsyncnet_server: "usw-s001.rsync.net"
+additional_users:
+  Noah:
+    name: john
+    shell: "/bin/bash"
+    groups:
+      - www-data
+      - ln
+      - ln-test
+      - ln-2-test
+#    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/noah') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/john_id_rsa.pub
+    hasdotfiles: false

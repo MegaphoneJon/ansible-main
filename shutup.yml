@@ -79,6 +79,27 @@
     when: civicrm == 'Yes'
     tags: civi-core
 
+  - name: Shut up about something else
+    uri:
+      url: "{{ primary_url }}/{{ endpoint }}"
+      method: POST
+      body:
+        entity: StatusPreference
+        action: create
+        json: "{{ {'name': item, 'ignore_severity': 3, 'hush_until': seven_days_hence } | to_json }}"
+        api_key: "{{ crm_api_key }}"
+        key: "{{ crm_site_key }}"
+      body_format: form-urlencoded
+      url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
+      headers:
+        X-Requested-With: XMLHttpRequest
+    with_items:
+      - "{{ something_else }}"
+    delegate_to: 127.0.0.1
+    when: civicrm == 'Yes'
+    tags: something-else, something_else
+
   - name: Collect last 10 errors in watchdog
     shell: "PATH=$HOME/bin:$PATH;drush --root='{{ webroot }}' watchdog:show --severity=3"
     when: cms == 'Drupal' or cms == 'Drupal8'
