@@ -40,23 +40,6 @@
     when: civicrm == 'Yes'
     tags: civi-extensions
 
-  # - name: Shut up about Civi extensions (allavailableupgrades) (warnings only, 7 days)
-  #   uri:
-  #     url: "{{ primary_url }}/{{ endpoint }}"
-  #     method: POST
-  #     body:
-  #       entity: StatusPreference
-  #       action: create
-  #       json: "{{ {'name': 'allavailableupgrades', 'ignore_severity': 3, 'hush_until': seven_days_hence } | to_json }}"
-  #       api_key: "{{ crm_api_key }}"
-  #       key: "{{ crm_site_key }}"
-  #     body_format: form-urlencoded
-  #     url_username: "{{ (env == 'Test') | ternary('megaphone', '') }}"
-  #     url_password: "{{ (env == 'Test') | ternary('megaphone', '') }}"
-  #   delegate_to: 127.0.0.1
-  #   when: civicrm == 'Yes'
-  #   tags: civi-extensions
-
   - name: Shut up about Civi core updates (warnings only, 7 days)
     uri:
       url: "{{ primary_url }}/{{ endpoint }}"
