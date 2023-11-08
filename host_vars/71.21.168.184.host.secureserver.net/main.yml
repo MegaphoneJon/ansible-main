@@ -3,6 +3,9 @@ utils_path: $HOME/bin/
 sqldumps_path: $HOME/sql-dumps
 nosudo_backup_dbs:
   - wp_cplive
+  - cprj_civi_logs
+nosudo_backup_structure_only_dbs:
+  - cprj_civi_logs
 nosudo_backup_dirs:
   - /var/www/vhosts/collectivepowerrj.org/httpdocs
   - /var/www/vhosts/collectivepowerrj.org/sql-dumps
