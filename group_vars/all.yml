@@ -95,6 +95,10 @@ default_basic_auth_name: "megaphone"
 default_basic_auth_password: "megaphone"
 # Get WP paid modules by downloading on the sites they're licensed
 wp_paid_modules:
+  admin-menu-editor-pro:
+    site: justassociates.org
+    module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
+    run_as: jass
   elementor-pro: 
     site: breaktheshackles.org
     module_root: /var/www/breaktheshackles.org/web/wp-content/plugins
