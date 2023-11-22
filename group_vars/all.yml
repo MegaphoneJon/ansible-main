@@ -110,7 +110,7 @@ wp_paid_modules:
   gravityforms-multilingual:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
-    run_as: www-data
+    run_as: jass
   advanced-custom-fields-pro:
     site: 9to5.org
     module_root: /var/www/9to5.org/web/wp-content/plugins
@@ -119,6 +119,10 @@ wp_paid_modules:
     site: journal.leftroots.net
     module_root: /home/members/leftroots/sites/journal.leftroots.net/web/wp-content/plugins
     run_as: journal
+  types:
+    site: justassociates.org
+    module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
+    run_as: jass
   wpml-string-translation:
     site: journal.leftroots.net
     module_root: /home/members/leftroots/sites/journal.leftroots.net/web/wp-content/plugins
@@ -126,7 +130,7 @@ wp_paid_modules:
   wpml-media-translation:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
-    run_as: www-data
+    run_as: jass
 rsyncnet_public_hostkey: 'usw-s008.rsync.net ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOxhtYvZT6l0qN5JLRhUmG4F2Dpi6h/KV7k6hDRuTQhz'
 blocked_bots:
   - MJ12bot
