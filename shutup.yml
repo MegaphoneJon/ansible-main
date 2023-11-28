@@ -14,12 +14,9 @@
     endpoint: '{{ ajaxDict[cms | lower] }}'
     crm_api_key: "{{ lookup('passwordstore', client + '/' + (canonical_hostname | default(hostname, true)) + '/' + (canonical_bare_url | default(bare_url, true)) + '/civicrm_api_key') }}"
     crm_site_key: "{{ lookup('passwordstore', client + '/' + hostname + '/' + bare_url + '/sitekey') }}"
+    snooze_until: "{{ '%Y-%m-%d' | strftime( (lookup('pipe', 'date +%s') | int) + ( 86400 * snooze_days|default(7)|int ) ) }}"
 
   tasks:
-  - name: Set the length of time to shut up
-    set_fact:
-      snooze_until: "{{ '%Y-%m-%d' | strftime( (lookup('pipe', 'date +%s') | int) + ( 86400 * snooze_days|default(7)|int ) ) }}"
-
   - name: Shut up about Civi extensions (warnings only)
     uri:
       url: "{{ primary_url }}/{{ endpoint }}"
