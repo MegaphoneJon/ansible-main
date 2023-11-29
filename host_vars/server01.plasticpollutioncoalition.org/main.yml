@@ -38,3 +38,12 @@ additional_users:
     authorized:
       - https://ssh.megaphonetech.com/seamus_id_rsa.pub
     hasdotfiles: false
+  Lauren:
+    name: lauren
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - https://ssh.megaphonetech.com/lauren_id_rsa.pub
+    hasdotfiles: false
