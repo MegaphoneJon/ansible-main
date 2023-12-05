@@ -32,6 +32,7 @@ php_packages_extra:
   - php{{ php_version }}-gmp
   - php{{ php_version }}-bz2
   - php{{ php_version }}-soap
+  - php{{ php_version }}-xdebug
 
 php_memory_limit: '128M'
 php_max_execution_time: 300
