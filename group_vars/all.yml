@@ -66,16 +66,6 @@ users:
     hasdotfiles: true
     oh-my-zsh: true
     dotfiles: https://github.com/MegaphoneJon/dotfiles.git
-  Brienne:
-    name: brienne 
-    shell: "/bin/bash"
-    groups:
-      - sudo
-      - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/brienne') }}"
-    authorized:
-      - https://ssh.megaphonetech.com/brienne_id_rsa.pub
-    hasdotfiles: false
 # Docker
 # Use `docker compose`, not `docker-compose`.
 docker_install_compose_plugin: true
