@@ -17,8 +17,9 @@ function run($argv) {
       $password = $password[0];
       $headers = login($password);
       // Build a group hierarchy.
-      $groupResource = 'taxonomy_term';
+      $groupResource = 'server-rest';
       $groups = get($headers, $groupResource, NULL);
+      print_r($groups); die;
       $groupHierarchy = buildGroupHierarchy($groups);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
@@ -143,7 +144,7 @@ function buildServerList($servers, $websites) {
       if (strpos($website['contract_type'], 'Drupal Maintenance') !== FALSE && $website['cms'] === 'Drupal8') {
         $inventory['maintenance_drupal8'][] = $website['bare_url'];
       }
-      if (strpos($website['contract_type'], 'Civi Maintenance') !== false && $website['civicrm'] === 'Yes') {
+      if (strpos($website['contract_type'], 'Civi Maintenance') !== FALSE && $website['civicrm'] === 'Yes') {
         $inventory['maintenance_civi'][] = $website['bare_url'];
       }
       // Also put website data in the metadata of their respective server for building Icinga templates.}
@@ -173,12 +174,42 @@ function post($curlHeaders, $operation, $postFields = NULL) {
   return json_decode($result);
 }
 
+/**
+ * Like POST but gets cookies too.
+ */
+function loginPost($curlHeaders, $operation, $postFields = NULL) {
+  // A closure to use as a callback to get the cookie. See https://stackoverflow.com/a/25098798.
+  $sessionId = '';
+  $curlResponseHeaderCallback = function ($ch, $headerLine) use (&$sessionId) {
+    if (preg_match('/^Set-Cookie:\s*([^;]*)/mi', $headerLine, $cookie) == 1)
+      $sessionId = $cookie[1];
+    return strlen($headerLine);
+  };
+  $curlHeaders[] = 'Content-Type: application/json';
+  $curlHeaders[] = 'Accept: application/json';
+  $curlOptions = [
+    CURLOPT_HTTPHEADER => $curlHeaders,
+    CURLOPT_RETURNTRANSFER => TRUE,
+    CURLOPT_POST => 1,
+    CURLOPT_HEADERFUNCTION => $curlResponseHeaderCallback,
+    CURLOPT_URL => ENDPOINT . $operation,
+    CURLOPT_POSTFIELDS => $postFields ? json_encode($postFields) : NULL,
+  ];
+  $curl = curl_init();
+  curl_setopt_array($curl, $curlOptions);
+  $result = curl_exec($curl);
+  curl_close($curl);
+  $result = json_decode($result);
+  $csrfToken = $result->csrf_token;
+  return [$sessionId, $csrfToken];
+}
+
 function get($curlHeaders, $operation, $body = NULL) {
   $curlHeaders[] = 'Accept: application/json';
   $curlOptions = [
     CURLOPT_HTTPHEADER => $curlHeaders,
     CURLOPT_RETURNTRANSFER => TRUE,
-    CURLOPT_URL => ENDPOINT . $operation,
+    CURLOPT_URL => ENDPOINT . $operation // . '?_format=json',
   ];
   $curl = curl_init();
   curl_setopt_array($curl, $curlOptions);
@@ -193,12 +224,13 @@ function get($curlHeaders, $operation, $body = NULL) {
  */
 function login($password) {
   $creds = [
-    'username' => USERNAME,
-    'password' => $password,
+    'name' => USERNAME,
+    'pass' => $password,
   ];
 
-  $result = post(NULL, 'user/login.json', $creds);
-  $headers[] = "Cookie: $result->session_name=$result->sessid";
+  [$sessionId, $csrfToken] = loginPost(NULL, 'user/login', $creds);
+  $headers[] = 'X-CSRF-Token: ' . $csrfToken;
+  $headers[] = 'Cookie: ' . $sessionId;
   return $headers;
 }
 
