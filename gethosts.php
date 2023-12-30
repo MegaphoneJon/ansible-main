@@ -16,27 +16,15 @@ function run($argv) {
       exec('/usr/bin/pass ls megaphone/crm/restpassword', $password);
       $password = $password[0];
       $headers = login($password);
-  
-      getGroups($headers);
+      if ($argv[1] == '--host' && $argv[2]) {
+        $host = "$argv[2]";
+      }
+      $groupHierarchy = getGroups($headers);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
-      $resource = 'views/server_list?display_id=services_1';
-      $titleResource = $urlResource = $queryParam = NULL;
-      if ($argv[1] == '--host' && $argv[2]) {
-        $resource .= "&title=$argv[2]";
-      }
-      $servers = get($headers, $resource, NULL);
-      // Get the websites too.
-      // Ugh - wish I could use "Views Combined Filter" but it uses WS_CONCAT which makes it impossible to do exact "rquals" searches.
-      if ($argv[1] == '--host' && $argv[2]) {
-        $queryParam = $argv[2];
-      }
-      $titleResource = "views/website_list?display_id=services_1&title=$queryParam";
-      $websites = get($headers, $titleResource, NULL);
-      // Don't need a second query of the website list if we just got all websites.
-      if ($queryParam) {
-        $urlResource = "views/website_list?display_id=services_1&url=$queryParam";
-        $websites = $websites + get($headers, $urlResource, NULL);
-      }
+      $servers = getServers($headers, $host ?? NULL);
+      // If we're searching on a single server, only get that server's websites.
+      $isServer = count($servers) === 1;
+      $websites = getWebsites($headers, $host ?? NULL, $isServer);
       $inventory = buildServerList($servers, $websites);
       $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
       echo $inventory;
@@ -51,16 +39,32 @@ function run($argv) {
 
 run($argv);
 
-function getGroups($headers) {
+function getServers(array $headers, ?string $host) : array {
+  $endpoint = "server-rest/$host";
+  return get($headers, $endpoint, NULL);
+}
+
+function getWebsites(array $headers, ?string $host, bool $isServer) : array {
+  // Can't use contextual filter because bare URL is calculated.
+  $endpoint = "website-rest?site=//$host";
+  if ($isServer) {
+    $endpoint = "website-rest?server=$host";  
+  }
+
+  return get($headers, $endpoint, NULL);
+}
+
+function getGroups(array $headers) : array {
   // Build a group hierarchy.
-  $groupResource = 'group-rest';
-  $groups = get($headers, $groupResource, NULL);
-  $groupHierarchy = buildGroupHierarchy($groups);
+  $endpoint = 'group-rest';
+  $groups = get($headers, $endpoint, NULL);
+  return buildGroupHierarchy($groups);
 }
 /**
  * Accepts a taxonomy term list from Drupal Services.
  * Outputs a hierarchical array of children, suitable for merging into the taxonomy.
  */
+// FIXME: The nosudo etc. isn't here.
 function buildGroupHierarchy($groups) {
   $hierarchicalList = [];
   $groupTids = array_combine(array_column($groups, 'tid'), array_column($groups, 'name'));
@@ -70,8 +74,7 @@ function buildGroupHierarchy($groups) {
     }
   }
   // Websites are in their own hierarchy.
-  $hierarchicalList['websites']['children'] = ['websites_dev', 'websites_test', 'websites_live'];
-  return $hierarchicalList;
+  $hierarchicalList['websites']['children'] = ['websites_dev', 'websites_test', 'websites_live'];  return $hierarchicalList;
 }
 
 /**
@@ -207,12 +210,12 @@ function loginPost($curlHeaders, $operation, $postFields = NULL) {
   return [$sessionId, $csrfToken];
 }
 
-function get($curlHeaders, $operation, $body = NULL) {
+function get(array $curlHeaders, string $endpoint) {
   $curlHeaders[] = 'Accept: application/json';
   $curlOptions = [
     CURLOPT_HTTPHEADER => $curlHeaders,
     CURLOPT_RETURNTRANSFER => TRUE,
-    CURLOPT_URL => ENDPOINT . $operation // . '?_format=json',
+    CURLOPT_URL => ENDPOINT . $endpoint // . '?_format=json',
   ];
   $curl = curl_init();
   curl_setopt_array($curl, $curlOptions);
