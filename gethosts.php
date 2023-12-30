@@ -16,11 +16,8 @@ function run($argv) {
       exec('/usr/bin/pass ls megaphone/crm/restpassword', $password);
       $password = $password[0];
       $headers = login($password);
-      // Build a group hierarchy.
-      $groupResource = 'server-rest';
-      $groups = get($headers, $groupResource, NULL);
-      print_r($groups); die;
-      $groupHierarchy = buildGroupHierarchy($groups);
+  
+      getGroups($headers);
       // Pull the view that shows the list of Ansible-enabled servers from Drupal.
       $resource = 'views/server_list?display_id=services_1';
       $titleResource = $urlResource = $queryParam = NULL;
@@ -54,6 +51,12 @@ function run($argv) {
 
 run($argv);
 
+function getGroups($headers) {
+  // Build a group hierarchy.
+  $groupResource = 'group-rest';
+  $groups = get($headers, $groupResource, NULL);
+  $groupHierarchy = buildGroupHierarchy($groups);
+}
 /**
  * Accepts a taxonomy term list from Drupal Services.
  * Outputs a hierarchical array of children, suitable for merging into the taxonomy.
