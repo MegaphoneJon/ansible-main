@@ -103,3 +103,4 @@
   become: yes
   roles:
     - { role: contrib/geerlingguy.redis, tags: redis }
+    - { role: redis-additional, tags: redis }

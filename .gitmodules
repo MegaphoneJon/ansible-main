@@ -160,3 +160,6 @@
 [submodule "roles/upgrade-drupal"]
 	path = roles/upgrade-drupal
 	url = https://github.com/MegaphoneJon/ansible-role-upgrade-drupal
+[submodule "roles/redis-additional"]
+	path = roles/redis-additional
+	url = https://github.com/MegaphoneJon/ansible-role-redis-additional
