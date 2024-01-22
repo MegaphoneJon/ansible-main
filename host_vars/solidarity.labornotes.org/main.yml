@@ -9,7 +9,7 @@ additional_users:
       - ln
       - ln-test
       - ln-2-test
-#    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/noah') }}"
+#    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/noah') }}"
     authorized:
       - https://ssh.megaphonetech.com/john_id_rsa.pub
     hasdotfiles: false

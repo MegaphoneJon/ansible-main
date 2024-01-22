@@ -5,7 +5,7 @@ additional_users:
     groups:
       - sudo
       - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/edsel') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/edsel') }}"
     authorized:
       - https://ssh.megaphonetech.com/edsel_id_rsa.pub
     hasdotfiles: false
@@ -15,7 +15,7 @@ additional_users:
     groups:
       - sudo
       - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/monish') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/monish') }}"
     authorized:
       - https://ssh.megaphonetech.com/monish_id_rsa.pub
     hasdotfiles: false
@@ -28,7 +28,7 @@ additional_users:
     authorized:
       - https://ssh.megaphonetech.com/joemurray_id_rsa.pub
     hasdotfiles: false
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/joemurray') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/joemurray') }}"
   Seamus:
     name: seamus
     shell: "/bin/bash"

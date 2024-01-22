@@ -5,7 +5,7 @@ additional_users:
     groups:
       - sudo
       - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/eric') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/eric') }}"
     authorized:
       - https://ssh.megaphonetech.com/eric_id_rsa.pub
     hasdotfiles: false
@@ -15,7 +15,7 @@ additional_users:
     groups:
       - sudo
       - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/vijay') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/vijay') }}"
     authorized:
       - https://ssh.megaphonetech.com/vijay_id_rsa.pub
     hasdotfiles: false

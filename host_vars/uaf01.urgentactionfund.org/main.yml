@@ -6,7 +6,7 @@ additional_users:
       - sudo
       - www-data
       - uaf
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/sofia') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/sofia') }}"
     update_password: always
     authorized:
       - https://ssh.megaphonetech.com/sofia_id_rsa.pub
@@ -18,7 +18,7 @@ additional_users:
       - sudo
       - www-data
       - uaf
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/fraser') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/fraser') }}"
     update_password: always
     authorized:
       - https://ssh.megaphonetech.com/fraser_id_rsa.pub
