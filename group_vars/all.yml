@@ -44,7 +44,7 @@ php_fpm_listen: "/var/run/php/php-fpm.sock"
 #Workaround for https://github.com/geerlingguy/ansible-role-php/issues/255
 #php_extension_conf_paths: '/etc/php/7.0/mods-available'
 #MySQL
-mysql_root_password: "{{ lookup('passwordstore', client + '/' + hostname + '/mysql/root create=true length=32') }}"
+mysql_root_password: "{{ lookup('community.general.passwordstore', client + '/' + hostname + '/mysql/root create=true length=32') }}"
 sqldumps_path: "{{ webroot }}/../sql-dumps"
 
 # MySQL tunings
@@ -60,7 +60,7 @@ users:
     groups:
       - sudo
       - www-data
-    password: "{{ lookup('passwordstore', 'megaphone/ansible/users/jon') }}"
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/jon') }}"
     authorized:
       - https://ssh.megaphonetech.com/jon_id_rsa.pub
     hasdotfiles: true
@@ -91,9 +91,9 @@ wp_paid_modules:
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: jass
   elementor-pro: 
-    site: breaktheshackles.org
-    module_root: /var/www/breaktheshackles.org/web/wp-content/plugins
-    run_as: breaktheshackles
+    site: www.reamp.org
+    module_root: /var/www/www.reamp.org/web/wp-content/plugins
+    run_as: reamp
   gravityforms:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
@@ -107,17 +107,17 @@ wp_paid_modules:
     module_root: /var/www/9to5.org/web/wp-content/plugins
     run_as: 9to5
   sitepress-multilingual-cms:
-    site: journal.leftroots.net
-    module_root: /home/members/leftroots/sites/journal.leftroots.net/web/wp-content/plugins
-    run_as: journal
+    site: justassociates.org
+    module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
+    run_as: jass
   types:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: jass
   wpml-string-translation:
-    site: journal.leftroots.net
-    module_root: /home/members/leftroots/sites/journal.leftroots.net/web/wp-content/plugins
-    run_as: journal
+    site: justassociates.org
+    module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
+    run_as: jass
   wpml-media-translation:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
