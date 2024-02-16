@@ -36,11 +36,29 @@
     - { role: contrib/geerlingguy.pip, tags: [docker, pip] }
     - { role: promtail-docker, tags: promtail}
 
-- hosts: openvpn
-  become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
+- hosts: training
+  become: yes
 
   roles:
-#    - { role: openvpn-server, tags: openvpn-server }
+    - { role: contrib/geerlingguy.apache, tags: [apache, deploy-site] }
+    - { role: cv, tags: cv }
+    - { role: contrib/geerlingguy.mysql, tags: mysql }
+    - { role: mysql-additional, tags: [mysql, mysql-additional] }
+    - { role: contrib/geerlingguy.php-versions , tags: [php, php-versions] }
+    - { role: contrib/geerlingguy.php , tags: php }
+    - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
+    - { role: php-additional , tags: php }
+    - { role: apache-additional , tags: [apache, apache-additional] }
+    - { role: contrib/geerlingguy.composer, tags: composer}
+    - { role: drush, tags: drush}
+    - { role: wp-cli, tags: wp-cli}
+    - { role: contrib/geerlingguy.security, tags: security }
+    - { role: incoming-smtp, tags: postfix } # Must run before geerlingguy.postifx
+    - { role: contrib/geerlingguy.postfix, tags: postfix }
+    - { role: fail2ban, tags: fail2ban}
+    - { role: php-xdebug, tags: [xdebug, php-xdebug]}
+    - { role: civix, tags: civix }
+    - { role: civicrm-buildkit, tags: civicrm-buildkit }
 
 - hosts: websites
   become: "{{ 'no' if run_as_user == ansible_user else 'yes' }}"
