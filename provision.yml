@@ -7,5 +7,5 @@
   connection: local
 
   roles:
-  #  - { role: provision-linode, tags: provision }
+    - { role: provision-linode, tags: provision }
     - { role: bootstrap, tags: bootstrap }
