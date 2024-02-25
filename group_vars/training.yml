@@ -1,0 +1,21 @@
+additional_users:
+  Training:
+    name: training
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - https://ssh.megaphonetech.com/jon_id_rsa.pub
+    hasdotfiles: false
+  Noah:
+    name: noah
+    shell: "/bin/zsh"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/noah') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/noah_id_rsa.pub
+    hasdotfiles: false
+
