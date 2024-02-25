@@ -6,8 +6,8 @@
   roles:
     - { role: common, tags: common }
     - { role: users, tags: users }
-    - { role: backupninja, tags: [backup, backupninja] }
-    - { role: rsyncnet, tags: [backup, rsyncnet] }
+#    - { role: backupninja, tags: [backup, backupninja] }
+#    - { role: rsyncnet, tags: [backup, rsyncnet] }
     - { role: firewall-common, tags: firewall }
 
 - hosts: lamp
@@ -66,15 +66,15 @@
     - { role: site-dns, tags: [site-dns] }
     - { role: site-user-php-apache, tags: [site-upa], when: run_as_user != ansible_user }
     - { role: site-mysql, tags: [site-mysql], when: run_as_user != ansible_user }
-    - { role: site-gitea, tags: [site-gitea] }
+    # - { role: site-gitea, tags: [site-gitea] }
     - { role: deploy-site, tags: [site-main] }
     - { role: site-db-sync-initial, tags: [site-db-sync-initial] }
     - { role: site-permissions, tags: [site-permissions]}
     - { role: site-postinstall-config, tags: [site-postinstall-config] }
-    - { role: site-standard-extensions, tags: [site-standard-extensions]}
-    - { role: site-wp-monitor, tags: [site-wp-monitor] }
-    - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
-    - { role: site-cron, tags: [site-cron], when: run_as_user != ansible_user }
+    # - { role: site-standard-extensions, tags: [site-standard-extensions]}
+    # - { role: site-wp-monitor, tags: [site-wp-monitor] }
+    # - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
+    # - { role: site-cron, tags: [site-cron], when: run_as_user != ansible_user }
     - { role: site-robots-txt, tags: [site-robots-txt] }
 #    - { role: monitoring, tags: monitoring }
 
