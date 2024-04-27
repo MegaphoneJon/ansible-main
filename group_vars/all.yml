@@ -103,9 +103,9 @@ wp_paid_modules:
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: jass
   advanced-custom-fields-pro:
-    site: 9to5.org
-    module_root: /var/www/9to5.org/web/wp-content/plugins
-    run_as: 9to5
+    site: urgentactionfund.org
+    module_root: /var/www/urgentactionfund.org/web/wp-content/plugins
+    run_as: uaf
   sitepress-multilingual-cms:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
