@@ -6,3 +6,14 @@ incoming_ports:
 greenlist_ips:
   - 69.122.128.206
   - 24.198.99.54
+additional_users:
+  Sean:
+    name: sean
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    authorized:
+      - https://ssh.megaphonetech.com/sean_id_rsa.pub
+    hasdotfiles: false
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/sean') }}"
