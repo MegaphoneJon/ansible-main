@@ -1,8 +1,0 @@
-# Block HTTP/HTTPS, allow OpenVPN
-incoming_ports:
-# Remove next 2 lines later
-  - { port: 80, protocol: tcp, name: 'HTTP' }
-  - { port: 443, protocol: tcp, name: 'HTTPS' }
-  - { port: 22, protocol: tcp, name: 'SSH' }
-  - { port: 1194, protocol: udp, name: 'OpenVPN' }
-  - { port: 5665, protocol: tcp, name: 'Icinga2' }

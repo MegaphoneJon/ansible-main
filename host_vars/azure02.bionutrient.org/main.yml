@@ -1,1 +1,0 @@
-php_fpm_pool_conf_path: "/etc/php/7.3/fpm/pool.d/www.conf"
