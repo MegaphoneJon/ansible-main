@@ -1,3 +1,0 @@
-ansible_python_interpreter: /var/www/vhosts/collectivepowerrj.org/python-venv/bin/python3
-utils_path: $HOME/bin/
-sqldumps_path: $HOME/sql-dumps
