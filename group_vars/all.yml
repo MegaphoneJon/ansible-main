@@ -86,6 +86,14 @@ default_basic_auth_name: "megaphone"
 default_basic_auth_password: "megaphone"
 # Get WP paid modules by downloading on the sites they're licensed
 wp_paid_modules:
+  acf-extended-pro: 
+    site: 9to5.org
+    module_root: /var/www/9to5.org/web/wp-content/plugins
+    run_as: 9to5
+  advanced-custom-fields-pro:
+    site: urgentactionfund.org
+    module_root: /var/www/urgentactionfund.org/web/wp-content/plugins
+    run_as: uaf
   admin-menu-editor-pro:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
@@ -102,10 +110,10 @@ wp_paid_modules:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: jass
-  advanced-custom-fields-pro:
-    site: urgentactionfund.org
-    module_root: /var/www/urgentactionfund.org/web/wp-content/plugins
-    run_as: uaf
+  kadence-blocks-pro: 
+    site: 9to5.org
+    module_root: /var/www/9to5.org/web/wp-content/plugins
+    run_as: 9to5
   sitepress-multilingual-cms:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins

@@ -1,0 +1,3 @@
+ansible_remote_tmp: /tmp
+#ansible_ssh_use_tty: yes
+
