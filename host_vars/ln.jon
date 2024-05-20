@@ -1,1 +1,0 @@
-solidarity.labornotes.org

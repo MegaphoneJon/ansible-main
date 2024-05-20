@@ -1,6 +1,4 @@
-roles/common/files
-roles/users/files
-roles/bootstrap/files
 *swp
 gethosts.cfg.php
 *retry
+host_vars

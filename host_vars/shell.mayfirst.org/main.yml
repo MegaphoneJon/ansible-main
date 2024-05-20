@@ -1,4 +1,0 @@
-nosudo_backup_dirs:
-  - /home/sites/357691
-nosudo_backup_db_user: 357691
-nosudo_backup_db_password_path: wrl/juanita/www.warresisters.org/mysql

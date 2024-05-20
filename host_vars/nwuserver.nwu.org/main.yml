@@ -1,2 +1,0 @@
-linode_personal_access_token: "{{ lookup('community.general.passwordstore', 'nwu/linode/personal_access_token') }}" 
-#databases: "mysql nwu_oneill nwu_wpcivicrm nwu_test_civ nwu_test_wp"

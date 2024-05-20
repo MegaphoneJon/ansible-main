@@ -1,3 +1,0 @@
-linode_api_key: "{{ lookup('community.general.passwordstore', 'acd/linode/apikey') }}"
-linode_personal_access_token: "{{ lookup('community.general.passwordstore', 'acd/linode/personal_access_token') }}" 
-linode_username: jongoldbergacd

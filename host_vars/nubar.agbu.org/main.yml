@@ -1,2 +1,0 @@
-linode_api_key: "{{ lookup('community.general.passwordstore', 'agbu/linode/apikey') }}"
-linode_username: agbu
