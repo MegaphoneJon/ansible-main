@@ -163,3 +163,6 @@
 [submodule "roles/redis-additional"]
 	path = roles/redis-additional
 	url = https://github.com/MegaphoneJon/ansible-role-redis-additional
+[submodule "roles/mayfirst"]
+	path = roles/mayfirst
+	url = https://github.com/MegaphoneJon/ansible-role-mayfirst.git
