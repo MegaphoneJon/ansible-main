@@ -12,10 +12,7 @@ function run($argv) {
   switch ($argv[1]) {
     case '--list':
     case '--host':
-      # Get password from the "pass" utility.
-      exec('/usr/bin/pass ls megaphone/crm/restpassword', $password);
-      $password = $password[0];
-      $headers = login($password);
+      $headers = loginHeaders();
       // Build a group hierarchy.
       $groupResource = 'taxonomy_term';
       $groups = get($headers, $groupResource, NULL);
@@ -44,6 +41,10 @@ function run($argv) {
       echo $inventory;
       break;
 
+    case '--site-mappings':
+      generateSiteMapping();
+      break;
+
     default:
       echo "Unknown command.\n\n";
     case '--help':
@@ -52,6 +53,50 @@ function run($argv) {
 }
 
 run($argv);
+
+/**
+ * Generates site mapping for bookmarklets to change between environments.  Not strictly Ansible but uses the inventory.
+ */
+function generateSiteMapping() {
+  $headers = loginHeaders();
+  $mapping = [];
+  $titleResource = 'views/website_list?display_id=services_1';
+  $websites = get($headers, $titleResource, NULL);
+  // Because relationships are bidirectional, we only look at dev/test sites.
+  foreach ($websites as $website) {
+    // if (!str_contains($website['primary_url'], 'agbu')) {
+    //   continue;
+    // }
+    // Don't get any localhosts besides your own.
+    if ($website['env'] == 'Dev' && $website['server'] !== gethostname()) {
+      continue;
+    }
+    if ($website['canonical_primary_url']) {
+      $mapping[strtolower($website['env'])][$website['canonical_primary_url']] = $website['primary_url'];
+      $mapping['live'][$website['primary_url']] = $website['canonical_primary_url'];
+    }
+  }
+  // Dev and test sites aren't connected to each other directly, so we can use the mapping to generate them.
+  foreach ($mapping['dev'] as $liveSite => $devSite) {
+    if (!isset($mapping['test'][$liveSite])) {
+      continue;
+    }
+    $mapping['test'][$devSite] = $mapping['test'][$liveSite];
+    $mapping['dev'][$mapping['test'][$liveSite]] = $devSite;
+  }
+  $mappingJson = json_encode($mapping);
+  echo $mappingJson;
+}
+
+/**
+ * Creates the login headers necessary to access the Drupal data.
+ */
+function loginHeaders(): array {
+      # Get password from the "pass" utility.
+      exec('/usr/bin/pass ls megaphone/crm/restpassword', $password);
+      $password = $password[0];
+      return login($password);
+}
 
 /**
  * Accepts a taxonomy term list from Drupal Services.
