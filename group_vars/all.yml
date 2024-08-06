@@ -6,7 +6,6 @@ greenlist_ips:
 #CiviCRM extension blacklist
 extension_redlist:
   - mosaico
-  - apirestlog
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
 primary_icinga_server_ip: '173.255.234.245'
@@ -53,6 +52,8 @@ mysql_group_concat_max_len: "15000"
 mysql_tmp_table_size: 128M 
 mysql_max_heap_table_size: 128M
 mysql_innodb_log_file_size: "512M"
+mysql_config_include_files:
+ - src: files/mysqld.cnf
 
 users:
   Jon:
