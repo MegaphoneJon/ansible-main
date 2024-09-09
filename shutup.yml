@@ -36,7 +36,7 @@
       - checkExtensionsUpdates
       - allavailableupgrades
     delegate_to: 127.0.0.1
-    when: civicrm == 'Yes'
+    when: civicrm == 'Yes' and inventory_hostname in groups['maintenance_civi']
     tags: civi-extensions
 
   - name: Shut up about Civi core updates (warnings only, 7 days)
@@ -58,7 +58,7 @@
       - checkVersion_upgrade
       - checkVersion_patch
     delegate_to: 127.0.0.1
-    when: civicrm == 'Yes'
+    when: civicrm == 'Yes' and inventory_hostname in groups['maintenance_civi']
     tags: civi-core
 
   - name: Shut up about something else

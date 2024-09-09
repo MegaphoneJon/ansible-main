@@ -6,7 +6,7 @@ additional_users:
       - sudo
       - www-data
     authorized:
-      - https://ssh.megaphonetech.com/jon_id_rsa.pub
+      - https://ssh.megaphonetech.com/jon.pub
     hasdotfiles: false
   Noah:
     name: noah
