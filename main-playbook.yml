@@ -65,6 +65,8 @@
     - { role: site-dns, tags: [site-dns] }
     - { role: site-user-php-apache, tags: [site-upa], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
     - { role: site-mysql, tags: [site-mysql], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
+    - { role: nosudo-backup, tags: [backup, nosudo-backup], when: run_as_user == ansible_user or 'mayfirst_ng_site' in group_names }
+    - { role: rsyncnet, tags: [backup, rsyncnet], when: run_as_user == ansible_user or 'mayfirst_ng_site' in group_names }
     - { role: site-gitea, tags: [site-gitea] }
     - { role: deploy-site, tags: [site-main] }
     - { role: site-db-sync-initial, tags: [site-db-sync-initial] }
@@ -75,7 +77,6 @@
     - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
     - { role: site-cron, tags: [site-cron], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
     - { role: site-robots-txt, tags: [site-robots-txt] }
-    - { role: nosudo-backup, tags: [backup, nosudo-backup], when: run_as_user == ansible_user or 'mayfirst_ng_site' in group_names }
 #    - { role: monitoring, tags: monitoring }
 
 - hosts: vps
@@ -91,7 +92,7 @@
     - common
     - { role: contrib/geerlingguy.apache, tags: apache }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
-    - { role: mysql-additional, tags: mysql }
+    - { role: mysql-additional, tags: [mysql, mysql-additional] }
     - { role: contrib/geerlingguy.php-versions , tags: [php, php-versions] }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
