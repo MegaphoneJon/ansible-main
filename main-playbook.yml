@@ -122,3 +122,8 @@
   roles:
     - { role: contrib/geerlingguy.redis, tags: redis }
     - { role: redis-additional, tags: redis }
+
+- hosts: docker
+  become: yes
+  roles:
+    - { role: contrib/geerlingguy.docker, tags: docker}
