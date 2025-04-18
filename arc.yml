@@ -1,0 +1,8 @@
+- hosts: wireguard
+  become: yes
+
+  roles:
+  - { role: contrib/geerlingguy.docker, tags: docker}
+  - { role: caddy-docker, tags: caddy }
+  - { role: wireguard-docker, tags: wireguard }
+  - { role: civiproxy-docker, tags: civiproxy }
