@@ -24,7 +24,7 @@
       body:
         entity: StatusPreference
         action: create
-        json: "{{ {'name': checkExtensionsUpdates, 'ignore_severity': 3, 'hush_until': snooze_until } | to_json }}"
+        json: "{{ {'name': 'checkExtensionsUpdates', 'ignore_severity': 3, 'hush_until': snooze_until } | to_json }}"
         api_key: "{{ crm_api_key }}"
         key: "{{ crm_site_key }}"
       body_format: form-urlencoded
