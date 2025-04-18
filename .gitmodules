@@ -166,3 +166,12 @@
 [submodule "roles/mayfirst"]
 	path = roles/mayfirst
 	url = https://github.com/MegaphoneJon/ansible-role-mayfirst.git
+[submodule "roles/caddy-docker"]
+	path = roles/caddy-docker
+	url = git@github.com:MegaphoneJon/ansible-role-caddy-docker.git
+[submodule "roles/civiproxy-docker"]
+	path = roles/civiproxy-docker
+	url = git@github.com:MegaphoneJon/ansible-role-civiproxy-docker.git
+[submodule "roles/wireguard-docker"]
+	path = roles/wireguard-docker
+	url = git@github.com:MegaphoneJon/ansible-role-wireguard-docker.git
