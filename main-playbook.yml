@@ -20,7 +20,7 @@
     - { role: contrib/geerlingguy.php-versions , tags: [php, php-versions] }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
-    - { role: php-additional , tags: php }
+    - { role: php-additional , tags: [php, php-additional] }
     - { role: apache-additional , tags: [apache, apache-additional] }
     - { role: contrib/geerlingguy.composer, tags: composer}
     - { role: drush, tags: drush}
