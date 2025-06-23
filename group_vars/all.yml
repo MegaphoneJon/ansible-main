@@ -6,7 +6,6 @@ greenlist_ips:
 #CiviCRM extension blacklist
 extension_redlist:
   - mosaico
-  - org.wikimedia.geocoder
   - com.iatspayments.civicrm
 #Icinga2
 primary_icinga_server: 'orange.megaphonetech.com'
@@ -71,6 +70,16 @@ users:
     hasdotfiles: true
     oh-my-zsh: true
     dotfiles: https://github.com/MegaphoneJon/dotfiles.git
+  Mathieu:
+    name: mathieu
+    shell: "/bin/bash"
+    groups:
+      - sudo
+      - www-data
+    password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/mathieu') }}"
+    authorized:
+      - https://ssh.megaphonetech.com/mathieu.pub
+    hasdotfiles: false
 # Docker
 # Use `docker compose`, not `docker-compose`.
 docker_install_compose_plugin: true
