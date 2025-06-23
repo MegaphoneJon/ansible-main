@@ -48,7 +48,7 @@ else {
  */
 function write_dns($params, $action, $item_id = NULL) {
   echo "Write DNS: $action\n";
-  $data = array(
+  $data = [
     'action' => $action,
     'object' => 'item',
     'user_name' => $params['api_user'],
@@ -61,7 +61,7 @@ function write_dns($params, $action, $item_id = NULL) {
     'set:dns_sshfp_algorithm' => '1',
     'set:dns_sshfp_type' => '1',
     'set:dns_sshfp_fpr' => '1',
-  );
+  ];
   if ($item_id) {
     $data['where:item_id'] = $item_id;
   }
@@ -75,14 +75,14 @@ function write_dns($params, $action, $item_id = NULL) {
 function query_dns($params) {
 
   // Non-A records may exist; we can't have both CNAME and A so we need to check.
-  $data = array(
+  $data = [
     'action' => 'select',
     'object' => 'item',
     'user_name' => $params['api_user'],
     'user_pass' => $params['api_password'],
     'where:service_id' => 9,
     'where:dns_fqdn' => $params['fqdn'],
-  );
+  ];
 
   $result = red_api($params['url'], $data);
   $return = NULL;
