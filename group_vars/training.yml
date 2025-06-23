@@ -16,6 +16,6 @@ additional_users:
       - www-data
     password: "{{ lookup('community.general.passwordstore', 'megaphone/ansible/users/noah') }}"
     authorized:
-      - https://ssh.megaphonetech.com/noah_id_rsa.pub
+      - https://ssh.megaphonetech.com/noah.pub
     hasdotfiles: false
 
