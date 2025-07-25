@@ -11,6 +11,15 @@ function run($argv) {
   }
   switch ($argv[1]) {
     case '--list':
+      // "List" has caching, "Host" does not.
+      if (file_exists('/tmp/ansible_inventory_cache.json')) {
+        $cacheTtl = 24 * 60 * 60; // 24 hours
+        if (filemtime('/tmp/ansible_inventory_cache.json') > time() - $cacheTtl) {
+          $inventory = file_get_contents('/tmp/ansible_inventory_cache.json');
+          echo $inventory;
+          exit;
+        }
+      }
     case '--host':
       $headers = loginHeaders();
       // Build a group hierarchy.
@@ -38,6 +47,11 @@ function run($argv) {
       }
       $inventory = buildServerList($servers, $websites);
       $inventory = json_encode(array_merge_recursive($inventory, $groupHierarchy));
+      // Cache results of --list
+      if ($argv[1] == '--list') {
+        $cacheFile = '/tmp/ansible_inventory_cache.json';
+        file_put_contents($cacheFile, $inventory);
+      }
       echo $inventory;
       break;
 
@@ -53,6 +67,7 @@ function run($argv) {
 }
 
 run($argv);
+
 
 /**
  * Generates site mapping for bookmarklets to change between environments.  Not strictly Ansible but uses the inventory.
