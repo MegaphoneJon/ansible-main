@@ -124,10 +124,22 @@ wp_paid_modules:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
     run_as: jass
-  kadence-blocks-pro: 
+  kadence-blocks-pro:
     site: 9to5.org
     module_root: /var/www/9to5.org/web/wp-content/plugins
     run_as: 9to5
+  LayerSlider:
+    site: forgemedia.org
+    module_root: /var/www/forgemedia.org/web/wp-content/plugins
+    run_as: arteffect-fm
+  nextend-smart-slider3-pro:
+    site: thearteffect.org
+    module_root: /var/www/thearteffect.org/web/wp-content/plugins
+    run_as: arteffect-public
+  relevanssi-premium:
+    site: justassociates.org
+    module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
+    run_as: jass
   sitepress-multilingual-cms:
     site: justassociates.org
     module_root: /var/opt/www/justassociates.org/htdocs/wp-content/plugins
