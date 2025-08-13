@@ -9,17 +9,21 @@ function run($argv) {
     help();
     exit;
   }
+  $inventory = '';
+  if (file_exists('/tmp/ansible_inventory_cache.json')) {
+    $cacheTtl = 24 * 60 * 60; // 24 hours
+    if (filemtime('/tmp/ansible_inventory_cache.json') > time() - $cacheTtl) {
+      $inventory = file_get_contents('/tmp/ansible_inventory_cache.json');
+    }
+  }
   switch ($argv[1]) {
     case '--list':
-      // "List" has caching, "Host" does not.
-      if (file_exists('/tmp/ansible_inventory_cache.json')) {
-        $cacheTtl = 24 * 60 * 60; // 24 hours
-        if (filemtime('/tmp/ansible_inventory_cache.json') > time() - $cacheTtl) {
-          $inventory = file_get_contents('/tmp/ansible_inventory_cache.json');
-          echo $inventory;
-          exit;
-        }
+    case '--host':
+      if ($inventory) {
+        echo $inventory;
+        exit;
       }
+
     case '--host':
       $headers = loginHeaders();
       // Build a group hierarchy.
@@ -67,6 +71,7 @@ function run($argv) {
 }
 
 run($argv);
+
 
 
 /**
