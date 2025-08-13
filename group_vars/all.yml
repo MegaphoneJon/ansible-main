@@ -2,7 +2,7 @@ ansible_authorized_keys: "https://ssh.megaphonetech.com/megaphonetech.pub"
 ansible_python_interpreter: /usr/bin/python3
 # fail2ban greenlist
 greenlist_ips:
-  - 69.126.42.6
+  - 24.186.23.232
 #CiviCRM extension blacklist
 extension_redlist:
   - mosaico
@@ -80,6 +80,7 @@ users:
     authorized:
       - https://ssh.megaphonetech.com/mathieu.pub
     hasdotfiles: false
+    update_password: always
 # Docker
 # Use `docker compose`, not `docker-compose`.
 docker_install_compose_plugin: true
