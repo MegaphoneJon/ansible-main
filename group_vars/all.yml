@@ -1,8 +1,5 @@
 ansible_authorized_keys: "https://ssh.megaphonetech.com/megaphonetech.pub"
 ansible_python_interpreter: /usr/bin/python3
-# fail2ban greenlist
-greenlist_ips:
-  - 24.186.23.232
 #CiviCRM extension blacklist
 extension_redlist:
   - mosaico
@@ -11,6 +8,10 @@ extension_redlist:
 primary_icinga_server: 'orange.megaphonetech.com'
 primary_icinga_server_ip: '173.255.234.245'
 apache_remove_default_vhost: true
+# fail2ban/crowdsec greenlist
+greenlist_ips:
+  - 24.186.23.232
+  - 173.255.234.245
 #temp for Apache
 apache_vhosts: []
 #PHP
