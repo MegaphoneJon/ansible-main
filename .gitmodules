@@ -175,3 +175,6 @@
 [submodule "roles/wireguard-docker"]
 	path = roles/wireguard-docker
 	url = git@github.com:MegaphoneJon/ansible-role-wireguard-docker.git
+[submodule "roles/crowdsec"]
+	path = roles/crowdsec
+	url = git@github.com:MegaphoneJon/ansible-role-crowdsec.git
