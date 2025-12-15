@@ -1,5 +1,5 @@
 ---
-- hosts: websites_test:websites_live
+- hosts: websites_test:websites_live:&maintenance_civi
   # become: yes
   # become_user: "{{ run_as_user }}"
   gather_facts: no
