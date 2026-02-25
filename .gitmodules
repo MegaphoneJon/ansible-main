@@ -178,3 +178,6 @@
 [submodule "roles/crowdsec"]
 	path = roles/crowdsec
 	url = git@github.com:MegaphoneJon/ansible-role-crowdsec.git
+[submodule "roles/scratchfolder"]
+	path = roles/scratchfolder
+	url = git@github.com:MegaphoneJon/ansible-role-scratchfolder.git
