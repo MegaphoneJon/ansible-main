@@ -15,8 +15,8 @@ greenlist_ips:
 #temp for Apache
 apache_vhosts: []
 #PHP
-php_version: '8.3'
-php_default_version_debian: '7.4'
+php_version: '8.4'
+#php_default_version_debian: '7.4'
 php_versions_install_recommends: true
 php_packages_extra:
   - php-pear
