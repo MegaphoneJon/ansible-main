@@ -35,7 +35,7 @@
     - { role: mysql-firewall, tags: mysql-firewall}
     - { role: contrib/geerlingguy.docker, tags: docker}
     - { role: contrib/geerlingguy.pip, tags: [docker, pip] }
-    - { role: promtail-docker, tags: promtail}
+#    - { role: promtail-docker, tags: promtail}
 
 - hosts: training
   become: yes
