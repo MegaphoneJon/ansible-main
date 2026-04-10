@@ -181,3 +181,6 @@
 [submodule "roles/scratchfolder"]
 	path = roles/scratchfolder
 	url = git@github.com:MegaphoneJon/ansible-role-scratchfolder.git
+[submodule "roles/azure-vm"]
+	path = roles/azure-vm
+	url = git@github.com:MegaphoneJon/ansible-role-azure-vm.git
