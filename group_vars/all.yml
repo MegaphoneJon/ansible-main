@@ -17,6 +17,7 @@ apache_vhosts: []
 #PHP
 php_version: '8.4'
 #php_default_version_debian: '7.4'
+php_apc_shm_size: "128M"
 php_versions_install_recommends: true
 php_packages_extra:
   - php-pear
