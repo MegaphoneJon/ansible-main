@@ -11,7 +11,7 @@ apache_remove_default_vhost: true
 # fail2ban/crowdsec greenlist
 greenlist_ips:
   - 24.186.23.232
-  - 173.255.234.245
+  - 67.82.105.64
 #temp for Apache
 apache_vhosts: []
 #PHP
