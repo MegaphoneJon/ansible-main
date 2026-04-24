@@ -19,6 +19,8 @@ php_version: '8.4'
 #php_default_version_debian: '7.4'
 php_apc_shm_size: "128M"
 php_versions_install_recommends: true
+# Newer versions of...PHP? geerlingguy.php? set this as blank.
+php_session_save_path: "/var/lib/php/sessions"
 php_packages_extra:
   - php-pear
   - php{{ php_version }}-gd
@@ -179,4 +181,5 @@ blocked_bots:
   - Bytespider
   - ClaudeBot
   - FriendlyCrawler
+  - Barkrowler
 
