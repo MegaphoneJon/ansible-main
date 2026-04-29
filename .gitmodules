@@ -184,3 +184,6 @@
 [submodule "roles/azure-vm"]
 	path = roles/azure-vm
 	url = git@github.com:MegaphoneJon/ansible-role-azure-vm.git
+[submodule "roles/common_vars"]
+	path = roles/common_vars
+	url = git@git.megaphonetech.com:megaphone/ansible_common_vars.git
