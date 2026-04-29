@@ -2,4 +2,5 @@
 - name: Provision VMs
   hosts: vps
   roles:
+    - { role: common_vars, tags: always }
     - { role: azure-vm, tags: azure }

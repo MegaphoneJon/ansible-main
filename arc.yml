@@ -2,6 +2,7 @@
   become: yes
 
   roles:
+  - { role: common_vars, tags: always }
   - { role: contrib/geerlingguy.docker, tags: docker}
   - { role: caddy-docker, tags: caddy }
   - { role: wireguard-docker, tags: wireguard }

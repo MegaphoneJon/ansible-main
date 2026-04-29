@@ -1,8 +1,8 @@
 ---
 - hosts: vps
   become: yes
-
   roles:
+    - { role: common_vars, tags: always }
     - { role: common, tags: common }
     - { role: users, tags: users }
     - { role: backupninja, tags: [backup, backupninja] }
@@ -11,8 +11,8 @@
 
 - hosts: lamp
   become: yes
-
   roles:
+    - { role: common_vars, tags: always }
     - { role: contrib/geerlingguy.apache, tags: [apache, deploy-site] }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
@@ -39,8 +39,8 @@
 
 - hosts: training
   become: yes
-
   roles:
+    - { role: common_vars, tags: always }
     - { role: contrib/geerlingguy.apache, tags: [apache, deploy-site] }
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
@@ -64,6 +64,7 @@
 - hosts: websites
   become: "{{ 'no' if run_as_user == ansible_user else ('no' if 'mayfirst_ng_site' in group_names else 'yes') }}"
   roles:
+    - { role: common_vars, tags: always }
     - { role: site-dns, tags: [site-dns] }
     - { role: site-user-php-apache, tags: [site-upa], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
     - { role: site-mysql, tags: [site-mysql], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
@@ -84,6 +85,7 @@
 - hosts: vps
   become: "{{ 'no' if run_as_user|default('', True) == ansible_user else 'yes' }}"
   roles:
+    - { role: common_vars, tags: always }
     # Run after deploy-site now that it monitors sites
     - { role: icinga2-satellite, tags: [icinga2, icinga2-satellite] }
     - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }
@@ -91,6 +93,7 @@
 - hosts: localhosts
   become: yes
   roles:
+    - { role: common_vars, tags: always }
     - common
     - { role: contrib/geerlingguy.apache, tags: apache }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
@@ -116,6 +119,7 @@
   become: no
   gather_facts: no
   roles:
+    - { role: common_vars, tags: always }
     - { role: cv, tags: cv }
     - { role: rsyncnet, tags: [backup, rsyncnet] }
     - { role: icinga2-primary, tags: [icinga2, icinga2-primary] }
@@ -123,10 +127,12 @@
 - hosts: redis
   become: yes
   roles:
+    - { role: common_vars, tags: always }
     - { role: contrib/geerlingguy.redis, tags: redis }
     - { role: redis-additional, tags: redis }
 
 - hosts: docker
   become: yes
   roles:
+    - { role: common_vars, tags: always }
     - { role: contrib/geerlingguy.docker, tags: docker}
