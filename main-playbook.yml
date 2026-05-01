@@ -17,7 +17,7 @@
     - { role: cv, tags: cv }
     - { role: contrib/geerlingguy.mysql, tags: mysql }
     - { role: mysql-additional, tags: [mysql, mysql-additional] }
-    - { role: contrib/geerlingguy.php-versions , tags: [php, php-versions] }
+    - { role: php-pre, tags: [php, php-versions] }
     - { role: contrib/geerlingguy.php , tags: php }
     - { role: contrib/geerlingguy.apache-php-fpm , tags: php }
     - { role: php-additional , tags: [php, php-additional] }
