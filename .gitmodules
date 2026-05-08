@@ -187,3 +187,6 @@
 [submodule "roles/common_vars"]
 	path = roles/common_vars
 	url = git@git.megaphonetech.com:megaphone/ansible_common_vars.git
+[submodule "roles/php-pre"]
+	path = roles/php-pre
+	url = https://github.com/MegaphoneJon/ansible-role-php-pre.git
