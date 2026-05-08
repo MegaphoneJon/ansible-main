@@ -190,3 +190,6 @@
 [submodule "roles/php-pre"]
 	path = roles/php-pre
 	url = https://github.com/MegaphoneJon/ansible-role-php-pre.git
+[submodule "roles/site-wp-security"]
+	path = roles/site-wp-security
+	url = https://github.com/MegaphoneJon/ansible-role-site-wp-security.git

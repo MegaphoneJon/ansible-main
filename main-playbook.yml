@@ -77,6 +77,7 @@
     - { role: site-postinstall-config, tags: [site-postinstall-config] }
     - { role: site-standard-extensions, tags: [site-standard-extensions]}
     - { role: site-wp-monitor, tags: [site-wp-monitor] }
+    - { role: site-wp-security, tags: [site-wp-security] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
     - { role: site-cron, tags: [site-cron], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
     - { role: site-robots-txt, tags: [site-robots-txt] }
