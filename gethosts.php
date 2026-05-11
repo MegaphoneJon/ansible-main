@@ -187,12 +187,12 @@ function buildServerList($servers, $websites) {
       $websiteGroups = explode(', ', $website['website_groups']) ?? NULL;
       foreach ($websiteGroups as $websiteGroup) {
         if ($websiteGroup) {
-          $inventory[$websiteGroup][] = $website['bare_url'];
+          $inventory[$websiteGroup]['hosts'][] = $website['bare_url'];
         }
       }
       // Put sites in groups based on environment.
       $envGroup = 'websites_' . strtolower($website['env']);
-      $inventory[$envGroup][] = $website['bare_url'];
+      $inventory[$envGroup]['hosts'][] = $website['bare_url'];
       // Also create maintenance groups.
       $maintenanceArray = [
         'maintenance_drupal' => 'Drupal',
@@ -201,15 +201,15 @@ function buildServerList($servers, $websites) {
       ];
       foreach ($maintenanceArray as $group => $descriptor) {
         if (strpos($website['contract_type'], $descriptor . ' Maintenance') !== FALSE && $website['cms'] == $descriptor) {
-          $inventory[$group][] = $website['bare_url'];
+          $inventory[$group]['hosts'][] = $website['bare_url'];
         }
       }
       // Drupal8 hack, sigh. Fix when D7 is no more.
       if (strpos($website['contract_type'], 'Drupal Maintenance') !== FALSE && $website['cms'] === 'Drupal8') {
-        $inventory['maintenance_drupal8'][] = $website['bare_url'];
+        $inventory['maintenance_drupal8']['hosts'][] = $website['bare_url'];
       }
       if (strpos($website['contract_type'], 'Civi Maintenance') !== false && $website['civicrm'] === 'Yes') {
-        $inventory['maintenance_civi'][] = $website['bare_url'];
+        $inventory['maintenance_civi']['hosts'][] = $website['bare_url'];
       }
       // Also put website data in the metadata of their respective server for building Icinga templates.}
       $parentServer = $inventory['_meta']['hostvars'][$website['server']] ?? NULL;
