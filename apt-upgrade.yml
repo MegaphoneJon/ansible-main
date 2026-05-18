@@ -1,6 +1,6 @@
 ---
 # This provisions any VPSes that were defined but not built in server-list
-- hosts: vps
+- hosts: maintenance_vps
   become: yes
 
   tasks:
