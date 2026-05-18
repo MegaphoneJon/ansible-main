@@ -73,7 +73,6 @@ function run($argv) {
 run($argv);
 
 
-
 /**
  * Generates site mapping for bookmarklets to change between environments.  Not strictly Ansible but uses the inventory.
  */
@@ -158,6 +157,10 @@ function buildServerList($servers, $websites) {
       if ($server['security_ssh_port'] != 22) {
         $inventory['_meta']['hostvars'][$server['fqdn']]['ansible_port'] = $server['security_ssh_port'];
       }
+      // maintenance_vps needs to be pulled from the contract terms
+      if ($key == 'contract_type' && str_contains($value, 'VPS')) {
+        $inventory['maintenance_vps']['hosts'][] = $server['fqdn'];
+      }
     }
     // Put servers in groups.
     $groups = explode(', ', $server['group']);
@@ -171,7 +174,6 @@ function buildServerList($servers, $websites) {
         $ignoredServers[$server['hostname']] = TRUE;
         continue 2;
       }
-      $inventory[$group]['hosts'][] = $server['fqdn'];
     }
   }
   // Websites go in their own group.
