@@ -174,6 +174,7 @@ function buildServerList($servers, $websites) {
         $ignoredServers[$server['hostname']] = TRUE;
         continue 2;
       }
+      $inventory[$group]['hosts'][] = $server['fqdn'];
     }
   }
   // Websites go in their own group.
