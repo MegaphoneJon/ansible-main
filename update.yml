@@ -6,7 +6,7 @@
     - {role: mayfirst, tags: always}
 
 - name: Update sites
-  hosts: websites_test:websites_live
+  hosts: maintenance_civi:maintenance_drupal:maintenance_drupal8:maintenance_wp:!websites_dev
   become: "{{ 'false' if run_as_user == ansible_user else ('false' if 'mayfirst_ng_site' in group_names else 'true') }}"
   gather_facts: false
 
