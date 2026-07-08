@@ -1,0 +1,7 @@
+name: megaphonejon/icinga-greenlist
+description: "Greenlist calls to Icinga"
+filter: "evt.Meta.target_fqdn == 'icinga.megaphonetech.com' && evt.Meta.log_type in ['http_access-log', 'http_error-log']"
+whitelist:
+  reason: "Icinga greenlist"
+  expression: 
+    - "evt.Meta.target_fqdn == 'icinga.megaphonetech.com'"
