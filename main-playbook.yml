@@ -66,10 +66,10 @@
   roles:
     - { role: common_vars, tags: always }
     - { role: site-dns, tags: [site-dns] }
-    - { role: site-user-php-apache, tags: [site-upa], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
-    - { role: site-mysql, tags: [site-mysql], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
-    - { role: nosudo-backup, tags: [backup, nosudo-backup], when: run_as_user == ansible_user or 'mayfirst_ng_site' in group_names }
-    - { role: rsyncnet, tags: [backup, rsyncnet], when: run_as_user == ansible_user or 'mayfirst_ng_site' in group_names }
+    - { role: site-user-php-apache, tags: [site-upa], when: not nosudo }
+    - { role: site-mysql, tags: [site-mysql], when: not nosudo }
+    - { role: nosudo-backup, tags: [backup, nosudo-backup], when: nosudo }
+    - { role: rsyncnet, tags: [backup, rsyncnet], when: nosudo }
     - { role: site-gitea, tags: [site-gitea] }
     - { role: deploy-site, tags: [site-main] }
     - { role: site-db-sync-initial, tags: [site-db-sync-initial] }
@@ -79,8 +79,9 @@
     - { role: site-wp-monitor, tags: [site-wp-monitor] }
     - { role: site-wp-security, tags: [site-wp-security] }
     - { role: site-drupal-monitor, tags: [site-drupal-monitor] }
-    - { role: site-cron, tags: [site-cron], when: run_as_user != ansible_user and 'mayfirst_ng_site' not in group_names }
+    - { role: site-cron, tags: [site-cron], when: not nosudo }
     - { role: site-robots-txt, tags: [site-robots-txt] }
+    - { role: site-envrc, tags: [site-envrc], when: not nosudo }
 #    - { role: monitoring, tags: monitoring }
 
 - hosts: vps
