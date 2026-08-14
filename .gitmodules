@@ -193,3 +193,6 @@
 [submodule "roles/site-wp-security"]
 	path = roles/site-wp-security
 	url = https://github.com/MegaphoneJon/ansible-role-site-wp-security.git
+[submodule "roles/site-envrc"]
+	path = roles/site-envrc
+	url = https://github.com/MegaphoneJon/ansible-role-site-envrc.git
