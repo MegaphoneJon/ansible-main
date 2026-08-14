@@ -1,4 +1,10 @@
 ---
+- hosts: mayfirst_ng,mayfirst_ng_site
+  become: false
+  gather_facts: false
+  roles:
+    - {role: mayfirst, tags: [clear-drush, show-drush]}
+
 - hosts: websites_test:websites_live:&maintenance_civi
   # become: yes
   # become_user: "{{ run_as_user }}"
@@ -80,7 +86,7 @@
     tags: something-else, something_else
 
   - name: Collect last 10 errors in watchdog
-    shell: "PATH=$HOME/bin:$PATH;drush --root='{{ webroot }}' watchdog:show --severity=3"
+    shell: "PATH=$HOME/bin:{{ gitroot }}/vendor/bin:$PATH;drush --root='{{ webroot }}' watchdog:show --severity=3"
     when: cms == 'Drupal' or cms == 'Drupal8'
     register: drushmessages
     tags: clear-drush, show-drush
@@ -93,6 +99,6 @@
     changed_when: false
 
   - name: Clear errors in watchdog
-    shell: "PATH=$HOME/bin:$PATH;drush --yes --root='{{ webroot }}' watchdog:delete --severity=3"
+    shell: "PATH=$HOME/bin:{{ gitroot }}/vendor/bin:$PATH;drush --yes --root='{{ webroot }}' watchdog:delete --severity=3"
     when: cms == 'Drupal' or cms == 'Drupal8' and drushmessages.stdout != ''
     tags: clear-drush
